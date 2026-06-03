@@ -11,19 +11,16 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   return (
     /* 
        THE TRUE FULLSCREEN LOCK:
-       - width: 100vw ensures it completely fills the Safari viewport.
-       - No maxWidth constraints, so iOS doesn't try to scale it differently.
+       - Since body is position: fixed, AppShell just fills 100% of it.
+       - This eliminates double-fixed conflicts on Safari.
     */
     <div style={{
-      position: "fixed",
-      inset: 0,
-      width: "100vw",
+      width: "100%",
       height: "100%",
       background: "#131313",
       display: "flex",
       flexDirection: "column",
       overflow: "hidden",
-      zIndex: 1,
     }}>
       {/* 
           Main Content Container:
@@ -36,7 +33,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         display: "flex", 
         flexDirection: "column", 
         overflow: "hidden",
-        paddingTop: "env(safe-area-inset-top, 0px)",
+        paddingTop: "max(env(safe-area-inset-top), 20px)",
         position: "relative",
       }}>
         {children}

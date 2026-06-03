@@ -113,7 +113,7 @@ function SettingRow({ label, sublabel, last=false }: { label: string; sublabel?:
 /* ══ Settings panel ═══════════════════════════════════════════════ */
 function SettingsPanel({ onClose }: { onClose: () => void }) {
   return (
-    <div style={{ position:"absolute", inset:0, background:BG, zIndex:70, overflowY:"auto", scrollbarWidth:"none" }}>
+    <div style={{ position:"absolute", inset:0, background:BG, zIndex:70, overflowY:"auto", scrollbarWidth:"none", paddingTop:"max(env(safe-area-inset-top), 20px)" }}>
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"16px 20px 0" }}>
         <span style={{ fontSize:10, color:T3, letterSpacing:1.8, textTransform:"uppercase", fontWeight:600 }}>Settings</span>
         <button aria-label="Close" onClick={onClose} style={{ background:SURFACE2, border:`1px solid ${BORDER}`, cursor:"pointer", color:T2, width:32, height:32, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"inherit" }}>
@@ -151,7 +151,7 @@ function AccountPanel({ onClose }: { onClose: () => void }) {
     </svg>
   );
   return (
-    <div style={{ position:"absolute", inset:0, background:BG, zIndex:70, overflowY:"auto", scrollbarWidth:"none" }}>
+    <div style={{ position:"absolute", inset:0, background:BG, zIndex:70, overflowY:"auto", scrollbarWidth:"none", paddingTop:"max(env(safe-area-inset-top), 20px)" }}>
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"16px 20px 0" }}>
         <span style={{ fontSize:10, color:T3, letterSpacing:1.8, textTransform:"uppercase", fontWeight:600 }}>Account</span>
         <button aria-label="Close" onClick={onClose} style={{ background:SURFACE2, border:`1px solid ${BORDER}`, cursor:"pointer", color:T2, width:32, height:32, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"inherit" }}>
