@@ -521,21 +521,17 @@ export default function DashboardClient() {
           <NightlyPulse filter={filter} />
         </div>
 
-        <div style={{ padding: "16px 18px 16px", borderBottom: `1px solid ${LINE}` }}>
-          <SectionLabel text="Top neighborhoods" right="Map ↗" />
-          <TopNeighborhoods />
-        </div>
-
-        <div style={{ padding: "12px 18px 4px" }}>
-          <p style={{ fontSize: 10, fontWeight: 600, color: T4, letterSpacing: 2, textTransform: "uppercase", margin: "0 0 6px" }}>City dashboard</p>
-        </div>
-
         <div style={{ display: "flex", flexDirection: "column", gap: 10, padding: "4px 18px 24px" }}>
           <EventsByTimePreview      filter={filter} blocks={data.timeBlocks} onOpen={() => setOpenModal("events")} />
           <CategoryBreakdownPreview stats={data.categoryStats}              onOpen={() => setOpenModal("categories")} />
           <WeatherImpactPreview     weather={data.weather}                  onOpen={() => setOpenModal("weather")} />
           <SafetyCautionPreview     items={data.safetyItems}                onOpen={() => setOpenModal("safety")} />
           <TransitDisruptionPreview routes={mockDashboard.transitRoutes}   onOpen={() => setOpenModal("transit")} />
+        </div>
+
+        <div style={{ padding: "16px 18px 32px", borderTop: `1px solid ${LINE}` }}>
+          <SectionLabel text="Top neighborhoods" right="Map ↗" />
+          <TopNeighborhoods />
         </div>
       </main>
 

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { DM_Sans } from "next/font/google";
 import "./globals.css";
 import AppShell from "../components/AppShell";
+import GlobalErrorHandler from "../components/GlobalErrorHandler";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -47,6 +48,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={dmSans.variable}>
       <body className={dmSans.className}>
+        <GlobalErrorHandler />
         <AppShell>{children}</AppShell>
       </body>
     </html>
