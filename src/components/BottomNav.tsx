@@ -327,8 +327,3 @@ export default function BottomNav() {
     </>
   );
 }
-pen(false)}/>}
-      {accountOpen  && <AccountPanel  onClose={() => setAccountOpen(false)}/>}
-    </>
-  );
-}
