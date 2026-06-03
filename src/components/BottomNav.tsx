@@ -269,9 +269,13 @@ export default function BottomNav() {
     <>
       <div style={{
         display:"flex", justifyContent:"space-around", alignItems:"center",
-        paddingTop: 12,
-        paddingBottom: "calc(16px + env(safe-area-inset-bottom, 0px))",
-        background:"rgba(19,19,19,0.98)",
+        paddingTop: 10,
+        /* 
+           The padding-bottom here handles the PWA home indicator.
+           In the Safari browser, the address bar handles itself.
+        */
+        paddingBottom: "max(env(safe-area-inset-bottom, 0px), 14px)",
+        background:BG,
         borderTop:`1px solid ${LINE}`,
         flexShrink:0, width:"100%", zIndex:40,
       }}>

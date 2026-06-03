@@ -9,18 +9,15 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const showNav = !isLanding;
 
   return (
-    /*
-       THE TRUE FULLSCREEN LOCK:
-       - body is sized with 100dvh, so this absolute (inset: 0) shell fills it
-         precisely in both Safari and iOS standalone (Add to Home Screen) mode.
-       - This eliminates double-fixed conflicts on Safari.
+    /* 
+       NATURAL FLOW SHELL:
+       - No fixed or absolute positioning on the root.
+       - Uses display: flex to fill the 100dvh body naturally.
+       - This prevents Safari from "guessing" the height and shifting the UI.
     */
     <div style={{
-      position: "absolute",
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
+      width: "100%",
+      height: "100%",
       background: "#131313",
       display: "flex",
       flexDirection: "column",
