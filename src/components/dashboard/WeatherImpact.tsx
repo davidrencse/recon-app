@@ -3,9 +3,9 @@
 import type { WeatherData, WeatherConditionCode, ImpactLevel } from "../../types/dashboard";
 
 /* ── Design tokens ────────────────────────────────────────────── */
-const T_PRIMARY = "#f0f0f0";
-const T_MUTED   = "#888";
-const T_DIM     = "#444";
+const T_PRIMARY = "#f2f2f2";
+const T_MUTED   = "#9a9a9a";
+const T_DIM     = "#4e4e4e";
 
 /* ── Weather icons (SVG) ──────────────────────────────────────── */
 function CloudRainIcon({ size = 40 }: { size?: number }) {
@@ -234,9 +234,9 @@ export function WeatherImpactPreview({
       aria-label={`Weather impact — ${weather.condition}, ${weather.temperature}°C. Tap to expand.`}
       style={{
         width: "100%",
-        background: "#111",
-        border: "1px solid rgba(255,255,255,0.07)",
-        borderRadius: 14,
+        background: "#1c1c1c",
+        border: "1px solid rgba(255,255,255,0.08)",
+        borderRadius: 18,
         padding: "14px 14px 14px",
         cursor: "pointer",
         textAlign: "left" as const,
@@ -248,7 +248,7 @@ export function WeatherImpactPreview({
       <div style={{ marginBottom: 12 }}>
         <span
           style={{
-            fontSize: 9.5,
+            fontSize: 10,
             fontWeight: 700,
             color: "#555",
             letterSpacing: 1.8,
@@ -309,9 +309,9 @@ export function WeatherImpactModal({ weather }: { weather: WeatherData }) {
       {/* Reference-image style header */}
       <div
         style={{
-          background: "#0f0f0f",
-          border: "1px solid rgba(255,255,255,0.07)",
-          borderRadius: 12,
+          background: "#1a1a1a",
+          border: "1px solid rgba(255,255,255,0.08)",
+          borderRadius: 14,
           padding: "16px 16px 14px",
           marginBottom: 16,
           color: T_PRIMARY,
@@ -358,9 +358,9 @@ export function WeatherImpactModal({ weather }: { weather: WeatherData }) {
           display: "flex",
           gap: 0,
           marginBottom: 16,
-          background: "#0f0f0f",
-          border: "1px solid rgba(255,255,255,0.07)",
-          borderRadius: 12,
+          background: "#1a1a1a",
+          border: "1px solid rgba(255,255,255,0.08)",
+          borderRadius: 14,
           overflow: "hidden",
         }}
       >
@@ -457,7 +457,7 @@ export function WeatherImpactModal({ weather }: { weather: WeatherData }) {
                   fontSize: 11,
                   color: T_MUTED,
                   background: "#1a1a1a",
-                  border: "1px solid rgba(255,255,255,0.07)",
+                  border: "1px solid rgba(255,255,255,0.08)",
                   borderRadius: 9999,
                   padding: "4px 10px",
                 }}

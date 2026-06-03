@@ -4,9 +4,9 @@ import { useState } from "react";
 import type { CategoryStat, CategoryKey } from "../../types/dashboard";
 
 /* ── Design tokens ────────────────────────────────────────────── */
-const T_PRIMARY = "#f0f0f0";
-const T_MUTED   = "#888";
-const T_DIM     = "#444";
+const T_PRIMARY = "#f2f2f2";
+const T_MUTED   = "#9a9a9a";
+const T_DIM     = "#4e4e4e";
 
 /* ── Category colors (monochrome shades) ──────────────────────── */
 const CAT_COLORS: Record<CategoryKey, string> = {
@@ -269,7 +269,7 @@ function CategoryDetail({ stat }: { stat: CategoryStat }) {
             fontSize: 11,
             color: T_DIM,
             background: "#1a1a1a",
-            border: "1px solid rgba(255,255,255,0.07)",
+            border: "1px solid rgba(255,255,255,0.08)",
             borderRadius: 9999,
             padding: "2px 8px",
             marginLeft: "auto",
@@ -313,9 +313,9 @@ export function CategoryBreakdownPreview({
       aria-label={`Category breakdown — ${total} total pins. Tap to expand.`}
       style={{
         width: "100%",
-        background: "#111",
-        border: "1px solid rgba(255,255,255,0.07)",
-        borderRadius: 14,
+        background: "#1c1c1c",
+        border: "1px solid rgba(255,255,255,0.08)",
+        borderRadius: 18,
         padding: "14px 14px 12px",
         cursor: "pointer",
         textAlign: "left" as const,
@@ -332,7 +332,7 @@ export function CategoryBreakdownPreview({
       >
         <span
           style={{
-            fontSize: 9.5,
+            fontSize: 10,
             fontWeight: 700,
             color: "#555",
             letterSpacing: 1.8,

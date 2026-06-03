@@ -4,12 +4,12 @@ import { useState } from "react";
 import type { EventTimeBlock, EventItem, TimeBlock, DashboardFilter } from "../../types/dashboard";
 
 /* ── Design tokens ────────────────────────────────────────────── */
-const T_PRIMARY = "#f0f0f0";
-const T_MUTED   = "#888";
-const T_DIM     = "#444";
+const T_PRIMARY = "#f2f2f2";
+const T_MUTED   = "#9a9a9a";
+const T_DIM     = "#4e4e4e";
 const BAR_PEAK  = "#e8e8e8";
-const BAR_MID   = "#2c2c2c";
-const BAR_REST  = "#1a1a1a";
+const BAR_MID   = "#2e2e2e";
+const BAR_REST  = "#1e1e1e";
 
 /* ── Bar inner content (shared between interactive and static bars) ── */
 function BarContent({
@@ -258,10 +258,10 @@ export function EventsByTimePreview({
       aria-label={`Events by time — ${total} events ${filterLabel[filter]}. Tap to expand.`}
       style={{
         width: "100%",
-        background: "#111",
-        border: "1px solid rgba(255,255,255,0.07)",
-        borderRadius: 14,
-        padding: "14px 14px 12px",
+        background: "#1c1c1c",
+        border: "1px solid rgba(255,255,255,0.08)",
+        borderRadius: 18,
+        padding: "15px 15px 13px",
         cursor: "pointer",
         textAlign: "left",
       }}
@@ -277,9 +277,9 @@ export function EventsByTimePreview({
       >
         <span
           style={{
-            fontSize: 9.5,
-            fontWeight: 700,
-            color: "#555",
+            fontSize: 10,
+            fontWeight: 600,
+            color: "#4e4e4e",
             letterSpacing: 1.8,
             textTransform: "uppercase" as const,
           }}

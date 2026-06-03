@@ -2,6 +2,13 @@
 
 import { useEffect, useRef } from "react";
 
+const BG      = "#131313";
+const SURFACE = "#1c1c1c";
+const LINE    = "rgba(255,255,255,0.05)";
+const BORDER  = "rgba(255,255,255,0.09)";
+const T1      = "#f2f2f2";
+const T2      = "#9a9a9a";
+
 interface DashboardModalProps {
   title: string;
   children: React.ReactNode;
@@ -12,9 +19,7 @@ export default function DashboardModal({ title, children, onClose }: DashboardMo
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
+    const handleKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     document.addEventListener("keydown", handleKey);
     containerRef.current?.focus();
     return () => document.removeEventListener("keydown", handleKey);
@@ -28,71 +33,40 @@ export default function DashboardModal({ title, children, onClose }: DashboardMo
       ref={containerRef}
       tabIndex={-1}
       style={{
-        position: "absolute",
-        inset: 0,
-        zIndex: 60,
-        background: "#080808",
-        display: "flex",
-        flexDirection: "column",
-        outline: "none",
-        overflowY: "auto",
-        scrollbarWidth: "none",
+        position: "absolute", inset: 0, zIndex: 60,
+        background: BG, display: "flex", flexDirection: "column",
+        outline: "none", overflowY: "auto", scrollbarWidth: "none",
       }}
     >
-      {/* Drag handle */}
+      {/* Handle */}
       <div style={{ display: "flex", justifyContent: "center", padding: "14px 0 8px", flexShrink: 0 }}>
-        <div style={{ width: 36, height: 4, borderRadius: 2, background: "rgba(255,255,255,0.12)" }} />
+        <div style={{ width: 36, height: 4, borderRadius: 2, background: "rgba(255,255,255,0.1)" }} />
       </div>
 
       {/* Header */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "0 18px 14px",
-          borderBottom: "1px solid rgba(255,255,255,0.06)",
-          flexShrink: 0,
-        }}
-      >
-        <span style={{ fontSize: 16, fontWeight: 700, color: "#f0f0f0", letterSpacing: -0.3 }}>
-          {title}
-        </span>
+      <div style={{
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        padding: "0 20px 14px", borderBottom: `1px solid ${LINE}`, flexShrink: 0,
+      }}>
+        <span style={{ fontSize: 17, fontWeight: 700, color: T1, letterSpacing: -0.4 }}>{title}</span>
         <button
           onClick={onClose}
           aria-label="Close"
           style={{
-            width: 34,
-            height: 34,
-            borderRadius: "50%",
-            background: "#1a1a1a",
-            border: "1px solid rgba(255,255,255,0.08)",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            color: "#888",
-            flexShrink: 0,
+            width: 34, height: 34, borderRadius: "50%",
+            background: SURFACE, border: `1px solid ${BORDER}`,
+            cursor: "pointer", display: "flex", alignItems: "center",
+            justifyContent: "center", color: T2, flexShrink: 0, fontFamily: "inherit",
           }}
         >
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <line x1="18" y1="6" x2="6" y2="18" />
-            <line x1="6" y1="6" x2="18" y2="18" />
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
           </svg>
         </button>
       </div>
 
-      {/* Scrollable content */}
-      <div style={{ flex: 1, padding: "18px 18px 48px", overflowY: "auto", scrollbarWidth: "none" }}>
+      {/* Content */}
+      <div style={{ flex: 1, padding: "18px 20px 48px", overflowY: "auto", scrollbarWidth: "none" }}>
         {children}
       </div>
     </div>
