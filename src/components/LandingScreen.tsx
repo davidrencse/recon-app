@@ -2,19 +2,20 @@
 
 import Link from "next/link";
 
-function ReconRLogo() {
+function ReconLogo() {
   return (
     <div style={{
-      width: 96, height: 96, borderRadius: 22,
-      background: "#1c1c1c",
+      width: 100, height: 100, borderRadius: 22,
+      overflow: "hidden",
       border: "1px solid rgba(255,255,255,0.08)",
       display: "flex", alignItems: "center", justifyContent: "center",
+      background: "#000",
     }}>
-      <svg width="52" height="52" viewBox="0 0 100 100" fill="none" stroke="white" strokeWidth="8.5" strokeLinecap="round" strokeLinejoin="round">
-        <line x1="24" y1="78" x2="24" y2="24"/>
-        <path d="M 24 24 C 24 18 72 18 72 40 C 72 58 48 60 38 60"/>
-        <line x1="38" y1="60" x2="74" y2="80"/>
-      </svg>
+      <img 
+        src="/logo.png" 
+        alt="Recon Logo" 
+        style={{ width: "100%", height: "100%", objectFit: "cover" }} 
+      />
     </div>
   );
 }
@@ -45,7 +46,7 @@ export default function LandingScreen() {
 
           {/* Logo */}
           <div style={{ display: "flex", justifyContent: "center", paddingTop: 52, marginBottom: 36 }}>
-            <ReconRLogo />
+            <ReconLogo />
           </div>
 
           {/* Headline */}

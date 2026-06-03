@@ -26,6 +26,10 @@ export const metadata: Metadata = {
   title: "Recon",
   description: "See your city, as it is, right now.",
   manifest: "/manifest.json",
+  icons: {
+    icon: "/icon-192.png",
+    apple: "/apple-touch-icon.png",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",

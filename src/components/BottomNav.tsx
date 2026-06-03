@@ -143,12 +143,12 @@ function SettingsPanel({ onClose }: { onClose: () => void }) {
 
 /* ══ Account panel ════════════════════════════════════════════════ */
 function AccountPanel({ onClose }: { onClose: () => void }) {
-  const R_LOGO = (
-    <svg width="20" height="20" viewBox="0 0 100 100" fill="none" stroke="white" strokeWidth="9" strokeLinecap="round" strokeLinejoin="round">
-      <line x1="24" y1="78" x2="24" y2="24"/>
-      <path d="M 24 24 C 24 18 72 18 72 40 C 72 58 48 60 38 60"/>
-      <line x1="38" y1="60" x2="74" y2="80"/>
-    </svg>
+  const LOGO_IMG = (
+    <img 
+      src="/logo.png" 
+      alt="R" 
+      style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 12 }} 
+    />
   );
   return (
     <div style={{ position:"absolute", inset:0, background:BG, zIndex:70, overflowY:"auto", scrollbarWidth:"none", paddingTop:"max(env(safe-area-inset-top), 20px)" }}>
@@ -160,7 +160,9 @@ function AccountPanel({ onClose }: { onClose: () => void }) {
       </div>
       <div style={{ margin:"16px 20px 0", background:"#111", borderRadius:22, padding:"24px 22px", border:`1px solid ${BORDER_M}` }}>
         <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", marginBottom:20 }}>
-          <div style={{ width:40, height:40, borderRadius:12, background:SURFACE2, border:`1px solid ${BORDER}`, display:"flex", alignItems:"center", justifyContent:"center" }}>{R_LOGO}</div>
+          <div style={{ width:40, height:40, borderRadius:12, background:SURFACE2, border:`1px solid ${BORDER}`, display:"flex", alignItems:"center", justifyContent:"center", overflow: "hidden" }}>
+            {LOGO_IMG}
+          </div>
           <span style={{ fontSize:8, color:"rgba(255,255,255,0.25)", letterSpacing:3, textTransform:"uppercase" as const, fontWeight:700, paddingTop:4 }}>RECON™</span>
         </div>
         <div style={{ fontSize:22, fontWeight:800, color:T1, letterSpacing:-0.3, textTransform:"uppercase" as const, marginBottom:18, lineHeight:1.2 }}>Member —<br/>All Access</div>
