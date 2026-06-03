@@ -9,16 +9,16 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const showNav = !isLanding;
 
   return (
-    /* 
-       FINAL NUCLEAR FIX:
-       - position: fixed + inset: 0 locks the app to the viewport.
-       - height: 100dvh handles the mobile address bar perfectly in all browsers.
-    */
     <div style={{
       position: "fixed",
       inset: 0,
       width: "100%",
-      maxWidth: 430,
+      /* 
+         "ZOOMED IN" FIX: 
+         - Remove maxWidth on small mobile screens to let it fill the space.
+         - On desktop, keep the 430px container for mobile-app preview.
+      */
+      maxWidth: "100%", 
       margin: "0 auto",
       height: "100dvh",
       background: "#131313",
@@ -26,24 +26,35 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       flexDirection: "column",
       overflow: "hidden",
       zIndex: 1,
-      /* 
-         Purposeful downward shift: 
-         Add an extra 10px buffer to ensure it NEVER shifts into the status bar area.
-      */
-      paddingTop: "calc(env(safe-area-inset-top, 0px) + 10px)",
+      paddingTop: "calc(env(safe-area-inset-top, 0px) + 6px)",
     }}>
-      <div style={{ 
-        flex: 1, 
-        minHeight: 0, 
-        display: "flex", 
-        flexDirection: "column", 
-        overflow: "hidden",
+      {/* 
+          Media query style simulation:
+          Using a wrapper to enforce 430px max-width ONLY if screen is wider than mobile.
+      */}
+      <div style={{
+        flex: 1,
+        display: "flex",
+        flexDirection: "column",
+        width: "100%",
+        maxWidth: 430,
+        margin: "0 auto",
+        minHeight: 0,
         position: "relative",
       }}>
-        {children}
+        <div style={{ 
+          flex: 1, 
+          minHeight: 0, 
+          display: "flex", 
+          flexDirection: "column", 
+          overflow: "hidden",
+          position: "relative",
+        }}>
+          {children}
+        </div>
+        
+        {showNav && <BottomNav />}
       </div>
-      
-      {showNav && <BottomNav />}
     </div>
   );
 }

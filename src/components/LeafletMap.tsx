@@ -106,7 +106,7 @@ function LeafletMap({ pins, selectedPin, onPinSelect }: LeafletMapProps) {
     <MapContainer
       preferCanvas
       center={[49.2827, -123.1207]}
-      zoom={13}
+      zoom={15}
       scrollWheelZoom
       zoomControl={false}
       attributionControl={false}
