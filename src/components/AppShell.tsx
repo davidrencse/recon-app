@@ -11,12 +11,15 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   return (
     /* 
        THE TRUE FULLSCREEN LOCK:
-       - Since body is position: fixed, AppShell just fills 100% of it.
+       - Since body uses -webkit-fill-available, AppShell absolute fills it precisely.
        - This eliminates double-fixed conflicts on Safari.
     */
     <div style={{
-      width: "100%",
-      height: "100%",
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
       background: "#131313",
       display: "flex",
       flexDirection: "column",
