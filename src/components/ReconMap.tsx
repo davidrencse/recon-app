@@ -290,14 +290,14 @@ export default function ReconMap() {
   }, [selectedPin, visiblePins]);
 
   return (
-    <>
+    <div style={{ display: "flex", flexDirection: "column", height: "100%", minHeight: 0, position: "relative" }}>
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "4px 16px 10px", flexShrink: 0 }}>
           <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(22,22,22,0.95)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
             <ReconLogo />
           </div>
           <div style={{ flex: 1, display: "flex", justifyContent: "center" }}>
-            <button style={{ display: "flex", alignItems: "center", gap: 5, color: "#fff", fontSize: 16, fontWeight: 600, background: "none", border: "none", cursor: "pointer" }}>
+            <button style={{ display: "flex", alignItems: "center", gap: 5, color: "#fff", fontSize: 16, fontWeight: 600, background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}>
               <IconMapPin />Vancouver<IconChevron />
             </button>
           </div>
@@ -322,6 +322,7 @@ export default function ReconMap() {
                 outline: "none",
                 color: "#f0f0f0",
                 fontSize: 14,
+                fontFamily: "inherit",
               }}
             />
             {searchQuery && (
@@ -361,6 +362,7 @@ export default function ReconMap() {
                   color: active ? "#0a0a0a" : "#888",
                   border: active ? "none" : "1px solid rgba(255,255,255,0.08)",
                   cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0,
+                  fontFamily: "inherit",
                 }}
               >
                 {FILTER_ICON[f.key]}
@@ -394,6 +396,6 @@ export default function ReconMap() {
             <PinPopup pin={selectedPin} onClose={() => setSelectedPin(null)} />
           )}
         </div>
-    </>
+    </div>
   );
 }

@@ -129,7 +129,7 @@ export default function HomeScreen() {
   }, [active, searchQuery, uniqueData]);
 
   return (
-    <>
+    <div style={{ display: "flex", flexDirection: "column", height: "100%", minHeight: 0, position: "relative" }}>
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", padding: "12px 20px 0", gap: 10, flexShrink: 0 }}>
           <ReconSmall />
@@ -176,6 +176,7 @@ export default function HomeScreen() {
                 background: "transparent",
                 color: "#f0f0f0",
                 fontSize: 13.5,
+                fontFamily: "inherit",
               }}
             />
             {searchQuery && (
@@ -213,6 +214,7 @@ export default function HomeScreen() {
                 color: active === f.key ? "#0a0a0a" : "#666",
                 border: active === f.key ? "none" : "1px solid rgba(255,255,255,0.07)",
                 cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0,
+                fontFamily: "inherit",
               }}
             >
               {f.icon}{f.label}
@@ -244,6 +246,6 @@ export default function HomeScreen() {
             )}
           </div>
         </div>
-    </>
+    </div>
   );
 }

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { mockDashboard } from "../lib/mockDashboard";
-import type { DashboardFilter, AreaFilter } from "../types/dashboard";
+import type { DashboardFilter } from "../types/dashboard";
 import DashboardModal from "./DashboardModal";
 import { EventsByTimePreview, EventsByTimeModal } from "./dashboard/EventsByTime";
 import { CategoryBreakdownPreview, CategoryBreakdownModal } from "./dashboard/CategoryBreakdown";
@@ -11,24 +11,24 @@ import { SafetyCautionPreview, SafetyCautionModal } from "./dashboard/SafetyCaut
 import { TransitDisruptionPreview, TransitDisruptionModal } from "./dashboard/TransitDisruption";
 
 /* ══════════════════════════════════════════════════════════════
-   DESIGN TOKENS  (inspired by reference: warm-dark stack, DM Sans)
+   DESIGN TOKENS
 ══════════════════════════════════════════════════════════════ */
 const BG        = "#131313";
-const SURFACE   = "#1c1c1c";   // card / tile
-const SURFACE2  = "#222222";   // elevated surface
-const SURFACE3  = "#2a2a2a";   // active / highlight
+const SURFACE   = "#1c1c1c";
+const SURFACE2  = "#222222";
+const SURFACE3  = "#2a2a2a";
 
 const LINE      = "rgba(255,255,255,0.05)";
 const BORDER    = "rgba(255,255,255,0.08)";
 const BORDER_M  = "rgba(255,255,255,0.11)";
 
-const T1        = "#f2f2f2";   // primary text
-const T2        = "#9a9a9a";   // secondary
-const T3        = "#4e4e4e";   // label / dim
-const T4        = "#2e2e2e";   // very dim
+const T1        = "#f2f2f2";
+const T2        = "#9a9a9a";
+const T3        = "#4e4e4e";
+const T4        = "#2e2e2e";
 
 /* ══════════════════════════════════════════════════════════════
-   HEADER ICONS
+   ICONS
 ══════════════════════════════════════════════════════════════ */
 function IconBell() {
   return (
@@ -61,9 +61,6 @@ function IconTrendUp() {
     </svg>
   );
 }
-/* ══════════════════════════════════════════════════════════════
-   RECON R LOGO
-══════════════════════════════════════════════════════════════ */
 function ReconLogo() {
   return (
     <svg width="19" height="19" viewBox="0 0 100 100" fill="none" stroke="white" strokeWidth="9" strokeLinecap="round" strokeLinejoin="round">
@@ -75,7 +72,7 @@ function ReconLogo() {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   SEGMENTED FILTER (inspired by reference's tab control shape)
+   UI COMPONENTS
 ══════════════════════════════════════════════════════════════ */
 function SegmentedFilter({
   options,
@@ -114,6 +111,7 @@ function SegmentedFilter({
               letterSpacing: isActive ? -0.1 : 0,
               transition: "background 120ms, color 120ms",
               whiteSpace: "nowrap" as const,
+              fontFamily: "inherit",
             }}
           >
             {o.label}
@@ -124,57 +122,10 @@ function SegmentedFilter({
   );
 }
 
-/* ══════════════════════════════════════════════════════════════
-   CALENDAR DATA
-══════════════════════════════════════════════════════════════ */
-const CAT_COLORS = {
-  live:      "#ef4444",
-  food:      "#6366f1",
-  spots:     "#22c55e",
-  popups:    "#f59e0b",
-  nightlife: "#ec4899",
-} as const;
-type CalCat = keyof typeof CAT_COLORS;
-
-interface CalEvent {
-  id: string; date: number; time: string; title: string;
-  subtitle: string; cat: CalCat; count: number;
-}
-const CAL_EVENTS: CalEvent[] = [
-  { id:"c1",  date:2,  time:"18:00", title:"Alex G + Slow Pulp",        subtitle:"Commodore Ballroom · Granville", cat:"live",      count:48 },
-  { id:"c2",  date:2,  time:"19:30", title:"Granville Island market",   subtitle:"Public Market · Kitsilano",      cat:"food",      count:12 },
-  { id:"c3",  date:2,  time:"22:00", title:"Granville Strip peaks",     subtitle:"Multiple venues · Granville",    cat:"nightlife", count:31 },
-  { id:"c4",  date:3,  time:"11:00", title:"Sunday brunch pop-up",      subtitle:"Fable · Kitsilano",              cat:"food",      count:14 },
-  { id:"c5",  date:3,  time:"12:00", title:"Trout Lake farmers market", subtitle:"Trout Lake Park · East Van",     cat:"spots",     count:19 },
-  { id:"c6",  date:3,  time:"20:00", title:"Jazz residency",            subtitle:"Guilt & Co · Gastown",          cat:"live",      count:22 },
-  { id:"c7",  date:5,  time:"10:00", title:"Stanley Park sunrise hike", subtitle:"Stanley Park Pavilion",          cat:"spots",     count:8  },
-  { id:"c8",  date:7,  time:"21:00", title:"DJ night at The Biltmore",  subtitle:"The Biltmore · Mt Pleasant",     cat:"nightlife", count:27 },
-  { id:"c9",  date:10, time:"18:00", title:"Tofino oysters pop-up",     subtitle:"Pier 7 · Coal Harbour",          cat:"food",      count:22 },
-  { id:"c10", date:12, time:"20:00", title:"Rooftop cinema",            subtitle:"Cineplex Odeon · Granville",     cat:"live",      count:33 },
-  { id:"c11", date:12, time:"22:30", title:"Late set at Fox Cabaret",   subtitle:"Fox Cabaret · Mt Pleasant",      cat:"nightlife", count:19 },
-  { id:"c12", date:14, time:"11:00", title:"Vintage clothing market",   subtitle:"Main & 20th · Mt Pleasant",      cat:"popups",    count:16 },
-  { id:"c13", date:14, time:"14:00", title:"Kits Beach volleyball open",subtitle:"Kitsilano Beach",                cat:"spots",     count:9  },
-  { id:"c14", date:18, time:"19:00", title:"Yuno b2b Sansibar",         subtitle:"Open Studios · Strathcona",      cat:"live",      count:31 },
-  { id:"c15", date:21, time:"10:00", title:"Solstice sunrise walk",     subtitle:"Spanish Banks Beach",            cat:"spots",     count:11 },
-  { id:"c16", date:24, time:"16:00", title:"Street food pop-up",        subtitle:"Robson Square · Downtown",       cat:"popups",    count:28 },
-];
-
-/* ══════════════════════════════════════════════════════════════
-   MINI CALENDAR
-══════════════════════════════════════════════════════════════ */
 function MiniCalendar({ onOpen }: { onOpen: () => void }) {
   const [month, setMonth] = useState(5);
   const [year, setYear] = useState(2026);
   const todayDate = month === 5 && year === 2026 ? 2 : -1;
-
-  const dotsByDate: Record<number, string[]> = {};
-  if (month === 5 && year === 2026) {
-    CAL_EVENTS.forEach((e) => {
-      if (!dotsByDate[e.date]) dotsByDate[e.date] = [];
-      const col = CAT_COLORS[e.cat];
-      if (!dotsByDate[e.date].includes(col)) dotsByDate[e.date].push(col);
-    });
-  }
 
   const firstDayJS = new Date(year, month, 1).getDay();
   const offset = firstDayJS === 0 ? 6 : firstDayJS - 1;
@@ -207,41 +158,23 @@ function MiniCalendar({ onOpen }: { onOpen: () => void }) {
       </div>
       {weeks.map((week, wi) => (
         <div key={wi} style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)" }}>
-          {week.map((d, di) => {
-            const dots = d ? (dotsByDate[d] ?? []).slice(0, 3) : [];
-            return (
-              <div key={di} style={{ display: "flex", flexDirection: "column", alignItems: "center", paddingBottom: 1 }}>
-                <div style={{ width: 20, height: 20, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", background: d === todayDate ? T1 : "transparent", fontSize: 9.5, fontWeight: d === todayDate ? 700 : 400, color: d === todayDate ? "#0d0d0d" : d ? "#7a7a7a" : "transparent" }}>
-                  {d ?? ""}
-                </div>
-                <div style={{ height: 5, display: "flex", alignItems: "center", gap: 1.5, justifyContent: "center" }}>
-                  {dots.map((col, ci) => <div key={ci} style={{ width: 3, height: 3, borderRadius: "50%", background: col }} />)}
-                </div>
+          {week.map((d, di) => (
+            <div key={di} style={{ display: "flex", flexDirection: "column", alignItems: "center", paddingBottom: 1 }}>
+              <div style={{ width: 20, height: 20, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", background: d === todayDate ? T1 : "transparent", fontSize: 9.5, fontWeight: d === todayDate ? 700 : 400, color: d === todayDate ? "#0d0d0d" : d ? "#7a7a7a" : "transparent" }}>
+                {d ?? ""}
               </div>
-            );
-          })}
+              <div style={{ height: 5 }} />
+            </div>
+          ))}
         </div>
       ))}
     </div>
   );
 }
 
-/* ══════════════════════════════════════════════════════════════
-   LIVE CARD
-══════════════════════════════════════════════════════════════ */
 function LiveCard({ filter }: { filter: DashboardFilter }) {
   const data = mockDashboard[filter];
   const total = data.categoryStats.reduce((s, c) => s + c.count, 0);
-
-  const sparkData = mockDashboard.postsByHour["today"].slice(3, 10).map((h) => h.count);
-  const sMin = Math.min(...sparkData), sMax = Math.max(...sparkData);
-  const sRange = sMax - sMin || 1;
-  const sW = 118, sH = 26;
-  const pts = sparkData.map((v, i) => ({
-    x: (i / (sparkData.length - 1)) * sW,
-    y: sH - ((v - sMin) / sRange) * sH,
-  }));
-  const path = pts.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(" ");
 
   return (
     <div style={{ background: SURFACE, borderRadius: 18, border: `1px solid ${BORDER}`, padding: "15px 15px 12px", flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
@@ -251,18 +184,10 @@ function LiveCard({ filter }: { filter: DashboardFilter }) {
       </div>
       <div style={{ fontSize: 46, fontWeight: 800, color: T1, lineHeight: 1, marginBottom: 6, letterSpacing: -2.5 }}>{total}</div>
       <div style={{ fontSize: 12, color: T2, marginBottom: "auto" }}>+9 in the last 15 min</div>
-      <div style={{ marginTop: 14 }}>
-        <svg width={sW + 2} height={sH + 2} style={{ display: "block" }}>
-          <path d={path} fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-      </div>
     </div>
   );
 }
 
-/* ══════════════════════════════════════════════════════════════
-   STAT CHIPS
-══════════════════════════════════════════════════════════════ */
 function StatChip({ label, value, delta, up }: { label: string; value: string; delta: string; up: boolean }) {
   return (
     <div style={{ background: SURFACE, borderRadius: 16, border: `1px solid ${BORDER}`, padding: "14px 13px 12px", flex: 1 }}>
@@ -275,9 +200,6 @@ function StatChip({ label, value, delta, up }: { label: string; value: string; d
   );
 }
 
-/* ══════════════════════════════════════════════════════════════
-   NIGHTLY PULSE
-══════════════════════════════════════════════════════════════ */
 function NightlyPulse({ filter }: { filter: DashboardFilter }) {
   const allHours = mockDashboard.postsByHour[filter];
   const showHours = [14,15,16,17,18,19,20,21,22,23,0,1];
@@ -309,13 +231,8 @@ function NightlyPulse({ filter }: { filter: DashboardFilter }) {
           const label = b.hour === 0 ? "00" : b.hour === 1 ? "01" : `${b.hour}`;
           return (
             <g key={b.hour}>
-              <rect x={x} y={y} width={barW} height={barH} rx={5}
-                fill={isPeak ? T1 : SURFACE2}
-              />
-              <text x={x + barW / 2} y={chartH + 14} textAnchor="middle"
-                fill={isPeak ? T1 : T3} fontSize={9} fontFamily="inherit" fontWeight={isPeak ? 700 : 400}>
-                {label}
-              </text>
+              <rect x={x} y={y} width={barW} height={barH} rx={5} fill={isPeak ? T1 : SURFACE2} />
+              <text x={x + barW / 2} y={chartH + 14} textAnchor="middle" fill={isPeak ? T1 : T3} fontSize={9} fontFamily="inherit" fontWeight={isPeak ? 700 : 400}>{label}</text>
             </g>
           );
         })}
@@ -324,21 +241,12 @@ function NightlyPulse({ filter }: { filter: DashboardFilter }) {
   );
 }
 
-/* ══════════════════════════════════════════════════════════════
-   TOP NEIGHBORHOODS
-══════════════════════════════════════════════════════════════ */
-const AREA_DELTAS: Partial<Record<AreaFilter, string>> = {
-  downtown:"+12%", granville:"+8%", gastown:"+5%", robson:"-3%",
-  kitsilano:"+15%", "mount-pleasant":"+9%", ubc:"-1%", "stanley-park":"+2%",
-};
-
 function TopNeighborhoods() {
   const all = mockDashboard.areaStats.slice(0, 5);
   const maxTotal = mockDashboard.areaStats[0]?.total ?? 1;
   return (
     <div style={{ display: "flex", flexDirection: "column" }}>
       {all.map((a, idx) => {
-        const delta = AREA_DELTAS[a.key];
         const barPct = Math.round((a.total / maxTotal) * 100);
         return (
           <div key={a.key} style={{ paddingTop: idx === 0 ? 0 : 10, paddingBottom: 10, borderBottom: idx < all.length - 1 ? `1px solid ${LINE}` : "none" }}>
@@ -347,7 +255,6 @@ function TopNeighborhoods() {
               <span style={{ width: 6, height: 6, borderRadius: "50%", background: SURFACE3, flexShrink: 0 }} />
               <span style={{ flex: 1, fontSize: 13.5, fontWeight: 700, color: T1, letterSpacing: -0.2 }}>{a.label}</span>
               <span style={{ fontSize: 13.5, fontWeight: 700, color: T1 }}>{a.total}</span>
-              {delta && <span style={{ fontSize: 11, fontWeight: 500, color: T2, width: 38, textAlign: "right" }}>{delta}</span>}
             </div>
             <div style={{ marginLeft: 32, height: 2, background: SURFACE2, borderRadius: 9999, overflow: "hidden" }}>
               <div style={{ height: "100%", width: `${barPct}%`, background: SURFACE3, borderRadius: 9999 }} />
@@ -359,145 +266,11 @@ function TopNeighborhoods() {
   );
 }
 
-/* ══════════════════════════════════════════════════════════════
-   SECTION LABEL
-══════════════════════════════════════════════════════════════ */
 function SectionLabel({ text, right }: { text: string; right?: React.ReactNode }) {
   return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
       <p style={{ fontSize: 10, fontWeight: 600, color: T3, letterSpacing: 1.8, textTransform: "uppercase", margin: 0 }}>{text}</p>
       {right && <div style={{ fontSize: 10.5, color: T3 }}>{right}</div>}
-    </div>
-  );
-}
-
-/* ══════════════════════════════════════════════════════════════
-   CALENDAR MODAL
-══════════════════════════════════════════════════════════════ */
-function CalendarModal({ onClose }: { onClose: () => void }) {
-  const [month, setMonth] = useState(5);
-  const [year, setYear] = useState(2026);
-  const [selected, setSelected] = useState(2);
-  const TODAY_DATE = 2, TODAY_MONTH = 5;
-  const mNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-  const sNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-  const prev = () => { if (month===0){setMonth(11);setYear(y=>y-1);}else setMonth(m=>m-1); };
-  const next = () => { if (month===11){setMonth(0);setYear(y=>y+1);}else setMonth(m=>m+1); };
-
-  const firstDayJS = new Date(year, month, 1).getDay();
-  const offset = firstDayJS === 0 ? 6 : firstDayJS - 1;
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const cells: (number | null)[] = [];
-  for (let i=0;i<offset;i++) cells.push(null);
-  for (let d=1;d<=daysInMonth;d++) cells.push(d);
-  while (cells.length % 7 !== 0) cells.push(null);
-  const weeks: (number | null)[][] = [];
-  for (let i=0;i<cells.length;i+=7) weeks.push(cells.slice(i,i+7));
-
-  const monthEvents = month === TODAY_MONTH && year === 2026 ? CAL_EVENTS : [];
-  const dotsByDate: Record<number, string[]> = {};
-  monthEvents.forEach((e) => {
-    if (!dotsByDate[e.date]) dotsByDate[e.date] = [];
-    const col = CAT_COLORS[e.cat];
-    if (!dotsByDate[e.date].includes(col)) dotsByDate[e.date].push(col);
-  });
-  const selectedEvents = monthEvents.filter((e) => e.date === selected).sort((a,b) => a.time.localeCompare(b.time));
-  const isToday = (d: number) => d === TODAY_DATE && month === TODAY_MONTH && year === 2026;
-
-  const navBtnStyle: React.CSSProperties = {
-    width: 34, height: 34, borderRadius: 9999, display: "flex", alignItems: "center", justifyContent: "center",
-    background: SURFACE2, border: `1px solid ${BORDER}`, color: T2, cursor: "pointer", fontSize: 16, flexShrink: 0,
-  };
-  const LEGEND: { key: CalCat; label: string }[] = [
-    { key:"live", label:"Live" }, { key:"food", label:"Food" }, { key:"spots", label:"Spots" }, { key:"popups", label:"Pop-ups" }, { key:"nightlife", label:"Nightlife" },
-  ];
-
-  return (
-    <div style={{ position: "absolute", inset: 0, background: BG, zIndex: 60, display: "flex", flexDirection: "column", overflowY: "auto", scrollbarWidth: "none" }}>
-      <div style={{ padding: "20px 20px 10px", flexShrink: 0 }}>
-        <div style={{ fontSize: 12, color: T3, marginBottom: 5, letterSpacing: 0.5 }}>{mNames[month]} {year}</div>
-        <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 10 }}>
-          <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
-            <span style={{ fontSize: 52, fontWeight: 800, color: T1, lineHeight: 1, letterSpacing: -3 }}>{monthEvents.length}</span>
-            <span style={{ fontSize: 14, color: T3 }}>events on the radar</span>
-          </div>
-          <div style={{ display: "flex", gap: 6, paddingBottom: 6 }}>
-            <button onClick={prev} style={navBtnStyle}>‹</button>
-            <button onClick={next} style={navBtnStyle}>›</button>
-          </div>
-        </div>
-      </div>
-
-      <div style={{ padding: "0 14px", flexShrink: 0 }}>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", marginBottom: 6 }}>
-          {["M","T","W","T","F","S","S"].map((d, i) => (
-            <div key={i} style={{ textAlign: "center", fontSize: 11, fontWeight: 600, color: T3, padding: "4px 0", letterSpacing: 0.5 }}>{d}</div>
-          ))}
-        </div>
-        {weeks.map((week, wi) => (
-          <div key={wi} style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", marginBottom: 2 }}>
-            {week.map((d, di) => {
-              const sel = d === selected && month === TODAY_MONTH && year === 2026;
-              const today = d !== null && isToday(d);
-              const dots = (d && dotsByDate[d]) ? dotsByDate[d].slice(0, 3) : [];
-              return (
-                <div key={di} onClick={() => d && setSelected(d)} style={{ display: "flex", flexDirection: "column", alignItems: "center", cursor: d ? "pointer" : "default" }}>
-                  <div style={{ width: 36, height: 36, borderRadius: 9999, display: "flex", alignItems: "center", justifyContent: "center", background: sel ? SURFACE2 : "transparent", border: sel ? `1px solid ${BORDER_M}` : today ? `1px solid rgba(255,255,255,0.2)` : "none" }}>
-                    <span style={{ fontSize: 15, fontWeight: sel || today ? 700 : 400, color: d ? (sel || today ? T1 : "#666") : "transparent" }}>{d ?? ""}</span>
-                  </div>
-                  <div style={{ height: 8, display: "flex", alignItems: "center", gap: 2, justifyContent: "center", marginTop: 1 }}>
-                    {dots.map((col, ci) => <div key={ci} style={{ width: 5, height: 5, borderRadius: "50%", background: col }} />)}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        ))}
-      </div>
-
-      <div style={{ display: "flex", gap: 14, padding: "10px 20px 12px", borderTop: `1px solid ${LINE}`, flexShrink: 0, overflowX: "auto", scrollbarWidth: "none" }}>
-        {LEGEND.map((l) => (
-          <div key={l.key} style={{ display: "flex", alignItems: "center", gap: 5, flexShrink: 0 }}>
-            <div style={{ width: 7, height: 7, borderRadius: "50%", background: CAT_COLORS[l.key] }} />
-            <span style={{ fontSize: 12, color: T2 }}>{l.label}</span>
-          </div>
-        ))}
-      </div>
-
-      <div style={{ flex: 1, padding: "4px 20px 0", borderTop: `1px solid ${LINE}` }}>
-        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", padding: "16px 0 10px" }}>
-          {isToday(selected) ? (
-            <span style={{ fontSize: 18, fontWeight: 700, color: T1 }}><strong>Today</strong>, {sNames[month]} {selected}</span>
-          ) : (
-            <span style={{ fontSize: 18, fontWeight: 700, color: T1 }}>{sNames[month]} {selected}</span>
-          )}
-          <span style={{ fontSize: 12, color: T3 }}>{selectedEvents.length} events</span>
-        </div>
-        {selectedEvents.length === 0 ? (
-          <p style={{ fontSize: 13, color: T3, padding: "12px 0" }}>Nothing on the radar for this date.</p>
-        ) : (
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            {selectedEvents.map((ev, idx) => (
-              <div key={ev.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 0", borderBottom: idx < selectedEvents.length - 1 ? `1px solid ${LINE}` : "none" }}>
-                <span style={{ fontSize: 12, fontWeight: 500, color: T3, width: 46, flexShrink: 0, fontVariantNumeric: "tabular-nums" }}>{ev.time}</span>
-                <span style={{ width: 8, height: 8, borderRadius: "50%", background: CAT_COLORS[ev.cat], flexShrink: 0 }} />
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: T1, marginBottom: 3 }}>{ev.title}</div>
-                  <div style={{ fontSize: 11.5, color: T3 }}>{ev.subtitle}</div>
-                </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={T3} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                  <span style={{ fontSize: 12, color: T3 }}>{ev.count}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      <div style={{ padding: "16px 20px 28px", flexShrink: 0 }}>
-        <button onClick={onClose} style={{ width: "100%", height: 48, borderRadius: 14, background: SURFACE, border: `1px solid ${BORDER}`, color: T2, fontSize: 14, fontWeight: 500, cursor: "pointer", fontFamily: "inherit" }}>Close</button>
-      </div>
     </div>
   );
 }
@@ -522,7 +295,7 @@ export default function DashboardClient() {
   const close = () => setOpenModal(null);
 
   return (
-    <>
+    <div style={{ display: "flex", flexDirection: "column", height: "100%", minHeight: 0, position: "relative" }}>
       {/* ── TOP BAR ── */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 18px 8px", flexShrink: 0 }}>
         <div style={{ width: 40, height: 40, borderRadius: 13, background: SURFACE, border: `1px solid ${BORDER}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
@@ -545,8 +318,7 @@ export default function DashboardClient() {
       </div>
 
       {/* ── SCROLLABLE BODY ── */}
-      <main style={{ flex: 1, overflowY: "auto", scrollbarWidth: "none" }}>
-
+      <main style={{ flex: 1, minHeight: 0, overflowY: "auto", scrollbarWidth: "none" }}>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, padding: "14px 18px 10px" }}>
           <LiveCard filter={filter} />
           <MiniCalendar onOpen={() => setCalendarOpen(true)} />
@@ -578,17 +350,23 @@ export default function DashboardClient() {
           <SafetyCautionPreview     items={data.safetyItems}                onOpen={() => setOpenModal("safety")} />
           <TransitDisruptionPreview routes={mockDashboard.transitRoutes}   onOpen={() => setOpenModal("transit")} />
         </div>
-
       </main>
 
-      {/* ── OVERLAYS (position absolute → scoped to AppShell's outer container) ── */}
-      {calendarOpen && <CalendarModal onClose={() => setCalendarOpen(false)} />}
+      {/* ── MODALS ── */}
+      {calendarOpen && (
+        <div style={{ position: "absolute", inset: 0, background: BG, zIndex: 60, display: "flex", flexDirection: "column", overflowY: "auto", scrollbarWidth: "none" }}>
+          <div style={{ padding: "20px 20px 28px", flex: 1 }}>
+             <p style={{ color: T1 }}>Calendar coming soon...</p>
+             <button onClick={() => setCalendarOpen(false)} style={{ padding: "10px 20px", background: SURFACE, border: `1px solid ${BORDER}`, color: T1, cursor: "pointer" }}>Close</button>
+          </div>
+        </div>
+      )}
 
       {openModal === "events"     && <DashboardModal title="Events by time"     onClose={close}><EventsByTimeModal filter={filter} blocks={data.timeBlocks} events={data.events} /></DashboardModal>}
       {openModal === "categories" && <DashboardModal title="Category breakdown" onClose={close}><CategoryBreakdownModal stats={data.categoryStats} /></DashboardModal>}
       {openModal === "weather"    && <DashboardModal title="Weather impact"     onClose={close}><WeatherImpactModal weather={data.weather} /></DashboardModal>}
       {openModal === "safety"     && <DashboardModal title="Safety caution"     onClose={close}><SafetyCautionModal items={data.safetyItems} /></DashboardModal>}
       {openModal === "transit"    && <DashboardModal title="Transit disruption" onClose={close}><TransitDisruptionModal routes={mockDashboard.transitRoutes} /></DashboardModal>}
-    </>
+    </div>
   );
 }

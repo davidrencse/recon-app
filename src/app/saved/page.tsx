@@ -237,7 +237,7 @@ export default function SavedPage() {
   const isEmpty = visiblePlaces.length === 0 && visiblePosts.length === 0;
 
   return (
-    <>
+    <div style={{ display: "flex", flexDirection: "column", height: "100%", minHeight: 0, position: "relative" }}>
         {/* Header */}
         <div style={{ padding: "14px 20px 12px", flexShrink: 0, borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
           <div style={{ fontSize: 24, fontWeight: 800, color: "#f0f0f0", letterSpacing: -0.3, marginBottom: 2 }}>Saved</div>
@@ -263,6 +263,7 @@ export default function SavedPage() {
                   color: active ? "#0a0a0a" : "#666",
                   border: active ? "none" : "1px solid rgba(255,255,255,0.07)",
                   cursor: "pointer", whiteSpace: "nowrap",
+                  fontFamily: "inherit",
                 }}
                 aria-pressed={active}
               >
@@ -332,6 +333,6 @@ export default function SavedPage() {
             </>
           )}
         </main>
-    </>
+    </div>
   );
 }
