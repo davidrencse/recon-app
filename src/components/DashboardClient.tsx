@@ -522,9 +522,7 @@ export default function DashboardClient() {
   const close = () => setOpenModal(null);
 
   return (
-    /* No outer container — AppShell provides maxWidth/height/position:relative */
-    <div style={{ display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }}>
-
+    <>
       {/* ── TOP BAR ── */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 18px 8px", flexShrink: 0 }}>
         <div style={{ width: 40, height: 40, borderRadius: 13, background: SURFACE, border: `1px solid ${BORDER}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
@@ -591,6 +589,6 @@ export default function DashboardClient() {
       {openModal === "weather"    && <DashboardModal title="Weather impact"     onClose={close}><WeatherImpactModal weather={data.weather} /></DashboardModal>}
       {openModal === "safety"     && <DashboardModal title="Safety caution"     onClose={close}><SafetyCautionModal items={data.safetyItems} /></DashboardModal>}
       {openModal === "transit"    && <DashboardModal title="Transit disruption" onClose={close}><TransitDisruptionModal routes={mockDashboard.transitRoutes} /></DashboardModal>}
-    </div>
+    </>
   );
 }
