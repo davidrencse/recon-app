@@ -22,6 +22,7 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: "Recon",
   description: "See your city, as it is, right now.",
+  manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
