@@ -269,12 +269,13 @@ export default function BottomNav() {
     <>
       <div style={{
         display:"flex", justifyContent:"space-around", alignItems:"center",
-        height:"calc(60px + env(safe-area-inset-bottom, 0px))",
-        paddingTop:8,
-        paddingBottom:"env(safe-area-inset-bottom, 0px)",
-        background:"rgba(19,19,19,0.97)",
+        /* Fixed height + safe area handling */
+        height: 64,
+        paddingBottom: "env(safe-area-inset-bottom, 0px)",
+        background:"rgba(19,19,19,0.98)",
         borderTop:`1px solid ${LINE}`,
         flexShrink:0, width:"100%", zIndex:40,
+        boxSizing: "content-box",
       }}>
         {NAV_ITEMS.map((item) => {
           const active = pathname === item.href;

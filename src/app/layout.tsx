@@ -11,12 +11,15 @@ const dmSans = DM_Sans({
 });
 
 /* 
-   RECOMMENDED PWA FIX:
-   Precise viewport settings to prevent Safari "Desktop Mode" rendering.
+   THE FORCED MOBILE VIEWPORT:
+   - initialScale 1.0 + maximumScale 1.0 + userScalable false
+   - This is the most aggressive way to prevent Safari from zooming out.
 */
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
   viewportFit: "cover",
   themeColor: "#131313",
 };
@@ -25,9 +28,19 @@ export const metadata: Metadata = {
   title: "Recon",
   description: "See your city, as it is, right now.",
   manifest: "/manifest.json",
+  /* 
+     iOS APP ICON FIX:
+     - iOS REQUIRES PNG for the home screen icon. SVG will not show up.
+     - I am pointing to icon-192.png and apple-touch-icon.png.
+  */
   icons: {
-    icon: "/next.svg",
-    apple: "/next.svg",
+    icon: [
+      { url: "/next.svg", type: "image/svg+xml" },
+      { url: "/icon-192.png", type: "image/png", sizes: "192x192" },
+    ],
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
   },
   appleWebApp: {
     capable: true,

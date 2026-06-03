@@ -10,34 +10,40 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     /* 
-       RECOMMENDED PWA FIX:
-       Simplified app wrapper using standard flex layout.
-       Filling 100% of the phone screen natively.
+       THE ROCK-SOLID MOBILE LOCK:
+       - position: fixed + inset: 0 locks the app to the visual viewport.
+       - height: 100% inside fixed is the safest way to prevent Safari UI shifts.
+       - overflow: hidden prevents the entire app from being "pulled up".
     */
     <div style={{
+      position: "fixed",
+      inset: 0,
       width: "100%",
-      minHeight: "100dvh",
+      maxWidth: 430,
+      margin: "0 auto",
+      height: "100%",
       background: "#131313",
       display: "flex",
       flexDirection: "column",
-      margin: "0 auto",
-      /* 
-         On desktop, we maintain the 430px mobile preview.
-         On mobile, it fills the width.
-      */
-      maxWidth: 430, 
+      overflow: "hidden",
+      zIndex: 1,
     }}>
-      {/* Main content area fills all space above navigation */}
-      <main style={{ 
+      {/* 
+          Main Content Container:
+          - padding-top handles notches.
+          - flex: 1 ensures it fills exactly the space above the navbar.
+      */}
+      <div style={{ 
         flex: 1, 
+        minHeight: 0, 
         display: "flex", 
         flexDirection: "column", 
-        minHeight: 0,
-        width: "100%",
+        overflow: "hidden",
         paddingTop: "env(safe-area-inset-top, 0px)",
+        position: "relative",
       }}>
         {children}
-      </main>
+      </div>
       
       {showNav && <BottomNav />}
     </div>
