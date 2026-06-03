@@ -269,13 +269,11 @@ export default function BottomNav() {
     <>
       <div style={{
         display:"flex", justifyContent:"space-around", alignItems:"center",
-        /* Fixed height + safe area handling */
-        height: 64,
-        paddingBottom: "env(safe-area-inset-bottom, 0px)",
+        paddingTop: 12,
+        paddingBottom: "calc(16px + env(safe-area-inset-bottom, 0px))",
         background:"rgba(19,19,19,0.98)",
         borderTop:`1px solid ${LINE}`,
         flexShrink:0, width:"100%", zIndex:40,
-        boxSizing: "content-box",
       }}>
         {NAV_ITEMS.map((item) => {
           const active = pathname === item.href;
@@ -325,6 +323,11 @@ export default function BottomNav() {
         />
       )}
       {settingsOpen && <SettingsPanel onClose={() => setSettingsOpen(false)}/>}
+      {accountOpen  && <AccountPanel  onClose={() => setAccountOpen(false)}/>}
+    </>
+  );
+}
+pen(false)}/>}
       {accountOpen  && <AccountPanel  onClose={() => setAccountOpen(false)}/>}
     </>
   );

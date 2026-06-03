@@ -28,20 +28,6 @@ export const metadata: Metadata = {
   title: "Recon",
   description: "See your city, as it is, right now.",
   manifest: "/manifest.json",
-  /* 
-     iOS APP ICON FIX:
-     - iOS REQUIRES PNG for the home screen icon. SVG will not show up.
-     - I am pointing to icon-192.png and apple-touch-icon.png.
-  */
-  icons: {
-    icon: [
-      { url: "/next.svg", type: "image/svg+xml" },
-      { url: "/icon-192.png", type: "image/png", sizes: "192x192" },
-    ],
-    apple: [
-      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
-    ],
-  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",

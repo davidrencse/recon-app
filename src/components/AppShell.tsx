@@ -10,17 +10,14 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     /* 
-       THE ROCK-SOLID MOBILE LOCK:
-       - position: fixed + inset: 0 locks the app to the visual viewport.
-       - height: 100% inside fixed is the safest way to prevent Safari UI shifts.
-       - overflow: hidden prevents the entire app from being "pulled up".
+       THE TRUE FULLSCREEN LOCK:
+       - width: 100vw ensures it completely fills the Safari viewport.
+       - No maxWidth constraints, so iOS doesn't try to scale it differently.
     */
     <div style={{
       position: "fixed",
       inset: 0,
-      width: "100%",
-      maxWidth: 430,
-      margin: "0 auto",
+      width: "100vw",
       height: "100%",
       background: "#131313",
       display: "flex",
