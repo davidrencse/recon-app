@@ -16,12 +16,19 @@
   --font-mono: "SF Mono", "Fira Code", "Fira Mono", monospace;
 }
 
-/* 
-   RECOMMENDED PWA FIXES:
-   Standard mobile resets with -webkit-fill-available to fix iOS Safari upward shifts.
+/*
+   PWA VIEWPORT HEIGHT:
+   Use dynamic viewport height (100dvh) so the app fills the screen exactly in
+   BOTH iOS Safari and iOS standalone (Add to Home Screen) mode.
+
+   The old `-webkit-fill-available` hack mis-computes in standalone mode on iOS —
+   it resolves shorter than the real screen, leaving dead space at the bottom and
+   making everything look shifted up. `100dvh` (iOS 15.4+) is the correct fix and
+   covers the dynamic Safari toolbar too. `100vh` stays as a fallback for old engines.
 */
 html {
-  height: -webkit-fill-available;
+  height: 100vh;
+  height: 100dvh;
   width: 100%;
   margin: 0;
   padding: 0;
@@ -30,8 +37,8 @@ html {
 }
 
 body {
-  min-height: 100vh;
-  min-height: -webkit-fill-available;
+  height: 100vh;
+  height: 100dvh;
   width: 100%;
   margin: 0;
   padding: 0;

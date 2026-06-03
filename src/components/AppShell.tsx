@@ -9,9 +9,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const showNav = !isLanding;
 
   return (
-    /* 
+    /*
        THE TRUE FULLSCREEN LOCK:
-       - Since body uses -webkit-fill-available, AppShell absolute fills it precisely.
+       - body is sized with 100dvh, so this absolute (inset: 0) shell fills it
+         precisely in both Safari and iOS standalone (Add to Home Screen) mode.
        - This eliminates double-fixed conflicts on Safari.
     */
     <div style={{
