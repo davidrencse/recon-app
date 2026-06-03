@@ -20,7 +20,6 @@ const SURFACE3  = "#2a2a2a";
 
 const LINE      = "rgba(255,255,255,0.05)";
 const BORDER    = "rgba(255,255,255,0.08)";
-const BORDER_M  = "rgba(255,255,255,0.11)";
 
 const T1        = "#f2f2f2";
 const T2        = "#9a9a9a";
@@ -123,21 +122,10 @@ function SegmentedFilter({
 }
 
 function MiniCalendar({ onOpen }: { onOpen: () => void }) {
-  const [month, setMonth] = useState(5);
-  const [year, setYear] = useState(2026);
-  const todayDate = month === 5 && year === 2026 ? 2 : -1;
-
-  const firstDayJS = new Date(year, month, 1).getDay();
-  const offset = firstDayJS === 0 ? 6 : firstDayJS - 1;
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const cells: (number | null)[] = [];
-  for (let i = 0; i < offset; i++) cells.push(null);
-  for (let d = 1; d <= daysInMonth; d++) cells.push(d);
-  while (cells.length % 7 !== 0) cells.push(null);
-  const weeks: (number | null)[][] = [];
-  for (let i = 0; i < cells.length; i += 7) weeks.push(cells.slice(i, i + 7));
+  const [month] = useState(5);
+  const [year] = useState(2026);
+  const todayDate = 2;
   const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-  const btnStyle: React.CSSProperties = { background: "none", border: "none", cursor: "pointer", color: T3, fontSize: 15, padding: "0 4px", lineHeight: 1 };
 
   return (
     <div
@@ -146,28 +134,21 @@ function MiniCalendar({ onOpen }: { onOpen: () => void }) {
     >
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 9 }}>
         <span style={{ fontSize: 12.5, fontWeight: 700, color: T1, letterSpacing: -0.2 }}>{monthNames[month]} {year}</span>
-        <div style={{ display: "flex" }}>
-          <button onClick={(e) => { e.stopPropagation(); if (month===0){setMonth(11);setYear(y=>y-1);}else setMonth(m=>m-1); }} style={btnStyle}>‹</button>
-          <button onClick={(e) => { e.stopPropagation(); if (month===11){setMonth(0);setYear(y=>y+1);}else setMonth(m=>m+1); }} style={btnStyle}>›</button>
-        </div>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", marginBottom: 2 }}>
         {["M","T","W","T","F","S","S"].map((d, i) => (
           <div key={i} style={{ textAlign: "center", fontSize: 9, fontWeight: 600, color: T3, paddingBottom: 3, letterSpacing: 0.5 }}>{d}</div>
         ))}
       </div>
-      {weeks.map((week, wi) => (
-        <div key={wi} style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)" }}>
-          {week.map((d, di) => (
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)" }}>
+          {[null,null,1,2,3,4,5].map((d, di) => (
             <div key={di} style={{ display: "flex", flexDirection: "column", alignItems: "center", paddingBottom: 1 }}>
               <div style={{ width: 20, height: 20, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", background: d === todayDate ? T1 : "transparent", fontSize: 9.5, fontWeight: d === todayDate ? 700 : 400, color: d === todayDate ? "#0d0d0d" : d ? "#7a7a7a" : "transparent" }}>
                 {d ?? ""}
               </div>
-              <div style={{ height: 5 }} />
             </div>
           ))}
-        </div>
-      ))}
+      </div>
     </div>
   );
 }
@@ -295,7 +276,14 @@ export default function DashboardClient() {
   const close = () => setOpenModal(null);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100%", minHeight: 0, position: "relative" }}>
+    <div style={{ 
+      flex: 1, 
+      display: "flex", 
+      flexDirection: "column", 
+      minHeight: 0, 
+      position: "relative",
+      width: "100%",
+    }}>
       {/* ── TOP BAR ── */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 18px 8px", flexShrink: 0 }}>
         <div style={{ width: 40, height: 40, borderRadius: 13, background: SURFACE, border: `1px solid ${BORDER}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
@@ -354,7 +342,7 @@ export default function DashboardClient() {
 
       {/* ── MODALS ── */}
       {calendarOpen && (
-        <div style={{ position: "absolute", inset: 0, background: BG, zIndex: 60, display: "flex", flexDirection: "column", overflowY: "auto", scrollbarWidth: "none" }}>
+        <div style={{ position: "absolute", inset: 0, background: BG, zIndex: 100, display: "flex", flexDirection: "column" }}>
           <div style={{ padding: "20px 20px 28px", flex: 1 }}>
              <p style={{ color: T1 }}>Calendar coming soon...</p>
              <button onClick={() => setCalendarOpen(false)} style={{ padding: "10px 20px", background: SURFACE, border: `1px solid ${BORDER}`, color: T1, cursor: "pointer" }}>Close</button>

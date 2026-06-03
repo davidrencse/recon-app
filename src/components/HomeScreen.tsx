@@ -129,7 +129,14 @@ export default function HomeScreen() {
   }, [active, searchQuery, uniqueData]);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100%", minHeight: 0, position: "relative" }}>
+    <div style={{ 
+      flex: 1, 
+      display: "flex", 
+      flexDirection: "column", 
+      minHeight: 0, 
+      position: "relative",
+      width: "100%",
+    }}>
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", padding: "12px 20px 0", gap: 10, flexShrink: 0 }}>
           <ReconSmall />

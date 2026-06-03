@@ -290,7 +290,14 @@ export default function ReconMap() {
   }, [selectedPin, visiblePins]);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100%", minHeight: 0, position: "relative" }}>
+    <div style={{ 
+      flex: 1, 
+      display: "flex", 
+      flexDirection: "column", 
+      minHeight: 0, 
+      position: "relative",
+      width: "100%",
+    }}>
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "4px 16px 10px", flexShrink: 0 }}>
           <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(22,22,22,0.95)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
