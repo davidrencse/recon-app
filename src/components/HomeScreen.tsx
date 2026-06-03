@@ -7,12 +7,13 @@ import mockCityData from "../lib/mockCity";
 /* ── Icons ────────────────────────────────────────────────────── */
 function ReconSmall() {
   return (
-    <div style={{ width: 30, height: 30, borderRadius: 8, background: "#1c1c1c", border: "1px solid rgba(255,255,255,0.08)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <svg width="16" height="16" viewBox="0 0 100 100" fill="none" stroke="white" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round">
-        <line x1="24" y1="78" x2="24" y2="24"/>
-        <path d="M 24 24 C 24 18 72 18 72 40 C 72 58 48 60 38 60"/>
-        <line x1="38" y1="60" x2="74" y2="80"/>
-      </svg>
+    <div style={{ 
+      width: 30, height: 30, borderRadius: 8, 
+      background: "#000", border: "1px solid rgba(255,255,255,0.08)", 
+      display: "flex", alignItems: "center", justifyContent: "center",
+      overflow: "hidden"
+    }}>
+      <img src="/logo.png" alt="R" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
     </div>
   );
 }

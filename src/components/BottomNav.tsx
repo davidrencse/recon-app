@@ -46,28 +46,11 @@ function IconUser({ active }: { active: boolean }) {
     </svg>
   );
 }
-function IconDashGrid() {
-  return (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="3" width="7" height="7" rx="1.5"/>
-      <rect x="14" y="3" width="7" height="7" rx="1.5"/>
-      <rect x="3" y="14" width="7" height="7" rx="1.5"/>
-      <rect x="14" y="14" width="7" height="7" rx="1.5"/>
-    </svg>
-  );
-}
 function IconSettings() {
   return (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <circle cx="12" cy="12" r="3"/>
       <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/>
-    </svg>
-  );
-}
-function IconChevronRight() {
-  return (
-    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="m9 18 6-6-6-6"/>
     </svg>
   );
 }
@@ -98,9 +81,12 @@ function MockQR() {
 }
 
 /* ══ Setting row ══════════════════════════════════════════════════ */
-function SettingRow({ label, sublabel, last=false }: { label: string; sublabel?: string; last?: boolean }) {
+function SettingRow({ label, sublabel, last=false, onClick }: { label: string; sublabel?: string; last?: boolean; onClick?: () => void }) {
   return (
-    <button style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"14px 0", background:"none", border:"none", cursor:"pointer", borderBottom: last ? "none" : `1px solid ${LINE}`, textAlign:"left" as const, fontFamily:"inherit" }}>
+    <button 
+      onClick={onClick}
+      style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"14px 0", background:"none", border:"none", cursor:"pointer", borderBottom: last ? "none" : `1px solid ${LINE}`, textAlign:"left" as const, fontFamily:"inherit" }}
+    >
       <div>
         <div style={{ fontSize:14, color:T1, fontWeight:400 }}>{label}</div>
         {sublabel && <div style={{ fontSize:12, color:T3, marginTop:2 }}>{sublabel}</div>}
@@ -111,11 +97,10 @@ function SettingRow({ label, sublabel, last=false }: { label: string; sublabel?:
 }
 
 /* ══ Settings panel ═══════════════════════════════════════════════ */
-function SettingsPanel({ onClose }: { onClose: () => void }) {
+function SettingsPanel({ onClose, onEditProfile }: { onClose: () => void; onEditProfile: () => void }) {
   return (
     <div style={{ position:"absolute", inset:0, background:BG, zIndex:70, overflowY:"auto", scrollbarWidth:"none", paddingTop:"max(env(safe-area-inset-top), 20px)" }}>
-      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"16px 20px 0" }}>
-        <span style={{ fontSize:10, color:T3, letterSpacing:1.8, textTransform:"uppercase", fontWeight:600 }}>Settings</span>
+      <div style={{ display:"flex", justifyContent:"flex-end", alignItems:"center", padding:"16px 20px 0" }}>
         <button aria-label="Close" onClick={onClose} style={{ background:SURFACE2, border:`1px solid ${BORDER}`, cursor:"pointer", color:T2, width:32, height:32, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"inherit" }}>
           <IconClose/>
         </button>
@@ -123,14 +108,14 @@ function SettingsPanel({ onClose }: { onClose: () => void }) {
       <div style={{ padding:"20px 20px 0" }}>
         <div style={{ fontSize:24, fontWeight:800, color:T1, marginBottom:22, letterSpacing:-0.5 }}>Settings</div>
         {[
-          { group:"Preferences", rows:[{ label:"Notifications" },{ label:"Privacy" },{ label:"Data & activity", last:true }] },
-          { group:"Account",     rows:[{ label:"Edit profile" },{ label:"Change city", sublabel:"Vancouver, BC", last:true }] },
+          { group:"Preferences", rows:[{ label:"Notifications" },{ label:"Security" },{ label:"Data & activity", last:true }] },
+          { group:"Account",     rows:[{ label:"Edit profile", onClick: onEditProfile },{ label:"Change city", sublabel:"Vancouver, BC", last:true }] },
           { group:"About",       rows:[{ label:"About Recon" },{ label:"Help & feedback" },{ label:"Terms of service" },{ label:"Privacy policy", last:true }] },
         ].map((section) => (
           <div key={section.group} style={{ marginBottom:20 }}>
             <div style={{ fontSize:10, color:T3, letterSpacing:1.8, textTransform:"uppercase" as const, fontWeight:600, marginBottom:6 }}>{section.group}</div>
             <div style={{ background:SURFACE, borderRadius:16, padding:"0 16px", border:`1px solid ${BORDER}` }}>
-              {section.rows.map((r) => <SettingRow key={r.label} {...r}/>)}
+              {section.rows.map((r) => <SettingRow key={r.label} {...(r as any)}/>)}
             </div>
           </div>
         ))}
@@ -195,67 +180,9 @@ function AccountPanel({ onClose }: { onClose: () => void }) {
   );
 }
 
-/* ══ You popup bubble ═════════════════════════════════════════════ */
-function YouPopup({ onSettings, onAccount, onClose }: {
-  onSettings: () => void;
-  onAccount: () => void;
-  onClose: () => void;
-}) {
-  const rowStyle: React.CSSProperties = {
-    width:"100%", display:"flex", alignItems:"center", gap:11,
-    padding:"13px 14px", background:"none", border:"none",
-    cursor:"pointer", textAlign:"left" as const, color:T1, fontFamily:"inherit",
-  };
-  const iconBox: React.CSSProperties = {
-    width:30, height:30, borderRadius:9, background:SURFACE2,
-    border:`1px solid ${BORDER}`, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0,
-  };
-
-  return (
-    <>
-      <div onClick={onClose} style={{ position:"absolute", inset:0, zIndex:65 }}/>
-      <div style={{
-        position:"absolute",
-        bottom:`calc(64px + env(safe-area-inset-bottom, 0px))`,
-        right:10,
-        width:200,
-        background:SURFACE,
-        border:`1px solid ${BORDER_M}`,
-        borderRadius:18,
-        zIndex:66,
-        overflow:"hidden",
-        boxShadow:"0 16px 48px rgba(0,0,0,0.65)",
-      }}>
-        <Link href="/dashboard" onClick={onClose} style={{ textDecoration:"none" }}>
-          <div style={{ ...rowStyle, display:"flex" as const }}>
-            <div style={iconBox}><IconDashGrid/></div>
-            <span style={{ flex:1, fontSize:14, fontWeight:500 }}>Dashboard</span>
-            <IconChevronRight/>
-          </div>
-        </Link>
-        <div style={{ height:1, background:LINE, margin:"0 14px" }}/>
-        <button onClick={() => { onSettings(); onClose(); }} style={rowStyle}>
-          <div style={iconBox}><IconSettings/></div>
-          <span style={{ flex:1, fontSize:14, fontWeight:500 }}>Settings</span>
-          <IconChevronRight/>
-        </button>
-        <div style={{ height:1, background:LINE, margin:"0 14px" }}/>
-        <button onClick={() => { onAccount(); onClose(); }} style={rowStyle}>
-          <div style={iconBox}><IconUser active={false}/></div>
-          <span style={{ flex:1, fontSize:14, fontWeight:500 }}>Account</span>
-          <IconChevronRight/>
-        </button>
-        {/* Arrow notch */}
-        <div style={{ position:"absolute", bottom:-6, right:23, width:12, height:12, background:SURFACE, border:`1px solid ${BORDER_M}`, transform:"rotate(45deg)", borderTop:"none", borderLeft:"none" }}/>
-      </div>
-    </>
-  );
-}
-
 /* ══ Bottom nav ═══════════════════════════════════════════════════ */
 export default function BottomNav() {
   const pathname = usePathname();
-  const [youPopupOpen, setYouPopupOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [accountOpen,  setAccountOpen]  = useState(false);
 
@@ -272,10 +199,6 @@ export default function BottomNav() {
       <div style={{
         display:"flex", justifyContent:"space-around", alignItems:"center",
         paddingTop: 10,
-        /* 
-           The padding-bottom here handles the PWA home indicator.
-           In the Safari browser, the address bar handles itself.
-        */
         paddingBottom: "max(env(safe-area-inset-bottom, 0px), 14px)",
         background:BG,
         borderTop:`1px solid ${LINE}`,
@@ -298,18 +221,30 @@ export default function BottomNav() {
           );
         })}
 
-        {/* You tab — on /dashboard opens popup, elsewhere navigates */}
+        {/* You tab — on /dashboard opens panels, elsewhere navigates */}
         {onDashboard ? (
-          <button
-            onClick={() => setYouPopupOpen(v => !v)}
-            aria-expanded={youPopupOpen}
-            style={{ background:"none", border:"none", cursor:"pointer", color: youPopupOpen ? T1 : "#3a3a3a", padding:"4px 16px", fontFamily:"inherit" }}
-          >
-            <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:3 }}>
-              <IconUser active={youPopupOpen}/>
-              <span style={{ fontSize:10.5, fontWeight: youPopupOpen ? 600 : 400, letterSpacing:0.1 }}>You</span>
-            </div>
-          </button>
+          <div style={{ display:"flex", alignItems:"center", gap:2 }}>
+            <button
+              onClick={() => setSettingsOpen(true)}
+              aria-label="Settings"
+              style={{ background:"none", border:"none", cursor:"pointer", color: "#3a3a3a", padding:"4px 12px", fontFamily:"inherit" }}
+            >
+              <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:3 }}>
+                <IconSettings />
+                <span style={{ fontSize:10.5, fontWeight:400, letterSpacing:0.1 }}>Settings</span>
+              </div>
+            </button>
+            <button
+              onClick={() => setAccountOpen(true)}
+              aria-label="Account"
+              style={{ background:"none", border:"none", cursor:"pointer", color: "#3a3a3a", padding:"4px 12px", fontFamily:"inherit" }}
+            >
+              <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:3 }}>
+                <IconUser active={false}/>
+                <span style={{ fontSize:10.5, fontWeight:400, letterSpacing:0.1 }}>Account</span>
+              </div>
+            </button>
+          </div>
         ) : (
           <Link href="/dashboard" style={{ textDecoration:"none" }}>
             <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:3, color:"#3a3a3a", padding:"4px 16px" }}>
@@ -320,15 +255,15 @@ export default function BottomNav() {
         )}
       </div>
 
-      {/* Overlays — position absolute, scoped to AppShell's outer container */}
-      {youPopupOpen && (
-        <YouPopup
-          onSettings={() => setSettingsOpen(true)}
-          onAccount={() => setAccountOpen(true)}
-          onClose={() => setYouPopupOpen(false)}
+      {settingsOpen && (
+        <SettingsPanel 
+          onClose={() => setSettingsOpen(false)} 
+          onEditProfile={() => {
+            setSettingsOpen(false);
+            setAccountOpen(true);
+          }}
         />
       )}
-      {settingsOpen && <SettingsPanel onClose={() => setSettingsOpen(false)}/>}
       {accountOpen  && <AccountPanel  onClose={() => setAccountOpen(false)}/>}
     </>
   );

@@ -77,14 +77,11 @@ const IconUsers = () => (
 
 /* ─── Recon "R" Logo ─────────────────────────────────────────── */
 const ReconLogo = () => (
-  <svg width="20" height="20" viewBox="0 0 100 100" fill="none" stroke="white" strokeWidth="9" strokeLinecap="round" strokeLinejoin="round">
-    {/* Left stem */}
-    <line x1="24" y1="78" x2="24" y2="24"/>
-    {/* Arch / bowl of R */}
-    <path d="M 24 24 C 24 18 72 18 72 40 C 72 58 48 60 38 60"/>
-    {/* Diagonal leg */}
-    <line x1="38" y1="60" x2="74" y2="80"/>
-  </svg>
+  <img 
+    src="/logo.png" 
+    alt="R" 
+    style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 4 }} 
+  />
 );
 
 /* ─── Dark Map SVG ───────────────────────────────────────────── */
