@@ -54,6 +54,13 @@ function IconSettings() {
     </svg>
   );
 }
+function IconChevronRight() {
+  return (
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="m9 18 6-6-6-6"/>
+    </svg>
+  );
+}
 function IconClose() {
   return (
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -99,7 +106,8 @@ function SettingRow({ label, sublabel, last=false, onClick }: { label: string; s
 /* ══ Settings panel ═══════════════════════════════════════════════ */
 function SettingsPanel({ onClose, onEditProfile }: { onClose: () => void; onEditProfile: () => void }) {
   return (
-    <div style={{ position:"absolute", inset:0, background:BG, zIndex:70, overflowY:"auto", scrollbarWidth:"none", paddingTop:"max(env(safe-area-inset-top), 20px)" }}>
+    /* Use position: fixed and extremely high z-index to stay above the map */
+    <div style={{ position:"fixed", inset:0, background:BG, zIndex:2000, overflowY:"auto", scrollbarWidth:"none", paddingTop:"max(env(safe-area-inset-top), 20px)" }}>
       <div style={{ display:"flex", justifyContent:"flex-end", alignItems:"center", padding:"16px 20px 0" }}>
         <button aria-label="Close" onClick={onClose} style={{ background:SURFACE2, border:`1px solid ${BORDER}`, cursor:"pointer", color:T2, width:32, height:32, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"inherit" }}>
           <IconClose/>
@@ -136,7 +144,8 @@ function AccountPanel({ onClose }: { onClose: () => void }) {
     />
   );
   return (
-    <div style={{ position:"absolute", inset:0, background:BG, zIndex:70, overflowY:"auto", scrollbarWidth:"none", paddingTop:"max(env(safe-area-inset-top), 20px)" }}>
+    /* Use position: fixed and extremely high z-index to stay above the map */
+    <div style={{ position:"fixed", inset:0, background:BG, zIndex:2000, overflowY:"auto", scrollbarWidth:"none", paddingTop:"max(env(safe-area-inset-top), 20px)" }}>
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"16px 20px 0" }}>
         <span style={{ fontSize:10, color:T3, letterSpacing:1.8, textTransform:"uppercase", fontWeight:600 }}>Account</span>
         <button aria-label="Close" onClick={onClose} style={{ background:SURFACE2, border:`1px solid ${BORDER}`, cursor:"pointer", color:T2, width:32, height:32, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"inherit" }}>
@@ -180,13 +189,72 @@ function AccountPanel({ onClose }: { onClose: () => void }) {
   );
 }
 
+/* ══ You popup bubble ═════════════════════════════════════════════ */
+function YouPopup({ onSettings, onClose }: {
+  onSettings: () => void;
+  onClose: () => void;
+}) {
+  const rowStyle: React.CSSProperties = {
+    width:"100%", display:"flex", alignItems:"center", gap:11,
+    padding:"13px 14px", background:"none", border:"none",
+    cursor:"pointer", textAlign:"left" as const, color:T1, fontFamily:"inherit",
+  };
+  const iconBox: React.CSSProperties = {
+    width:30, height:30, borderRadius:9, background:SURFACE2,
+    border:`1px solid ${BORDER}`, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0,
+  };
+
+  return (
+    <>
+      {/* Backdrop covers everything, sits above map */}
+      <div onClick={onClose} style={{ position:"fixed", inset:0, zIndex:1000 }}/>
+      <div style={{
+        position:"fixed",
+        bottom:`calc(74px + env(safe-area-inset-bottom, 0px))`,
+        right:16,
+        width:200,
+        background:SURFACE,
+        border:`1px solid ${BORDER_M}`,
+        borderRadius:18,
+        zIndex:1001,
+        overflow:"hidden",
+        boxShadow:"0 16px 48px rgba(0,0,0,0.65)",
+      }}>
+        <Link href="/dashboard" onClick={onClose} style={{ textDecoration:"none" }}>
+          <div style={{ ...rowStyle, display:"flex" as const }}>
+            <div style={iconBox}><IconDashGrid/></div>
+            <span style={{ flex:1, fontSize:14, fontWeight:500 }}>Dashboard</span>
+            <IconChevronRight/>
+          </div>
+        </Link>
+        <div style={{ height:1, background:LINE, margin:"0 14px" }}/>
+        <button onClick={() => { onSettings(); onClose(); }} style={rowStyle}>
+          <div style={iconBox}><IconSettings/></div>
+          <span style={{ flex:1, fontSize:14, fontWeight:500 }}>Settings</span>
+          <IconChevronRight/>
+        </button>
+        {/* Arrow notch */}
+        <div style={{ position:"absolute", bottom:-6, right:23, width:12, height:12, background:SURFACE, border:`1px solid ${BORDER_M}`, transform:"rotate(45deg)", borderTop:"none", borderLeft:"none" }}/>
+      </div>
+    </>
+  );
+}
+
+function IconDashGrid() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/>
+      <rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>
+    </svg>
+  );
+}
+
 /* ══ Bottom nav ═══════════════════════════════════════════════════ */
 export default function BottomNav() {
   const pathname = usePathname();
+  const [youPopupOpen, setYouPopupOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [accountOpen,  setAccountOpen]  = useState(false);
-
-  const onDashboard = pathname === "/dashboard";
 
   const NAV_ITEMS = [
     { label:"Home",     href:"/home",     icon:IconHome     },
@@ -202,7 +270,10 @@ export default function BottomNav() {
         paddingBottom: "max(env(safe-area-inset-bottom, 0px), 14px)",
         background:BG,
         borderTop:`1px solid ${LINE}`,
-        flexShrink:0, width:"100%", zIndex:40,
+        flexShrink:0, width:"100%", 
+        /* Ensure navbar itself is always above map layers */
+        position: "relative",
+        zIndex:999, 
       }}>
         {NAV_ITEMS.map((item) => {
           const active = pathname === item.href;
@@ -221,39 +292,24 @@ export default function BottomNav() {
           );
         })}
 
-        {/* You tab — on /dashboard opens panels, elsewhere navigates */}
-        {onDashboard ? (
-          <div style={{ display:"flex", alignItems:"center", gap:2 }}>
-            <button
-              onClick={() => setSettingsOpen(true)}
-              aria-label="Settings"
-              style={{ background:"none", border:"none", cursor:"pointer", color: "#3a3a3a", padding:"4px 12px", fontFamily:"inherit" }}
-            >
-              <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:3 }}>
-                <IconSettings />
-                <span style={{ fontSize:10.5, fontWeight:400, letterSpacing:0.1 }}>Settings</span>
-              </div>
-            </button>
-            <button
-              onClick={() => setAccountOpen(true)}
-              aria-label="Account"
-              style={{ background:"none", border:"none", cursor:"pointer", color: "#3a3a3a", padding:"4px 12px", fontFamily:"inherit" }}
-            >
-              <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:3 }}>
-                <IconUser active={false}/>
-                <span style={{ fontSize:10.5, fontWeight:400, letterSpacing:0.1 }}>Account</span>
-              </div>
-            </button>
+        <button
+          onClick={() => setYouPopupOpen(v => !v)}
+          aria-expanded={youPopupOpen}
+          style={{ background:"none", border:"none", cursor:"pointer", color: youPopupOpen ? T1 : "#3a3a3a", padding:"4px 16px", fontFamily:"inherit" }}
+        >
+          <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:3 }}>
+            <IconUser active={youPopupOpen}/>
+            <span style={{ fontSize:10.5, fontWeight: youPopupOpen ? 600 : 400, letterSpacing:0.1 }}>You</span>
           </div>
-        ) : (
-          <Link href="/dashboard" style={{ textDecoration:"none" }}>
-            <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:3, color:"#3a3a3a", padding:"4px 16px" }}>
-              <IconUser active={false}/>
-              <span style={{ fontSize:10.5, fontWeight:400, letterSpacing:0.1 }}>You</span>
-            </div>
-          </Link>
-        )}
+        </button>
       </div>
+
+      {youPopupOpen && (
+        <YouPopup
+          onSettings={() => setSettingsOpen(true)}
+          onClose={() => setYouPopupOpen(false)}
+        />
+      )}
 
       {settingsOpen && (
         <SettingsPanel 
