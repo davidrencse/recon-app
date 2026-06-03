@@ -10,11 +10,13 @@ const dmSans = DM_Sans({
   variable: "--font-dm-sans",
 });
 
+/* 
+   RECOMMENDED PWA FIX:
+   Precise viewport settings to prevent Safari "Desktop Mode" rendering.
+*/
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
   viewportFit: "cover",
   themeColor: "#131313",
 };

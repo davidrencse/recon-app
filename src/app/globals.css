@@ -16,40 +16,45 @@
   --font-mono: "SF Mono", "Fira Code", "Fira Mono", monospace;
 }
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
-  font-family: var(--font-apple);
-}
-
-html {
-  height: 100%;
+/* 
+   RECOMMENDED PWA FIXES:
+   Standard mobile resets to prevent Safari from zooming out.
+*/
+html,
+body {
   width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
   background: #131313;
-  overscroll-behavior: none;
-  overflow: hidden;
-  -webkit-text-size-adjust: 100%;
-  text-size-adjust: 100%;
-  font-family: var(--font-apple);
 }
 
 body {
-  height: 100%;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  background: #131313;
+  min-height: 100dvh;
+  -webkit-text-size-adjust: 100%;
   color: var(--foreground);
   font-family: var(--font-apple);
   -webkit-font-smoothing: antialiased;
   overscroll-behavior: none;
-  overflow: hidden;
-  touch-action: manipulation;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  font-family: inherit;
 }
 
 /* Leaflet */
 .leaflet-container { background-color: #131313 !important; }
 .leaflet-tile { background-color: transparent !important; transition: none !important; }
 .leaflet-tile-pane img.leaflet-tile { background-color: transparent !important; }
+
+/* Mobile specific overrides */
+@media (max-width: 768px) {
+  html,
+  body {
+    width: 100%;
+    overflow-x: hidden;
+  }
+}

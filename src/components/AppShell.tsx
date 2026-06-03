@@ -9,52 +9,37 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const showNav = !isLanding;
 
   return (
+    /* 
+       RECOMMENDED PWA FIX:
+       Simplified app wrapper using standard flex layout.
+       Filling 100% of the phone screen natively.
+    */
     <div style={{
-      position: "fixed",
-      inset: 0,
       width: "100%",
-      /* 
-         "ZOOMED IN" FIX: 
-         - Remove maxWidth on small mobile screens to let it fill the space.
-         - On desktop, keep the 430px container for mobile-app preview.
-      */
-      maxWidth: "100%", 
-      margin: "0 auto",
-      height: "100dvh",
+      minHeight: "100dvh",
       background: "#131313",
       display: "flex",
       flexDirection: "column",
-      overflow: "hidden",
-      zIndex: 1,
-      paddingTop: "calc(env(safe-area-inset-top, 0px) + 6px)",
+      margin: "0 auto",
+      /* 
+         On desktop, we maintain the 430px mobile preview.
+         On mobile, it fills the width.
+      */
+      maxWidth: 430, 
     }}>
-      {/* 
-          Media query style simulation:
-          Using a wrapper to enforce 430px max-width ONLY if screen is wider than mobile.
-      */}
-      <div style={{
-        flex: 1,
-        display: "flex",
-        flexDirection: "column",
-        width: "100%",
-        maxWidth: 430,
-        margin: "0 auto",
+      {/* Main content area fills all space above navigation */}
+      <main style={{ 
+        flex: 1, 
+        display: "flex", 
+        flexDirection: "column", 
         minHeight: 0,
-        position: "relative",
+        width: "100%",
+        paddingTop: "env(safe-area-inset-top, 0px)",
       }}>
-        <div style={{ 
-          flex: 1, 
-          minHeight: 0, 
-          display: "flex", 
-          flexDirection: "column", 
-          overflow: "hidden",
-          position: "relative",
-        }}>
-          {children}
-        </div>
-        
-        {showNav && <BottomNav />}
-      </div>
+        {children}
+      </main>
+      
+      {showNav && <BottomNav />}
     </div>
   );
 }

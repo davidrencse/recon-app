@@ -2,10 +2,10 @@
   "name": "Recon",
   "short_name": "Recon",
   "description": "See your city, as it is, right now.",
-  "start_url": "/home",
+  "start_url": "/",
   "display": "standalone",
-  "background_color": "#131313",
-  "theme_color": "#131313",
+  "background_color": "#000000",
+  "theme_color": "#000000",
   "orientation": "portrait",
   "icons": [
     {
