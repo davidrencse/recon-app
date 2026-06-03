@@ -10,10 +10,9 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     /* 
-       NATURAL FLOW SHELL:
-       - No fixed or absolute positioning on the root.
-       - Uses display: flex to fill the 100dvh body naturally.
-       - This prevents Safari from "guessing" the height and shifting the UI.
+       THE REDDIT-PROVEN SHELL:
+       - Since html/body is 100vh, this 100% height container 
+         will fill the exact true screen height.
     */
     <div style={{
       width: "100%",

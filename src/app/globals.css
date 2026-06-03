@@ -17,18 +17,18 @@
 }
 
 /* 
-   NATURAL FLOW RESET:
-   Instead of forcing fixed positions, we let the browser define the 100% height.
-   This is the most compatible way to handle Safari's bottom address bar.
+   REDDIT PWA FIX (r/PWA):
+   To fix the ~59px "chin gap" / upward shift on iOS:
+   - Must use 100vh on html/body instead of 100% or 100dvh.
+   - This accounts for the shift behind the status bar in standalone mode.
 */
 html,
 body {
   width: 100%;
-  height: 100%; /* Fallback */
-  height: 100dvh; /* Dynamic Viewport Height is the key */
+  height: 100vh; /* THE CRITICAL FIX */
   margin: 0;
   padding: 0;
-  overflow: hidden; /* Keep the app from "bouncing" or scrolling the whole page */
+  overflow: hidden;
   background: #131313;
 }
 
@@ -38,6 +38,8 @@ body {
   font-family: var(--font-apple);
   -webkit-font-smoothing: antialiased;
   overscroll-behavior: none;
+  /* Keep it relative so AppShell can fill it via 100% height */
+  position: relative;
 }
 
 * {
