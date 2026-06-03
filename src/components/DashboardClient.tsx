@@ -20,6 +20,7 @@ const SURFACE3  = "#2a2a2a";
 
 const LINE      = "rgba(255,255,255,0.05)";
 const BORDER    = "rgba(255,255,255,0.08)";
+const BORDER_M  = "rgba(255,255,255,0.12)";
 
 const T1        = "#f2f2f2";
 const T2        = "#9a9a9a";
@@ -121,11 +122,66 @@ function SegmentedFilter({
   );
 }
 
+/* ══════════════════════════════════════════════════════════════
+   CALENDAR DATA (mock — saved pins / events over time)
+══════════════════════════════════════════════════════════════ */
+const CAT_COLORS = {
+  live:      "#ef4444",
+  food:      "#6366f1",
+  spots:     "#22c55e",
+  popups:    "#f59e0b",
+  nightlife: "#ec4899",
+} as const;
+type CalCat = keyof typeof CAT_COLORS;
+
+interface CalEvent {
+  id: string; date: number; time: string; title: string;
+  subtitle: string; cat: CalCat; count: number;
+}
+const CAL_EVENTS: CalEvent[] = [
+  { id:"c1",  date:2,  time:"18:00", title:"Alex G + Slow Pulp",        subtitle:"Commodore Ballroom · Granville", cat:"live",      count:48 },
+  { id:"c2",  date:2,  time:"19:30", title:"Granville Island market",   subtitle:"Public Market · Kitsilano",      cat:"food",      count:12 },
+  { id:"c3",  date:2,  time:"22:00", title:"Granville Strip peaks",     subtitle:"Multiple venues · Granville",    cat:"nightlife", count:31 },
+  { id:"c4",  date:3,  time:"11:00", title:"Sunday brunch pop-up",      subtitle:"Fable · Kitsilano",              cat:"food",      count:14 },
+  { id:"c5",  date:3,  time:"12:00", title:"Trout Lake farmers market", subtitle:"Trout Lake Park · East Van",     cat:"spots",     count:19 },
+  { id:"c6",  date:3,  time:"20:00", title:"Jazz residency",            subtitle:"Guilt & Co · Gastown",          cat:"live",      count:22 },
+  { id:"c7",  date:5,  time:"10:00", title:"Stanley Park sunrise hike", subtitle:"Stanley Park Pavilion",          cat:"spots",     count:8  },
+  { id:"c8",  date:7,  time:"21:00", title:"DJ night at The Biltmore",  subtitle:"The Biltmore · Mt Pleasant",     cat:"nightlife", count:27 },
+  { id:"c9",  date:10, time:"18:00", title:"Tofino oysters pop-up",     subtitle:"Pier 7 · Coal Harbour",          cat:"food",      count:22 },
+  { id:"c10", date:12, time:"20:00", title:"Rooftop cinema",            subtitle:"Cineplex Odeon · Granville",     cat:"live",      count:33 },
+  { id:"c11", date:12, time:"22:30", title:"Late set at Fox Cabaret",   subtitle:"Fox Cabaret · Mt Pleasant",      cat:"nightlife", count:19 },
+  { id:"c12", date:14, time:"11:00", title:"Vintage clothing market",   subtitle:"Main & 20th · Mt Pleasant",      cat:"popups",    count:16 },
+  { id:"c13", date:14, time:"14:00", title:"Kits Beach volleyball open",subtitle:"Kitsilano Beach",                cat:"spots",     count:9  },
+  { id:"c14", date:18, time:"19:00", title:"Yuno b2b Sansibar",         subtitle:"Open Studios · Strathcona",      cat:"live",      count:31 },
+  { id:"c15", date:21, time:"10:00", title:"Solstice sunrise walk",     subtitle:"Spanish Banks Beach",            cat:"spots",     count:11 },
+  { id:"c16", date:24, time:"16:00", title:"Street food pop-up",        subtitle:"Robson Square · Downtown",       cat:"popups",    count:28 },
+];
+
 function MiniCalendar({ onOpen }: { onOpen: () => void }) {
-  const [month] = useState(5);
-  const [year] = useState(2026);
-  const todayDate = 2;
+  const [month, setMonth] = useState(5);
+  const [year, setYear] = useState(2026);
+  const todayDate = month === 5 && year === 2026 ? 2 : -1;
+
+  const dotsByDate: Record<number, string[]> = {};
+  if (month === 5 && year === 2026) {
+    CAL_EVENTS.forEach((e) => {
+      if (!dotsByDate[e.date]) dotsByDate[e.date] = [];
+      const col = CAT_COLORS[e.cat];
+      if (!dotsByDate[e.date].includes(col)) dotsByDate[e.date].push(col);
+    });
+  }
+
+  const firstDayJS = new Date(year, month, 1).getDay();
+  const offset = firstDayJS === 0 ? 6 : firstDayJS - 1;
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const cells: (number | null)[] = [];
+  for (let i = 0; i < offset; i++) cells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+  while (cells.length % 7 !== 0) cells.push(null);
+  const weeks: (number | null)[][] = [];
+  for (let i = 0; i < cells.length; i += 7) weeks.push(cells.slice(i, i + 7));
   const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const btnStyle: React.CSSProperties = { background: "none", border: "none", cursor: "pointer", color: T3, fontSize: 15, padding: "0 4px", lineHeight: 1 };
 
   return (
     <div
@@ -134,21 +190,33 @@ function MiniCalendar({ onOpen }: { onOpen: () => void }) {
     >
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 9 }}>
         <span style={{ fontSize: 12.5, fontWeight: 700, color: T1, letterSpacing: -0.2 }}>{monthNames[month]} {year}</span>
+        <div style={{ display: "flex" }}>
+          <button onClick={(e) => { e.stopPropagation(); if (month===0){setMonth(11);setYear(y=>y-1);}else setMonth(m=>m-1); }} style={btnStyle}>‹</button>
+          <button onClick={(e) => { e.stopPropagation(); if (month===11){setMonth(0);setYear(y=>y+1);}else setMonth(m=>m+1); }} style={btnStyle}>›</button>
+        </div>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", marginBottom: 2 }}>
         {["M","T","W","T","F","S","S"].map((d, i) => (
           <div key={i} style={{ textAlign: "center", fontSize: 9, fontWeight: 600, color: T3, paddingBottom: 3, letterSpacing: 0.5 }}>{d}</div>
         ))}
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)" }}>
-          {[null,null,1,2,3,4,5].map((d, di) => (
-            <div key={di} style={{ display: "flex", flexDirection: "column", alignItems: "center", paddingBottom: 1 }}>
-              <div style={{ width: 20, height: 20, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", background: d === todayDate ? T1 : "transparent", fontSize: 9.5, fontWeight: d === todayDate ? 700 : 400, color: d === todayDate ? "#0d0d0d" : d ? "#7a7a7a" : "transparent" }}>
-                {d ?? ""}
+      {weeks.map((week, wi) => (
+        <div key={wi} style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)" }}>
+          {week.map((d, di) => {
+            const dots = d ? (dotsByDate[d] ?? []).slice(0, 3) : [];
+            return (
+              <div key={di} style={{ display: "flex", flexDirection: "column", alignItems: "center", paddingBottom: 1 }}>
+                <div style={{ width: 20, height: 20, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", background: d === todayDate ? T1 : "transparent", fontSize: 9.5, fontWeight: d === todayDate ? 700 : 400, color: d === todayDate ? "#0d0d0d" : d ? "#7a7a7a" : "transparent" }}>
+                  {d ?? ""}
+                </div>
+                <div style={{ height: 5, display: "flex", alignItems: "center", gap: 1.5, justifyContent: "center" }}>
+                  {dots.map((col, ci) => <div key={ci} style={{ width: 3, height: 3, borderRadius: "50%", background: col }} />)}
+                </div>
               </div>
-            </div>
-          ))}
-      </div>
+            );
+          })}
+        </div>
+      ))}
     </div>
   );
 }
@@ -257,6 +325,137 @@ function SectionLabel({ text, right }: { text: string; right?: React.ReactNode }
 }
 
 /* ══════════════════════════════════════════════════════════════
+   CALENDAR MODAL
+══════════════════════════════════════════════════════════════ */
+function CalendarModal({ onClose }: { onClose: () => void }) {
+  const [month, setMonth] = useState(5);
+  const [year, setYear] = useState(2026);
+  const [selected, setSelected] = useState(2);
+  const TODAY_DATE = 2, TODAY_MONTH = 5;
+  const mNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  const sNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const prev = () => { if (month===0){setMonth(11);setYear(y=>y-1);}else setMonth(m=>m-1); };
+  const next = () => { if (month===11){setMonth(0);setYear(y=>y+1);}else setMonth(m=>m+1); };
+
+  const firstDayJS = new Date(year, month, 1).getDay();
+  const offset = firstDayJS === 0 ? 6 : firstDayJS - 1;
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const cells: (number | null)[] = [];
+  for (let i=0;i<offset;i++) cells.push(null);
+  for (let d=1;d<=daysInMonth;d++) cells.push(d);
+  while (cells.length % 7 !== 0) cells.push(null);
+  const weeks: (number | null)[][] = [];
+  for (let i=0;i<cells.length;i+=7) weeks.push(cells.slice(i,i+7));
+
+  const monthEvents = month === TODAY_MONTH && year === 2026 ? CAL_EVENTS : [];
+  const dotsByDate: Record<number, string[]> = {};
+  monthEvents.forEach((e) => {
+    if (!dotsByDate[e.date]) dotsByDate[e.date] = [];
+    const col = CAT_COLORS[e.cat];
+    if (!dotsByDate[e.date].includes(col)) dotsByDate[e.date].push(col);
+  });
+  const selectedEvents = monthEvents.filter((e) => e.date === selected).sort((a,b) => a.time.localeCompare(b.time));
+  const isToday = (d: number) => d === TODAY_DATE && month === TODAY_MONTH && year === 2026;
+
+  const navBtnStyle: React.CSSProperties = {
+    width: 34, height: 34, borderRadius: 9999, display: "flex", alignItems: "center", justifyContent: "center",
+    background: SURFACE2, border: `1px solid ${BORDER}`, color: T2, cursor: "pointer", fontSize: 16, flexShrink: 0,
+  };
+  const LEGEND: { key: CalCat; label: string }[] = [
+    { key:"live", label:"Live" }, { key:"food", label:"Food" }, { key:"spots", label:"Spots" }, { key:"popups", label:"Pop-ups" }, { key:"nightlife", label:"Nightlife" },
+  ];
+
+  return (
+    <div style={{ position: "absolute", inset: 0, background: BG, zIndex: 60, display: "flex", flexDirection: "column", overflowY: "auto", scrollbarWidth: "none" }}>
+      <div style={{ padding: "20px 20px 10px", flexShrink: 0 }}>
+        <div style={{ fontSize: 12, color: T3, marginBottom: 5, letterSpacing: 0.5 }}>{mNames[month]} {year}</div>
+        <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 10 }}>
+          <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
+            <span style={{ fontSize: 52, fontWeight: 800, color: T1, lineHeight: 1, letterSpacing: -3 }}>{monthEvents.length}</span>
+            <span style={{ fontSize: 14, color: T3 }}>events on the radar</span>
+          </div>
+          <div style={{ display: "flex", gap: 6, paddingBottom: 6 }}>
+            <button onClick={prev} style={navBtnStyle}>‹</button>
+            <button onClick={next} style={navBtnStyle}>›</button>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ padding: "0 14px", flexShrink: 0 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", marginBottom: 6 }}>
+          {["M","T","W","T","F","S","S"].map((d, i) => (
+            <div key={i} style={{ textAlign: "center", fontSize: 11, fontWeight: 600, color: T3, padding: "4px 0", letterSpacing: 0.5 }}>{d}</div>
+          ))}
+        </div>
+        {weeks.map((week, wi) => (
+          <div key={wi} style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", marginBottom: 2 }}>
+            {week.map((d, di) => {
+              const sel = d === selected && month === TODAY_MONTH && year === 2026;
+              const today = d !== null && isToday(d);
+              const dots = (d && dotsByDate[d]) ? dotsByDate[d].slice(0, 3) : [];
+              return (
+                <div key={di} onClick={() => d && setSelected(d)} style={{ display: "flex", flexDirection: "column", alignItems: "center", cursor: d ? "pointer" : "default" }}>
+                  <div style={{ width: 36, height: 36, borderRadius: 9999, display: "flex", alignItems: "center", justifyContent: "center", background: sel ? SURFACE2 : "transparent", border: sel ? `1px solid ${BORDER_M}` : today ? `1px solid rgba(255,255,255,0.2)` : "none" }}>
+                    <span style={{ fontSize: 15, fontWeight: sel || today ? 700 : 400, color: d ? (sel || today ? T1 : "#666") : "transparent" }}>{d ?? ""}</span>
+                  </div>
+                  <div style={{ height: 8, display: "flex", alignItems: "center", gap: 2, justifyContent: "center", marginTop: 1 }}>
+                    {dots.map((col, ci) => <div key={ci} style={{ width: 5, height: 5, borderRadius: "50%", background: col }} />)}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ))}
+      </div>
+
+      <div style={{ display: "flex", gap: 14, padding: "10px 20px 12px", borderTop: `1px solid ${LINE}`, flexShrink: 0, overflowX: "auto", scrollbarWidth: "none" }}>
+        {LEGEND.map((l) => (
+          <div key={l.key} style={{ display: "flex", alignItems: "center", gap: 5, flexShrink: 0 }}>
+            <div style={{ width: 7, height: 7, borderRadius: "50%", background: CAT_COLORS[l.key] }} />
+            <span style={{ fontSize: 12, color: T2 }}>{l.label}</span>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ flex: 1, padding: "4px 20px 0", borderTop: `1px solid ${LINE}` }}>
+        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", padding: "16px 0 10px" }}>
+          {isToday(selected) ? (
+            <span style={{ fontSize: 18, fontWeight: 700, color: T1 }}><strong>Today</strong>, {sNames[month]} {selected}</span>
+          ) : (
+            <span style={{ fontSize: 18, fontWeight: 700, color: T1 }}>{sNames[month]} {selected}</span>
+          )}
+          <span style={{ fontSize: 12, color: T3 }}>{selectedEvents.length} events</span>
+        </div>
+        {selectedEvents.length === 0 ? (
+          <p style={{ fontSize: 13, color: T3, padding: "12px 0" }}>Nothing on the radar for this date.</p>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            {selectedEvents.map((ev, idx) => (
+              <div key={ev.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 0", borderBottom: idx < selectedEvents.length - 1 ? `1px solid ${LINE}` : "none" }}>
+                <span style={{ fontSize: 12, fontWeight: 500, color: T3, width: 46, flexShrink: 0, fontVariantNumeric: "tabular-nums" }}>{ev.time}</span>
+                <span style={{ width: 8, height: 8, borderRadius: "50%", background: CAT_COLORS[ev.cat], flexShrink: 0 }} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: T1, marginBottom: 3 }}>{ev.title}</div>
+                  <div style={{ fontSize: 11.5, color: T3 }}>{ev.subtitle}</div>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={T3} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                  <span style={{ fontSize: 12, color: T3 }}>{ev.count}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div style={{ padding: "16px 20px 28px", flexShrink: 0 }}>
+        <button onClick={onClose} style={{ width: "100%", height: 48, borderRadius: 14, background: SURFACE, border: `1px solid ${BORDER}`, color: T2, fontSize: 14, fontWeight: 500, cursor: "pointer", fontFamily: "inherit" }}>Close</button>
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════
    MAIN DASHBOARD
 ══════════════════════════════════════════════════════════════ */
 type ModalId = "events" | "categories" | "weather" | "safety" | "transit" | null;
@@ -341,14 +540,7 @@ export default function DashboardClient() {
       </main>
 
       {/* ── MODALS ── */}
-      {calendarOpen && (
-        <div style={{ position: "absolute", inset: 0, background: BG, zIndex: 100, display: "flex", flexDirection: "column" }}>
-          <div style={{ padding: "20px 20px 28px", flex: 1 }}>
-             <p style={{ color: T1 }}>Calendar coming soon...</p>
-             <button onClick={() => setCalendarOpen(false)} style={{ padding: "10px 20px", background: SURFACE, border: `1px solid ${BORDER}`, color: T1, cursor: "pointer" }}>Close</button>
-          </div>
-        </div>
-      )}
+      {calendarOpen && <CalendarModal onClose={() => setCalendarOpen(false)} />}
 
       {openModal === "events"     && <DashboardModal title="Events by time"     onClose={close}><EventsByTimeModal filter={filter} blocks={data.timeBlocks} events={data.events} /></DashboardModal>}
       {openModal === "categories" && <DashboardModal title="Category breakdown" onClose={close}><CategoryBreakdownModal stats={data.categoryStats} /></DashboardModal>}
