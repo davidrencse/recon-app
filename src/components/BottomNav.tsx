@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -84,6 +84,72 @@ function MockQR() {
         cell === "1" ? <rect key={`${ri}-${ci}`} x={ci*SZ} y={ri*SZ} width={SZ} height={SZ} fill="rgba(255,255,255,0.6)"/> : null
       ))}
     </svg>
+  );
+}
+
+/* ══ Draggable Panel ══════════════════════════════════════════════ */
+function DraggablePanel({ children, onClose }: { children: React.ReactNode; onClose: () => void }) {
+  const [translateY, setTranslateY] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const startY = useRef(0);
+  const isDragging = useRef(false);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (containerRef.current?.scrollTop === 0) {
+      startY.current = e.touches[0].clientY;
+      isDragging.current = true;
+      setIsAnimating(false);
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging.current) return;
+    const currentY = e.touches[0].clientY;
+    const diff = currentY - startY.current;
+    if (diff > 0) {
+      setTranslateY(diff);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (!isDragging.current) return;
+    isDragging.current = false;
+    setIsAnimating(true);
+    if (translateY > 120) {
+      onClose();
+    } else {
+      setTranslateY(0);
+    }
+  };
+
+  return (
+    <div
+      ref={containerRef}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      style={{
+        position: "fixed",
+        inset: 0,
+        background: BG,
+        zIndex: 2000,
+        overflowY: "auto",
+        scrollbarWidth: "none",
+        transform: `translateY(${translateY}px)`,
+        transition: isAnimating ? "transform 0.3s cubic-bezier(0.2, 0, 0, 1)" : "none",
+        touchAction: "pan-y"
+      }}
+    >
+      <div style={{ position: "sticky", top: 0, background: BG, zIndex: 10, paddingTop: "max(env(safe-area-inset-top), 20px)" }}>
+        <div style={{ display: "flex", justifyContent: "center", padding: "8px 0 12px" }}>
+          <div style={{ width: 36, height: 5, borderRadius: 3, background: SURFACE2 }} />
+        </div>
+      </div>
+      <div style={{ minHeight: "100%", paddingBottom: 60 }}>
+        {children}
+      </div>
+    </div>
   );
 }
 
@@ -216,13 +282,13 @@ function NotificationsPanel({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <div style={{ position:"fixed", inset:0, background:BG, zIndex:2000, overflowY:"auto", scrollbarWidth:"none", paddingTop:"max(env(safe-area-inset-top), 20px)" }}>
-      <div style={{ display:"flex", justifyContent:"flex-end", alignItems:"center", padding:"16px 20px 0" }}>
+    <DraggablePanel onClose={onClose}>
+      <div style={{ display:"flex", justifyContent:"flex-end", alignItems:"center", padding:"0 20px" }}>
         <button aria-label="Close" onClick={onClose} style={{ background:SURFACE2, border:`1px solid ${BORDER}`, cursor:"pointer", color:T2, width:32, height:32, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"inherit" }}>
           <IconClose/>
         </button>
       </div>
-      <div style={{ padding:"20px 20px 48px" }}>
+      <div style={{ padding:"0 20px 48px" }}>
         <div style={{ fontSize:24, fontWeight:800, color:T1, marginBottom:22, letterSpacing:-0.5 }}>Notifications</div>
 
         {/* Main switch */}
@@ -352,7 +418,7 @@ function NotificationsPanel({ onClose }: { onClose: () => void }) {
 
         <div style={{ textAlign:"center", fontSize:12, color:T4, paddingTop:32 }}>Recon Beta · Vancouver · v0.1</div>
       </div>
-    </div>
+    </DraggablePanel>
   );
 }
 
@@ -395,13 +461,13 @@ function SecurityPanel({ onClose }: { onClose: () => void }) {
   ];
 
   return (
-    <div style={{ position:"fixed", inset:0, background:BG, zIndex:2000, overflowY:"auto", scrollbarWidth:"none", paddingTop:"max(env(safe-area-inset-top), 20px)" }}>
-      <div style={{ display:"flex", justifyContent:"flex-end", alignItems:"center", padding:"16px 20px 0" }}>
+    <DraggablePanel onClose={onClose}>
+      <div style={{ display:"flex", justifyContent:"flex-end", alignItems:"center", padding:"0 20px" }}>
         <button aria-label="Close" onClick={onClose} style={{ background:SURFACE2, border:`1px solid ${BORDER}`, cursor:"pointer", color:T2, width:32, height:32, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"inherit" }}>
           <IconClose/>
         </button>
       </div>
-      <div style={{ padding:"20px 20px 48px" }}>
+      <div style={{ padding:"0 20px 48px" }}>
         <div style={{ fontSize:24, fontWeight:800, color:T1, marginBottom:6, letterSpacing:-0.5 }}>Security</div>
         <div style={{ fontSize:13, color:T3, lineHeight:1.5, marginBottom:8 }}>Control account access, sessions, and sensitive app settings.</div>
 
@@ -471,7 +537,7 @@ function SecurityPanel({ onClose }: { onClose: () => void }) {
 
         <div style={{ textAlign:"center", fontSize:12, color:T4, paddingTop:32 }}>Recon Beta · Vancouver · v0.1</div>
       </div>
-    </div>
+    </DraggablePanel>
   );
 }
 
@@ -484,45 +550,53 @@ function IconDevice() {
 }
 
 /* ══ Settings panel ═══════════════════════════════════════════════ */
-function SettingsPanel({ onClose, onEditProfile, onPrivacy, onAbout, onNotifications, onSecurity }: { onClose: () => void; onEditProfile: () => void; onPrivacy: () => void; onAbout: () => void; onNotifications: () => void; onSecurity: () => void }) {
+function SettingsPanel({ onClose, onEditProfile, onPrivacy, onAbout, onTerms, onNotifications, onSecurity }: { onClose: () => void; onEditProfile: () => void; onPrivacy: () => void; onAbout: () => void; onTerms: () => void; onNotifications: () => void; onSecurity: () => void }) {
   return (
-    <div style={{ position:"fixed", inset:0, background:BG, zIndex:2000, overflowY:"auto", scrollbarWidth:"none", paddingTop:"max(env(safe-area-inset-top), 20px)" }}>
-      <div style={{ display:"flex", justifyContent:"flex-end", alignItems:"center", padding:"16px 20px 0" }}>
+    <DraggablePanel onClose={onClose}>
+      <div style={{ display:"flex", justifyContent:"flex-end", alignItems:"center", padding:"0 20px" }}>
         <button aria-label="Close" onClick={onClose} style={{ background:SURFACE2, border:`1px solid ${BORDER}`, cursor:"pointer", color:T2, width:32, height:32, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"inherit" }}>
           <IconClose/>
         </button>
       </div>
-      <div style={{ padding:"20px 20px 0" }}>
+      <div style={{ padding:"0 20px 0" }}>
         <div style={{ fontSize:24, fontWeight:800, color:T1, marginBottom:22, letterSpacing:-0.5 }}>Settings</div>
-        {[
+        {([
           { group:"Preferences", rows:[{ label:"Notifications", onClick: onNotifications },{ label:"Security", onClick: onSecurity },{ label:"Data & activity", last:true }] },
           { group:"Account",     rows:[{ label:"Edit profile", onClick: onEditProfile },{ label:"Change city", sublabel:"Vancouver, BC", last:true }] },
-          { group:"About",       rows:[{ label:"About Recon", onClick: onAbout },{ label:"Help & feedback" },{ label:"Terms of service" },{ label:"Privacy policy", last:true, onClick: onPrivacy }] },
-        ].map((section) => (
+          { group:"About",       rows:[{ label:"About Recon", onClick: onAbout },{ label:"Help & feedback" },{ label:"Terms of service", onClick: onTerms },{ label:"Privacy policy", last:true, onClick: onPrivacy }] },
+        ] as { group: string; rows: { label: string; sublabel?: string; last?: boolean; onClick?: () => void }[] }[]).map((section) => (
           <div key={section.group} style={{ marginBottom:20 }}>
             <div style={{ fontSize:10, color:T3, letterSpacing:1.8, textTransform:"uppercase" as const, fontWeight:600, marginBottom:6 }}>{section.group}</div>
             <div style={{ background:SURFACE, borderRadius:16, padding:"0 16px", border:`1px solid ${BORDER}` }}>
-              {section.rows.map((r) => <SettingRow key={r.label} {...(r as any)}/>)}
+              {section.rows.map((r) => (
+                <SettingRow 
+                  key={r.label} 
+                  label={r.label} 
+                  sublabel={r.sublabel}
+                  last={r.last}
+                  onClick={r.onClick}
+                />
+              ))}
             </div>
           </div>
         ))}
         <button style={{ width:"100%", height:50, borderRadius:14, background:"none", border:`1px solid ${BORDER}`, color:T1, fontSize:14, fontWeight:500, cursor:"pointer", marginBottom:28, fontFamily:"inherit" }}>Log out</button>
         <div style={{ textAlign:"center", fontSize:12, color:T4, paddingBottom:32 }}>Recon Beta · Vancouver · v0.1</div>
       </div>
-    </div>
+    </DraggablePanel>
   );
 }
 
 /* ══ About panel ══════════════════════════════════════════════════ */
 function AboutPanel({ onClose }: { onClose: () => void }) {
   return (
-    <div style={{ position:"fixed", inset:0, background:BG, zIndex:2000, overflowY:"auto", scrollbarWidth:"none", paddingTop:"max(env(safe-area-inset-top), 20px)" }}>
-      <div style={{ display:"flex", justifyContent:"flex-end", alignItems:"center", padding:"16px 20px 0" }}>
+    <DraggablePanel onClose={onClose}>
+      <div style={{ display:"flex", justifyContent:"flex-end", alignItems:"center", padding:"0 20px" }}>
         <button aria-label="Close" onClick={onClose} style={{ background:SURFACE2, border:`1px solid ${BORDER}`, cursor:"pointer", color:T2, width:32, height:32, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"inherit" }}>
           <IconClose/>
         </button>
       </div>
-      <div style={{ padding:"20px 20px 48px" }}>
+      <div style={{ padding:"0 20px 48px" }}>
         <div style={{ fontSize:24, fontWeight:800, color:T1, marginBottom:22, letterSpacing:-0.5 }}>About Recon</div>
         
         <p style={{ fontSize:14, color:T2, lineHeight:1.6, marginBottom:24 }}>
@@ -604,22 +678,22 @@ function AboutPanel({ onClose }: { onClose: () => void }) {
         <p style={{ fontSize:14, color:T2, lineHeight:1.6 }}>Check the context.</p>
         <p style={{ fontSize:14, color:T2, lineHeight:1.6 }}>Choose where to go.</p>
       </div>
-    </div>
+    </DraggablePanel>
   );
 }
 
 /* ══ Privacy panel ════════════════════════════════════════════════ */
 function PrivacyPanel({ onClose }: { onClose: () => void }) {
   return (
-    <div style={{ position:"fixed", inset:0, background:BG, zIndex:2000, overflowY:"auto", scrollbarWidth:"none", paddingTop:"max(env(safe-area-inset-top), 20px)" }}>
-      <div style={{ display:"flex", justifyContent:"flex-end", alignItems:"center", padding:"16px 20px 0" }}>
+    <DraggablePanel onClose={onClose}>
+      <div style={{ display:"flex", justifyContent:"flex-end", alignItems:"center", padding:"0 20px" }}>
         <button aria-label="Close" onClick={onClose} style={{ background:SURFACE2, border:`1px solid ${BORDER}`, cursor:"pointer", color:T2, width:32, height:32, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"inherit" }}>
           <IconClose/>
         </button>
       </div>
-      <div style={{ padding:"20px 20px 48px" }}>
+      <div style={{ padding:"0 20px 48px" }}>
         <div style={{ fontSize:24, fontWeight:800, color:T1, marginBottom:24, letterSpacing:-0.5 }}>Privacy</div>
-        
+
         <p style={{ fontSize:14, color:T2, lineHeight:1.6, marginBottom:24 }}>
           Recon is built to help you see what is happening around your city without collecting more information than the app needs to work.
         </p>
@@ -713,7 +787,245 @@ function PrivacyPanel({ onClose }: { onClose: () => void }) {
           wya.tech
         </div>
       </div>
-    </div>
+    </DraggablePanel>
+  );
+}
+
+/* ══ Terms of service panel ═══════════════════════════════════════ */
+function TermsPanel({ onClose }: { onClose: () => void }) {
+  const h3: React.CSSProperties = { fontSize:16, fontWeight:700, color:T1, margin:"28px 0 12px" };
+  const p:  React.CSSProperties = { fontSize:14, color:T2, lineHeight:1.6, marginBottom:16 };
+  return (
+    <DraggablePanel onClose={onClose}>
+      <div style={{ display:"flex", justifyContent:"flex-end", alignItems:"center", padding:"0 20px" }}>
+        <button aria-label="Close" onClick={onClose} style={{ background:SURFACE2, border:`1px solid ${BORDER}`, cursor:"pointer", color:T2, width:32, height:32, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"inherit" }}>
+          <IconClose/>
+        </button>
+      </div>
+      <div style={{ padding:"0 20px 48px" }}>
+        <div style={{ fontSize:24, fontWeight:800, color:T1, marginBottom:6, letterSpacing:-0.5 }}>Terms of Service</div>
+        <div style={{ fontSize:12, color:T4, marginBottom:20 }}>Last updated June 2026</div>
+
+        <h3 style={{ ...h3, marginTop:0 }}>Overview</h3>
+        <p style={p}>
+          This mobile app and website are operated by Recon. Throughout the app and site, the terms “we”, “us” and “our” refer to Recon. Recon offers this mobile app, website, information, tools and Services available through the app or site to you, the user, conditioned upon your acceptance of all terms, conditions, policies and notices stated here.
+        </p>
+        <p style={p}>
+          By accessing our app, visiting our site, creating an account, saving a place, viewing a map pin, opening a post, using directions, receiving an alert, or otherwise using our Service, you engage in our “Service” and agree to be bound by the following terms and conditions (“Terms of Service”, “Terms”), including those additional terms and conditions and policies referenced herein and/or available by hyperlink. These Terms of Service apply to all users of the Service, including without limitation users who are browsers, registered users, creators, venues, businesses, contributors of content, and users who view, save, submit, report, or interact with city activity.
+        </p>
+        <p style={p}>
+          Please read these Terms of Service carefully before accessing or using our app or website. By accessing or using any part of the Service, you agree to be bound by these Terms of Service. If you do not agree to all the terms and conditions of this agreement, then you may not access the app, website, or use any Services. If these Terms of Service are considered an offer, acceptance is expressly limited to these Terms of Service.
+        </p>
+        <p style={p}>
+          Any new features, tools, pages, alerts, maps, categories, dashboards, or mobile app functions which are added to the current Service shall also be subject to the Terms of Service. You can review the most current version of the Terms of Service at any time on this page. We reserve the right to update, change or replace any part of these Terms of Service by posting updates and/or changes to our app or website. It is your responsibility to check this page periodically for changes. Your continued use of or access to the app, website, or Service following the posting of any changes constitutes acceptance of those changes.
+        </p>
+        <p style={p}>
+          Recon is a mobile-first city discovery service. Recon may display maps, city activity, public posts, events, weather-related information, safety cautions, nightlife, cafes, pop-ups, venue information, creator content, and third-party links. Recon is not an emergency service, public safety authority, official weather authority, official transit authority, or official news source.
+        </p>
+
+        <h3 style={h3}>Section 1 — App Terms</h3>
+        <p style={p}>
+          By agreeing to these Terms of Service, you represent that you are at least the age required to use the Service in your state, province, or country of residence, or that you have permission from a parent or legal guardian where required by law.
+        </p>
+        <p style={p}>
+          You may not use our Service for any illegal or unauthorized purpose nor may you, in the use of the Service, violate any laws in your jurisdiction, including but not limited to copyright laws, privacy laws, location data laws, platform rules, and laws relating to harassment, trespass, public safety, or misuse of third-party content.
+        </p>
+        <p style={p}>You must not transmit any worms or viruses or any code of a destructive nature.</p>
+        <p style={p}>
+          You must not use Recon to create, share, report, save, or promote false, harmful, unlawful, misleading, threatening, abusive, private, or unsafe information.
+        </p>
+        <p style={p}>A breach or violation of any of the Terms will result in an immediate termination of your Services.</p>
+
+        <h3 style={h3}>Section 2 — General Conditions</h3>
+        <p style={p}>We reserve the right to refuse service to anyone for any reason at any time.</p>
+        <p style={p}>
+          You understand that your content, location-related information, device information, saved places, saved events, alert preferences, app usage, and other non-payment information may be transferred unencrypted and involve (a) transmissions over various networks; and (b) changes to conform and adapt to technical requirements of connecting networks, devices, maps, databases, hosting providers, or third-party services. Payment information, if any paid features are added in the future, is handled by the applicable payment provider or app store and is encrypted during transfer where required.
+        </p>
+        <p style={p}>
+          You agree not to reproduce, duplicate, copy, sell, resell or exploit any portion of the Service, use of the Service, map data, pin data, source data, user interface, app content, or access to the Service or any contact through which the Service is provided, without express written permission by us.
+        </p>
+        <p style={p}>
+          You agree not to scrape, harvest, crawl, copy, bulk download, reverse engineer, or otherwise collect data from Recon without our express written permission.
+        </p>
+        <p style={p}>The headings used in this agreement are included for convenience only and will not limit or otherwise affect these Terms.</p>
+
+        <h3 style={h3}>Section 3 — Accuracy, Completeness and Timeliness of Information</h3>
+        <p style={p}>
+          We are not responsible if information made available through the Service is not accurate, complete, current, available, safe, or reliable. The material in the app and on the website is provided for general information only and should not be relied upon or used as the sole basis for making decisions without consulting primary, more accurate, more complete, more timely, or official sources of information. Any reliance on the material in the Service is at your own risk.
+        </p>
+        <p style={p}>
+          Recon may display public posts, city activity, events, weather-related information, safety cautions, transit-related information, venue details, creator content, and map pins. Such information may be delayed, incomplete, outdated, inaccurate, miscategorized, unavailable, or based on third-party sources outside our control.
+        </p>
+        <p style={p}>
+          The Service may contain certain historical information. Historical information, necessarily, is not current and is provided for your reference only. Saved events, past activity, expired pins, old posts, previous alerts, and archived dashboard information may not reflect current conditions. We reserve the right to modify the contents of the Service at any time, but we have no obligation to update any information in the Service. You agree that it is your responsibility to monitor changes to the app, website, places, events, routes, alerts, and any other information you rely upon.
+        </p>
+        <p style={p}>
+          Recon is not a substitute for emergency services, official public alerts, government notices, transit authority updates, weather warnings, venue announcements, or direct confirmation from a business, creator, or event organizer.
+        </p>
+
+        <h3 style={h3}>Section 4 — Modifications to the Service and Prices</h3>
+        <p style={p}>
+          Prices for any future paid features, subscriptions, venue tools, creator tools, promoted placements, or premium Services are subject to change without notice.
+        </p>
+        <p style={p}>We reserve the right at any time to modify or discontinue the Service, or any part or content thereof, without notice at any time.</p>
+        <p style={p}>
+          We shall not be liable to you or to any third-party for any modification, price change, suspension, removal of features, change in categories, limitation of alerts, map changes, data source changes, or discontinuance of the Service.
+        </p>
+
+        <h3 style={h3}>Section 5 — Products or Services (if applicable)</h3>
+        <p style={p}>
+          Certain products or Services may be available exclusively online through the app or website. These products or Services may have limited availability and are subject to cancellation, refund, or account rules only according to the applicable policy shown at the time of purchase or subscription.
+        </p>
+        <p style={p}>
+          We have made every effort to display as accurately as possible the locations, categories, maps, pins, events, alerts, images, descriptions, and other information that appear in the Service. We cannot guarantee that your device screen, browser, operating system, network connection, location settings, or map provider will display any information accurately or consistently.
+        </p>
+        <p style={p}>
+          We reserve the right, but are not obligated, to limit access to our products or Services to any person, geographic region or jurisdiction. We may exercise this right on a case-by-case basis. We reserve the right to limit the availability, quantity, visibility, or access to any features or Services that we offer. All descriptions of products, Services, features, subscriptions, categories, alerts, or pricing are subject to change at any time without notice, at the sole discretion of us. We reserve the right to discontinue any product, Service, feature, category, alert, map layer, or source at any time. Any offer for any product or Service made through the app or website is void where prohibited.
+        </p>
+        <p style={p}>
+          We do not warrant that the quality of any products, Services, information, location data, city activity, events, alerts, posts, map pins, or other material purchased, accessed, viewed, saved, or obtained by you will meet your expectations, or that any errors in the Service will be corrected.
+        </p>
+
+        <h3 style={h3}>Section 6 — Accuracy of Billing and Account Information</h3>
+        <p style={p}>
+          We reserve the right to refuse any account, purchase, subscription, venue claim, creator profile, promoted placement, or other request you place with us. We may, in our sole discretion, limit or cancel access, purchases, accounts, claims, subscriptions, or requests placed by or under the same user account, email address, device, payment method, billing address, or other identifying information. In the event that we make a change to or cancel a purchase, account, subscription, claim, or request, we may attempt to notify you by contacting the e-mail and/or account information provided at the time the request was made. We reserve the right to limit or prohibit accounts, claims, purchases, or requests that, in our sole judgment, appear to be fraudulent, abusive, automated, inaccurate, misleading, or made by unauthorized parties.
+        </p>
+        <p style={p}>
+          You agree to provide current, complete and accurate account and purchase information for all accounts, purchases, subscriptions, venue claims, creator tools, or other transactions made through the Service. You agree to promptly update your account and other information, including your email address, payment information where applicable, location preferences, notification preferences, and contact details, so that we can complete your transactions and contact you as needed.
+        </p>
+        <p style={p}>For more detail, please review our Privacy Policy and any applicable refund, subscription, or app store policies.</p>
+
+        <h3 style={h3}>Section 7 — Optional Tools</h3>
+        <p style={p}>
+          We may provide you with access to third-party tools, platforms, services, maps, links, embedded content, post viewers, direction providers, analytics tools, payment processors, weather services, transit services, or other tools over which we neither monitor nor have any control nor input.
+        </p>
+        <p style={p}>
+          You acknowledge and agree that we provide access to such tools “as is” and “as available” without any warranties, representations or conditions of any kind and without any endorsement. We shall have no liability whatsoever arising from or relating to your use of optional third-party tools.
+        </p>
+        <p style={p}>
+          Any use by you of the optional tools offered through the Service is entirely at your own risk and discretion and you should ensure that you are familiar with and approve of the terms on which tools are provided by the relevant third-party provider(s).
+        </p>
+        <p style={p}>
+          We may also, in the future, offer new Services and/or features through the app or website, including new map layers, alerts, dashboards, venue tools, creator tools, paid features, reports, accounts, saved places, city categories, or other resources. Such new features and/or Services shall also be subject to these Terms of Service.
+        </p>
+
+        <h3 style={h3}>Section 8 — Third-Party Links</h3>
+        <p style={p}>Certain content, products and Services available via our Service may include materials from third-parties.</p>
+        <p style={p}>
+          Third-party links in the app or on the website may direct you to third-party websites, apps, platforms, posts, maps, venue pages, event pages, creator pages, social media platforms, transit providers, weather providers, payment providers, or other services that are not affiliated with us. We are not responsible for examining or evaluating the content or accuracy and we do not warrant and will not have any liability or responsibility for any third-party materials, websites, apps, platforms, posts, maps, events, alerts, products, or Services of third-parties.
+        </p>
+        <p style={p}>
+          We are not liable for any harm or damages related to the purchase or use of goods, Services, resources, content, directions, events, places, or any other transactions made in connection with any third-party websites or services. Please review carefully the third-party’s policies and practices and make sure you understand them before you engage in any transaction, visit any location, attend any event, follow any direction, or rely on any third-party information. Complaints, claims, concerns, or questions regarding third-party products, posts, creators, venues, events, maps, alerts, or services should be directed to the third-party.
+        </p>
+
+        <h3 style={h3}>Section 9 — User Comments, Feedback and Other Submissions</h3>
+        <p style={p}>
+          If, at our request, you send certain specific submissions, reports, feedback, corrections, venue details, event information, creator information, bug reports, or without a request from us you send creative ideas, suggestions, proposals, plans, reports, corrections, comments, or other materials, whether online, by email, through the app, by postal mail, or otherwise (collectively, “comments”), you agree that we may, at any time, without restriction, edit, copy, publish, distribute, translate, display, process, moderate, and otherwise use in any medium any comments that you forward to us. We are and shall be under no obligation (1) to maintain any comments in confidence; (2) to pay compensation for any comments; or (3) to respond to any comments.
+        </p>
+        <p style={p}>
+          We may, but have no obligation to, monitor, edit or remove content that we determine in our sole discretion to be unlawful, offensive, threatening, libelous, defamatory, pornographic, obscene, misleading, unsafe, private, inaccurate, harmful, abusive, spam, or otherwise objectionable or violates any party’s intellectual property, privacy rights, platform rights, or these Terms of Service.
+        </p>
+        <p style={p}>
+          You agree that your comments, reports, submissions, posts, corrections, or other content will not violate any right of any third-party, including copyright, trademark, privacy, personality, publicity, safety, or other personal or proprietary right. You further agree that your comments will not contain libelous or otherwise unlawful, abusive, obscene, misleading, private, dangerous, or harmful material, or contain any computer virus or other malware that could in any way affect the operation of the Service or any related website, app, platform, or third-party service. You may not use a false e-mail address, pretend to be someone other than yourself, falsely represent a venue, creator, business, event, or source, or otherwise mislead us or third-parties as to the origin of any comments. You are solely responsible for any comments you make and their accuracy. We take no responsibility and assume no liability for any comments, reports, corrections, submissions, or content posted by you or any third-party.
+        </p>
+
+        <h3 style={h3}>Section 10 — Personal Information</h3>
+        <p style={p}>
+          Your submission of personal information through the app, website, account, location features, saved places, alerts, dashboard, settings, or any related Service is governed by our Privacy Policy. To view our Privacy Policy, please see [LINK TO PRIVACY POLICY].
+        </p>
+
+        <h3 style={h3}>Section 11 — Errors, Inaccuracies and Omissions</h3>
+        <p style={p}>
+          Occasionally there may be information in the app, website, or Service that contains typographical errors, inaccuracies or omissions that may relate to place names, categories, event descriptions, times, creator handles, post links, source labels, map pins, directions, location data, weather-related information, safety cautions, transit information, pricing, promotions, offers, subscription terms, availability, or other city activity. We reserve the right to correct any errors, inaccuracies or omissions, and to change or update information or cancel accounts, purchases, subscriptions, claims, posts, pins, events, alerts, or orders if any information in the Service or on any related website is inaccurate at any time without prior notice, including after you have submitted a request, account information, saved event, report, purchase, or other action.
+        </p>
+        <p style={p}>
+          We undertake no obligation to update, amend or clarify information in the Service or on any related website, including without limitation, place information, event information, pricing information, map information, public posts, source links, alerts, or availability, except as required by law. No specified update or refresh date applied in the Service or on any related website should be taken to indicate that all information in the Service or on any related website has been modified or updated.
+        </p>
+
+        <h3 style={h3}>Section 12 — Prohibited Uses</h3>
+        <p style={p}>In addition to other prohibitions as set forth in the Terms of Service, you are prohibited from using the app, website, Service, or its content:</p>
+        <ul style={{ fontSize:14, color:T2, lineHeight:1.8, marginBottom:16, paddingLeft:20 }}>
+          <li>(a) for any unlawful purpose;</li>
+          <li>(b) to solicit others to perform or participate in any unlawful acts;</li>
+          <li>(c) to violate any international, federal, provincial, state, local, or municipal regulations, rules, laws, or ordinances;</li>
+          <li>(d) to infringe upon or violate our intellectual property rights or the intellectual property rights of others;</li>
+          <li>(e) to harass, abuse, insult, harm, defame, slander, disparage, intimidate, threaten, stalk, or discriminate based on gender, sexual orientation, religion, ethnicity, race, age, national origin, disability, or any protected status;</li>
+          <li>(f) to submit false or misleading information;</li>
+          <li>(g) to upload or transmit viruses or any other type of malicious code that will or may be used in any way that will affect the functionality or operation of the Service or of any related app, website, other websites, platforms, services, or the Internet;</li>
+          <li>(h) to collect or track the personal information, location, identity, account information, or private activity of others;</li>
+          <li>(i) to spam, phish, pharm, pretext, spider, crawl, scrape, bulk download, automate, or harvest data;</li>
+          <li>(j) for any obscene, harmful, exploitative, abusive, or immoral purpose;</li>
+          <li>(k) to interfere with or circumvent the security features of the Service or any related app, website, other websites, platforms, services, or the Internet;</li>
+          <li>(l) to expose private addresses, sensitive locations, private personal information, or information that may put a person at risk;</li>
+          <li>(m) to submit false safety reports, false event information, false venue claims, or misleading public activity; or</li>
+          <li>(n) to use Recon to encourage trespassing, unsafe activity, violence, vandalism, harassment, or illegal conduct.</li>
+        </ul>
+        <p style={p}>We reserve the right to terminate your use of the Service or any related website for violating any of the prohibited uses.</p>
+
+        <h3 style={h3}>Section 13 — Disclaimer of Warranties; Limitation of Liability</h3>
+        <p style={p}>We do not guarantee, represent or warrant that your use of our Service will be uninterrupted, timely, secure or error-free.</p>
+        <p style={p}>We do not warrant that the results that may be obtained from the use of the Service will be accurate or reliable.</p>
+        <p style={p}>You agree that from time to time we may remove the Service for indefinite periods of time or cancel the Service at any time, without notice to you.</p>
+        <p style={p}>
+          You expressly agree that your use of, or inability to use, the Service is at your sole risk. The Service and all products, Services, information, content, map pins, events, alerts, directions, location data, dashboards, posts, and other materials delivered to you through the Service are, except as expressly stated by us, provided “as is” and “as available” for your use, without any representation, warranties or conditions of any kind, either express or implied, including all implied warranties or conditions of merchantability, merchantable quality, fitness for a particular purpose, durability, title, accuracy, availability, safety, and non-infringement.
+        </p>
+        <p style={p}>
+          In no case shall Recon, our directors, officers, employees, affiliates, agents, contractors, interns, suppliers, service providers or licensors be liable for any injury, loss, claim, personal injury, property damage, travel issue, missed event, incorrect direction, inaccurate alert, unsafe condition, lost data, or any direct, indirect, incidental, punitive, special, or consequential damages of any kind, including, without limitation lost profits, lost revenue, lost savings, loss of data, replacement costs, lost opportunity, missed booking, missed event, travel costs, or any similar damages, whether based in contract, tort, including negligence, strict liability or otherwise, arising from your use of any of the Service or any products procured using the Service, or for any other claim related in any way to your use of the Service or any product, including, but not limited to, any errors or omissions in any content, map pin, event, alert, source, post, route, category, or location information, or any loss or damage of any kind incurred as a result of the use of the Service or any content posted, transmitted, displayed, linked, embedded, mapped, saved, or otherwise made available via the Service, even if advised of their possibility.
+        </p>
+        <p style={p}>
+          Because some states, provinces, countries, or jurisdictions do not allow the exclusion or the limitation of liability for consequential or incidental damages, in such states, provinces, countries, or jurisdictions, our liability shall be limited to the maximum extent permitted by law.
+        </p>
+
+        <h3 style={h3}>Section 14 — Indemnification</h3>
+        <p style={p}>
+          You agree to indemnify, defend and hold harmless Recon and our parent, subsidiaries, affiliates, partners, officers, directors, agents, contractors, licensors, service providers, subcontractors, suppliers, interns and employees, harmless from any claim or demand, including reasonable attorneys’ fees, made by any third-party due to or arising out of your breach of these Terms of Service or the documents they incorporate by reference, your use of the Service, your content, your reports, your submissions, your violation of any law, your misuse of third-party content, your violation of platform rules, or your violation of the rights of a third-party.
+        </p>
+
+        <h3 style={h3}>Section 15 — Severability</h3>
+        <p style={p}>
+          In the event that any provision of these Terms of Service is determined to be unlawful, void or unenforceable, such provision shall nonetheless be enforceable to the fullest extent permitted by applicable law, and the unenforceable portion shall be deemed to be severed from these Terms of Service. Such determination shall not affect the validity and enforceability of any other remaining provisions.
+        </p>
+
+        <h3 style={h3}>Section 16 — Termination</h3>
+        <p style={p}>The obligations and liabilities of the parties incurred prior to the termination date shall survive the termination of this agreement for all purposes.</p>
+        <p style={p}>
+          These Terms of Service are effective unless and until terminated by either you or us. You may terminate these Terms of Service at any time by notifying us that you no longer wish to use our Services, deleting your account where available, or when you cease using our app or site.
+        </p>
+        <p style={p}>
+          If in our sole judgment you fail, or we suspect that you have failed, to comply with any term or provision of these Terms of Service, we also may terminate this agreement at any time without notice and you will remain liable for all amounts due up to and including the date of termination, and/or accordingly may deny you access to our Services, accounts, saved items, app features, website, or any part thereof.
+        </p>
+
+        <h3 style={h3}>Section 17 — Entire Agreement</h3>
+        <p style={p}>The failure of us to exercise or enforce any right or provision of these Terms of Service shall not constitute a waiver of such right or provision.</p>
+        <p style={p}>
+          These Terms of Service and any policies or operating rules posted by us in the app, on this site, or in respect to the Service constitute the entire agreement and understanding between you and us and govern your use of the Service, superseding any prior or contemporaneous agreements, communications and proposals, whether oral or written, between you and us, including but not limited to any prior versions of the Terms of Service.
+        </p>
+        <p style={p}>Any ambiguities in the interpretation of these Terms of Service shall not be construed against the drafting party.</p>
+
+        <h3 style={h3}>Section 18 — Governing Law</h3>
+        <p style={p}>
+          These Terms of Service and any separate agreements whereby we provide you Services shall be governed by and construed in accordance with the laws of Canada.
+        </p>
+
+        <h3 style={h3}>Section 19 — Changes to Terms of Service</h3>
+        <p style={p}>You can review the most current version of the Terms of Service at any time at this page.</p>
+        <p style={p}>
+          We reserve the right, at our sole discretion, to update, change or replace any part of these Terms of Service by posting updates and changes to our app or website. It is your responsibility to check our app or website periodically for changes. Your continued use of or access to the app, website, or the Service following the posting of any changes to these Terms of Service constitutes acceptance of those changes.
+        </p>
+
+        <h3 style={h3}>Section 20 — Contact Information</h3>
+        <p style={{ ...p, marginBottom:4 }}>Questions about the Terms of Service should be sent to us at <a href="mailto:david.ren@nyu.edu" style={{ color:T1, textDecoration:"none" }}>david.ren@nyu.edu</a>.</p>
+        <p style={{ ...p, marginBottom:4 }}>Our contact information is posted below:</p>
+        <div style={{ fontSize:14, color:T1, lineHeight:1.6, fontWeight:500 }}>
+          Recon<br/>
+          david.ren@nyu.edu<br/>
+          [INSERT BUSINESS ADDRESS]<br/>
+          [INSERT BUSINESS PHONE NUMBER]<br/>
+          [INSERT BUSINESS REGISTRATION NUMBER]<br/>
+          [INSERT VAT NUMBER, IF APPLICABLE]
+        </div>
+      </div>
+    </DraggablePanel>
   );
 }
 
@@ -727,9 +1039,8 @@ function AccountPanel({ onClose }: { onClose: () => void }) {
     />
   );
   return (
-    /* Use position: fixed and extremely high z-index to stay above the map */
-    <div style={{ position:"fixed", inset:0, background:BG, zIndex:2000, overflowY:"auto", scrollbarWidth:"none", paddingTop:"max(env(safe-area-inset-top), 20px)" }}>
-      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"16px 20px 0" }}>
+    <DraggablePanel onClose={onClose}>
+      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"0 20px" }}>
         <span style={{ fontSize:10, color:T3, letterSpacing:1.8, textTransform:"uppercase", fontWeight:600 }}>Account</span>
         <button aria-label="Close" onClick={onClose} style={{ background:SURFACE2, border:`1px solid ${BORDER}`, cursor:"pointer", color:T2, width:32, height:32, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"inherit" }}>
           <IconClose/>
@@ -768,7 +1079,7 @@ function AccountPanel({ onClose }: { onClose: () => void }) {
       <div style={{ padding:"22px 20px 32px" }}>
         <button style={{ width:"100%", height:50, borderRadius:14, background:T1, border:"none", color:"#0d0d0d", fontSize:14, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>Edit profile</button>
       </div>
-    </div>
+    </DraggablePanel>
   );
 }
 
@@ -840,6 +1151,7 @@ export default function BottomNav() {
   const [accountOpen,  setAccountOpen]  = useState(false);
   const [privacyOpen,  setPrivacyOpen]  = useState(false);
   const [aboutOpen,    setAboutOpen]    = useState(false);
+  const [termsOpen,    setTermsOpen]    = useState(false);
   const [notifsOpen,   setNotifsOpen]   = useState(false);
   const [securityOpen, setSecurityOpen] = useState(false);
 
@@ -901,31 +1213,18 @@ export default function BottomNav() {
       {settingsOpen && (
         <SettingsPanel 
           onClose={() => setSettingsOpen(false)} 
-          onEditProfile={() => {
-            setSettingsOpen(false);
-            setAccountOpen(true);
-          }}
-          onPrivacy={() => {
-            setSettingsOpen(false);
-            setPrivacyOpen(true);
-          }}
-          onAbout={() => {
-            setSettingsOpen(false);
-            setAboutOpen(true);
-          }}
-          onNotifications={() => {
-            setSettingsOpen(false);
-            setNotifsOpen(true);
-          }}
-          onSecurity={() => {
-            setSettingsOpen(false);
-            setSecurityOpen(true);
-          }}
+          onEditProfile={() => setAccountOpen(true)}
+          onPrivacy={() => setPrivacyOpen(true)}
+          onAbout={() => setAboutOpen(true)}
+          onTerms={() => setTermsOpen(true)}
+          onNotifications={() => setNotifsOpen(true)}
+          onSecurity={() => setSecurityOpen(true)}
         />
       )}
       {accountOpen  && <AccountPanel  onClose={() => setAccountOpen(false)}/>}
       {privacyOpen  && <PrivacyPanel  onClose={() => setPrivacyOpen(false)}/>}
       {aboutOpen    && <AboutPanel    onClose={() => setAboutOpen(false)}/>}
+      {termsOpen    && <TermsPanel    onClose={() => setTermsOpen(false)}/>}
       {notifsOpen   && <NotificationsPanel onClose={() => setNotifsOpen(false)}/>}
       {securityOpen && <SecurityPanel onClose={() => setSecurityOpen(false)}/>}
     </>
