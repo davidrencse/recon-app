@@ -230,14 +230,10 @@ export default function HomeScreen() {
           ))}
         </div>
 
-        {/* Feed */}
+          {/* Feed */}
         <div style={{ flex: 1, minHeight: 0, overflowY: "auto", scrollbarWidth: "none", padding: "16px 20px 0" }}>
           {/* Section header */}
           <div style={{ marginBottom: 10 }}>
-            <div style={{ fontSize: 11, color: "#555", marginBottom: 4, display: "flex", alignItems: "center", gap: 6 }}>
-              <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#ef4444", display: "inline-block" }} />
-              Live · updated seconds ago
-            </div>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <span style={{ fontSize: 17, fontWeight: 700, color: "#fff" }}>Happening now</span>
               <span style={{ fontSize: 12, color: "#555", cursor: "pointer" }}>{filtered.length} shown</span>

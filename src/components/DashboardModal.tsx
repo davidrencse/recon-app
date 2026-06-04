@@ -36,13 +36,9 @@ export default function DashboardModal({ title, children, onClose }: DashboardMo
         position: "absolute", inset: 0, zIndex: 60,
         background: BG, display: "flex", flexDirection: "column",
         outline: "none", overflowY: "auto", scrollbarWidth: "none",
+        paddingTop: "max(env(safe-area-inset-top), 20px)"
       }}
     >
-      {/* Handle */}
-      <div style={{ display: "flex", justifyContent: "center", padding: "14px 0 8px", flexShrink: 0 }}>
-        <div style={{ width: 36, height: 4, borderRadius: 2, background: "rgba(255,255,255,0.1)" }} />
-      </div>
-
       {/* Header */}
       <div style={{
         display: "flex", alignItems: "center", justifyContent: "space-between",

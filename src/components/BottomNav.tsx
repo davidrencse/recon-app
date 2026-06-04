@@ -141,11 +141,10 @@ function DraggablePanel({ children, onClose }: { children: React.ReactNode; onCl
         touchAction: "pan-y"
       }}
     >
-      <div style={{ position: "sticky", top: 0, background: BG, zIndex: 10, paddingTop: "max(env(safe-area-inset-top), 20px)" }}>
-        <div style={{ display: "flex", justifyContent: "center", padding: "8px 0 12px" }}>
-          <div style={{ width: 36, height: 5, borderRadius: 3, background: SURFACE2 }} />
-        </div>
-      </div>
+      {/* Background extension above top edge */}
+      <div style={{ position: "absolute", top: -1000, left: 0, right: 0, height: 1000, background: BG }} />
+      
+      <div style={{ position: "sticky", top: 0, background: BG, zIndex: 10, paddingTop: "max(env(safe-area-inset-top), 20px)" }} />
       <div style={{ minHeight: "100%", paddingBottom: 60 }}>
         {children}
       </div>
@@ -550,7 +549,7 @@ function IconDevice() {
 }
 
 /* ══ Settings panel ═══════════════════════════════════════════════ */
-function SettingsPanel({ onClose, onEditProfile, onPrivacy, onAbout, onTerms, onNotifications, onSecurity }: { onClose: () => void; onEditProfile: () => void; onPrivacy: () => void; onAbout: () => void; onTerms: () => void; onNotifications: () => void; onSecurity: () => void }) {
+function SettingsPanel({ onClose, onEditProfile, onPrivacy, onAbout, onHelp, onTerms, onNotifications, onSecurity, onDataActivity }: { onClose: () => void; onEditProfile: () => void; onPrivacy: () => void; onAbout: () => void; onHelp: () => void; onTerms: () => void; onNotifications: () => void; onSecurity: () => void; onDataActivity: () => void }) {
   return (
     <DraggablePanel onClose={onClose}>
       <div style={{ display:"flex", justifyContent:"flex-end", alignItems:"center", padding:"0 20px" }}>
@@ -561,9 +560,9 @@ function SettingsPanel({ onClose, onEditProfile, onPrivacy, onAbout, onTerms, on
       <div style={{ padding:"0 20px 0" }}>
         <div style={{ fontSize:24, fontWeight:800, color:T1, marginBottom:22, letterSpacing:-0.5 }}>Settings</div>
         {([
-          { group:"Preferences", rows:[{ label:"Notifications", onClick: onNotifications },{ label:"Security", onClick: onSecurity },{ label:"Data & activity", last:true }] },
+          { group:"Preferences", rows:[{ label:"Notifications", onClick: onNotifications },{ label:"Security", onClick: onSecurity },{ label:"Data & activity", last:true, onClick: onDataActivity }] },
           { group:"Account",     rows:[{ label:"Edit profile", onClick: onEditProfile },{ label:"Change city", sublabel:"Vancouver, BC", last:true }] },
-          { group:"About",       rows:[{ label:"About Recon", onClick: onAbout },{ label:"Help & feedback" },{ label:"Terms of service", onClick: onTerms },{ label:"Privacy policy", last:true, onClick: onPrivacy }] },
+          { group:"About",       rows:[{ label:"About Recon", onClick: onAbout },{ label:"Help & feedback", onClick: onHelp },{ label:"Terms of service", onClick: onTerms },{ label:"Privacy policy", last:true, onClick: onPrivacy }] },
         ] as { group: string; rows: { label: string; sublabel?: string; last?: boolean; onClick?: () => void }[] }[]).map((section) => (
           <div key={section.group} style={{ marginBottom:20 }}>
             <div style={{ fontSize:10, color:T3, letterSpacing:1.8, textTransform:"uppercase" as const, fontWeight:600, marginBottom:6 }}>{section.group}</div>
@@ -582,6 +581,109 @@ function SettingsPanel({ onClose, onEditProfile, onPrivacy, onAbout, onTerms, on
         ))}
         <button style={{ width:"100%", height:50, borderRadius:14, background:"none", border:`1px solid ${BORDER}`, color:T1, fontSize:14, fontWeight:500, cursor:"pointer", marginBottom:28, fontFamily:"inherit" }}>Log out</button>
         <div style={{ textAlign:"center", fontSize:12, color:T4, paddingBottom:32 }}>Recon Beta · Vancouver · v0.1</div>
+      </div>
+    </DraggablePanel>
+  );
+}
+
+/* ══ Help panel ═══════════════════════════════════════════════════ */
+function HelpPanel({ onClose }: { onClose: () => void }) {
+  const h3: React.CSSProperties = { fontSize:16, fontWeight:700, color:T1, margin:"28px 0 12px" };
+  const p:  React.CSSProperties = { fontSize:14, color:T2, lineHeight:1.6, marginBottom:16 };
+  return (
+    <DraggablePanel onClose={onClose}>
+      <div style={{ display:"flex", justifyContent:"flex-end", alignItems:"center", padding:"0 20px" }}>
+        <button aria-label="Close" onClick={onClose} style={{ background:SURFACE2, border:`1px solid ${BORDER}`, cursor:"pointer", color:T2, width:32, height:32, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"inherit" }}>
+          <IconClose/>
+        </button>
+      </div>
+      <div style={{ padding:"0 20px 48px" }}>
+        <div style={{ fontSize:24, fontWeight:800, color:T1, marginBottom:22, letterSpacing:-0.5 }}>Help & feedback</div>
+        
+        <p style={{ fontSize:14, color:T2, lineHeight:1.6, marginBottom:24 }}>
+          We are currently in Beta. Your feedback helps us improve how Recon understands and organizes the city.
+        </p>
+
+        <h3 style={{ ...h3, marginTop:0 }}>Frequently Asked Questions</h3>
+        <div style={{ marginBottom: 24 }}>
+          <div style={{ fontSize:14, fontWeight:600, color:T1, marginBottom:4 }}>How does Recon find places and events?</div>
+          <p style={{ ...p, marginBottom:16 }}>Recon aggregates public posts, event listings, and community updates to show you what is happening locally.</p>
+          
+          <div style={{ fontSize:14, fontWeight:600, color:T1, marginBottom:4 }}>Why isn&apos;t my favorite spot on the map?</div>
+          <p style={{ ...p, marginBottom:16 }}>We only map places that have recent activity or upcoming events. If a place has no current buzz, it might not show up right now.</p>
+          
+          <div style={{ fontSize:14, fontWeight:600, color:T1, marginBottom:4 }}>How do I change my city?</div>
+          <p style={{ ...p, marginBottom:0 }}>Recon is currently only available for Vancouver during our Beta testing phase. More cities will be added soon.</p>
+        </div>
+
+        <h3 style={h3}>Report an issue</h3>
+        <p style={{ ...p, marginBottom:16 }}>
+          Notice a bug, an incorrect map pin, or a miscategorized event? Let us know so we can fix it.
+        </p>
+        <button style={{ width:"100%", height:50, borderRadius:14, background:SURFACE, border:`1px solid ${BORDER}`, color:T1, fontSize:14, fontWeight:600, cursor:"pointer", marginBottom:24, fontFamily:"inherit" }}>
+          Report an issue
+        </button>
+
+        <h3 style={h3}>Send feedback</h3>
+        <p style={{ ...p, marginBottom:16 }}>
+          Have an idea for a new feature or ways we can improve the app? We read every message.
+        </p>
+        <button style={{ width:"100%", height:50, borderRadius:14, background:T1, border:"none", color:"#0d0d0d", fontSize:14, fontWeight:700, cursor:"pointer", marginBottom:24, fontFamily:"inherit" }}>
+          Send feedback
+        </button>
+
+        <h3 style={h3}>Contact Support</h3>
+        <p style={{ ...p, marginBottom:4 }}>For urgent support or account issues, contact us at:</p>
+        <div style={{ fontSize:14, color:T1, lineHeight:1.6, fontWeight:500 }}>
+          support@wya.tech
+        </div>
+      </div>
+    </DraggablePanel>
+  );
+}
+
+/* ══ Data & Activity panel ════════════════════════════════════════ */
+function DataActivityPanel({ onClose }: { onClose: () => void }) {
+  const [analytics, setAnalytics] = useState(true);
+  const [personalization, setPersonalization] = useState(true);
+  
+  const card: React.CSSProperties = { background:SURFACE, borderRadius:16, border:`1px solid ${BORDER}`, padding:"4px 16px" };
+
+  return (
+    <DraggablePanel onClose={onClose}>
+      <div style={{ display:"flex", justifyContent:"flex-end", alignItems:"center", padding:"0 20px" }}>
+        <button aria-label="Close" onClick={onClose} style={{ background:SURFACE2, border:`1px solid ${BORDER}`, cursor:"pointer", color:T2, width:32, height:32, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"inherit" }}>
+          <IconClose/>
+        </button>
+      </div>
+      <div style={{ padding:"0 20px 48px" }}>
+        <div style={{ fontSize:24, fontWeight:800, color:T1, marginBottom:6, letterSpacing:-0.5 }}>Data & activity</div>
+        <div style={{ fontSize:13, color:T3, lineHeight:1.5, marginBottom:22 }}>Manage how your data is used and clear your app history.</div>
+
+        <NotifSection>Data usage</NotifSection>
+        <div style={card}>
+          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", gap:14, padding:"15px 0", borderBottom:`1px solid ${LINE}` }}>
+            <div style={{ flex:1 }}>
+              <div style={{ fontSize:14, fontWeight:600, color:T1 }}>App analytics</div>
+              <div style={{ fontSize:12.5, color:T3, marginTop:3, lineHeight:1.5 }}>Share anonymous usage data to help us improve Recon.</div>
+            </div>
+            <Switch on={analytics} onClick={() => setAnalytics(v => !v)}/>
+          </div>
+          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", gap:14, padding:"15px 0" }}>
+            <div style={{ flex:1 }}>
+              <div style={{ fontSize:14, fontWeight:600, color:T1 }}>Personalization</div>
+              <div style={{ fontSize:12.5, color:T3, marginTop:3, lineHeight:1.5 }}>Allow Recon to use your activity to recommend better places and events.</div>
+            </div>
+            <Switch on={personalization} onClick={() => setPersonalization(v => !v)}/>
+          </div>
+        </div>
+
+        <NotifSection>Manage history</NotifSection>
+        <div style={card}>
+          <ActionRow title="Clear search history" desc="Remove all your past search queries." action="Clear" />
+          <ActionRow title="Clear recently viewed" desc="Remove history of places and events you've viewed." action="Clear" />
+          <ActionRow title="Clear cache" desc="Free up storage space used by the app." action="Clear" danger last/>
+        </div>
       </div>
     </DraggablePanel>
   );
@@ -1151,6 +1253,8 @@ export default function BottomNav() {
   const [accountOpen,  setAccountOpen]  = useState(false);
   const [privacyOpen,  setPrivacyOpen]  = useState(false);
   const [aboutOpen,    setAboutOpen]    = useState(false);
+  const [helpOpen,     setHelpOpen]     = useState(false);
+  const [dataActivityOpen, setDataActivityOpen] = useState(false);
   const [termsOpen,    setTermsOpen]    = useState(false);
   const [notifsOpen,   setNotifsOpen]   = useState(false);
   const [securityOpen, setSecurityOpen] = useState(false);
@@ -1216,14 +1320,18 @@ export default function BottomNav() {
           onEditProfile={() => setAccountOpen(true)}
           onPrivacy={() => setPrivacyOpen(true)}
           onAbout={() => setAboutOpen(true)}
+          onHelp={() => setHelpOpen(true)}
           onTerms={() => setTermsOpen(true)}
           onNotifications={() => setNotifsOpen(true)}
           onSecurity={() => setSecurityOpen(true)}
+          onDataActivity={() => setDataActivityOpen(true)}
         />
       )}
       {accountOpen  && <AccountPanel  onClose={() => setAccountOpen(false)}/>}
       {privacyOpen  && <PrivacyPanel  onClose={() => setPrivacyOpen(false)}/>}
       {aboutOpen    && <AboutPanel    onClose={() => setAboutOpen(false)}/>}
+      {helpOpen     && <HelpPanel     onClose={() => setHelpOpen(false)}/>}
+      {dataActivityOpen && <DataActivityPanel onClose={() => setDataActivityOpen(false)}/>}
       {termsOpen    && <TermsPanel    onClose={() => setTermsOpen(false)}/>}
       {notifsOpen   && <NotificationsPanel onClose={() => setNotifsOpen(false)}/>}
       {securityOpen && <SecurityPanel onClose={() => setSecurityOpen(false)}/>}
