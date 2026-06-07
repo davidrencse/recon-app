@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import type { MockCityItem, ReconCategory } from "../lib/mockCity";
-import mockCityData from "../lib/mockCity";
+import { useState } from "react";
+import type { PinCategory } from "../types/pin";
 
 /* ── Icons ────────────────────────────────────────────────────── */
 function ReconSmall() {
@@ -53,81 +52,18 @@ function IconArrow() {
   return <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>;
 }
 
-/* ── FeedCard ─────────────────────────────────────────────────── */
-function FeedCard({ item }: { item: MockCityItem }) {
-  return (
-    <div
-      style={{
-        borderRadius: 12,
-        overflow: "hidden",
-        padding: "14px 14px 13px",
-        position: "relative",
-        background: "linear-gradient(to right, rgba(20,20,20,0.6), rgba(14,14,14,0)), #111",
-        border: "1px solid rgba(255,255,255,0.05)",
-        cursor: "pointer",
-      }}
-    >
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 7 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <span style={{
-            fontSize: 11, fontWeight: 600, color: "#e0e0e0",
-            background: "rgba(255,255,255,0.1)", padding: "2px 8px", borderRadius: 6,
-          }}>
-            {item.category.toUpperCase()}
-          </span>
-          <span style={{ fontSize: 11, color: "#555" }}>· {item.timeWindow}</span>
-        </div>
-        <span style={{ color: "#555" }}><IconArrow /></span>
-      </div>
-      <div style={{ fontSize: 15, fontWeight: 700, color: "#f0f0f0", lineHeight: 1.3, marginBottom: 4 }}>
-        {item.title}
-      </div>
-      <div style={{ fontSize: 12, color: "#555" }}>{item.placeName} · {item.neighborhood}</div>
-    </div>
-  );
-}
 
 /* ── Main ─────────────────────────────────────────────────────── */
 export default function HomeScreen() {
   const FILTERS = [
-    { key: "trending" as ReconCategory, label: "Trending", icon: <IconTrendUp /> },
-    { key: "cafes" as ReconCategory,    label: "Cafés",    icon: <IconCoffee /> },
-    { key: "nightlife" as ReconCategory,label: "Nightlife", icon: <IconMartini /> },
-    { key: "pop" as ReconCategory,      label: "Pop",      icon: <IconStar /> },
+    { key: "trending" as PinCategory, label: "Trending", icon: <IconTrendUp /> },
+    { key: "cafes" as PinCategory,    label: "Cafés",    icon: <IconCoffee /> },
+    { key: "nightlife" as PinCategory,label: "Nightlife", icon: <IconMartini /> },
+    { key: "pop" as PinCategory,      label: "Pop",      icon: <IconStar /> },
   ];
 
-  const [active, setActive] = useState<ReconCategory>("trending");
+  const [active, setActive] = useState<PinCategory>("trending");
   const [searchQuery, setSearchQuery] = useState("");
-
-  const uniqueData = useMemo(() => {
-    const map = new Map<string, MockCityItem>();
-    for (const d of mockCityData) map.set(d.id, d);
-    return Array.from(map.values());
-  }, []);
-
-  const filtered = useMemo(() => {
-    const query = searchQuery.trim().toLowerCase();
-
-    return uniqueData
-      .filter((d) => d.category === active)
-      .filter((d) => {
-        if (!query) return true;
-
-        const haystack = [
-          d.title,
-          d.placeName,
-          d.neighborhood,
-          d.description,
-          d.timeWindow,
-          ...d.tags,
-        ]
-          .join(" ")
-          .toLowerCase();
-
-        return haystack.includes(query);
-      })
-      .slice(0, 12);
-  }, [active, searchQuery, uniqueData]);
 
   return (
     <div style={{ 
@@ -236,18 +172,16 @@ export default function HomeScreen() {
           <div style={{ marginBottom: 10 }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <span style={{ fontSize: 17, fontWeight: 700, color: "#fff" }}>Happening now</span>
-              <span style={{ fontSize: 12, color: "#555", cursor: "pointer" }}>{filtered.length} shown</span>
+              <span style={{ fontSize: 12, color: "#555" }}>0 shown</span>
             </div>
           </div>
 
           {/* Cards */}
           <div style={{ display: "flex", flexDirection: "column", gap: 8, paddingBottom: 16 }}>
-            {filtered.map((item) => (
-              <FeedCard key={item.id} item={item} />
-            ))}
-            {filtered.length === 0 && (
-              <div style={{ color: "#666", fontSize: 13 }}>No items for this category.</div>
-            )}
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, padding: "40px 0", pointerEvents: "none" }}>
+              <span style={{ color: "#444", fontSize: 13, fontWeight: 500 }}>No live activity yet.</span>
+              <span style={{ color: "#2e2e2e", fontSize: 12 }}>Backend connected. Waiting for city activity.</span>
+            </div>
           </div>
         </div>
     </div>
