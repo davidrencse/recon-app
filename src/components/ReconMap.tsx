@@ -1,11 +1,9 @@
 "use client";
 
-import { useState, useMemo, memo, useEffect } from "react";
+import { useState, useMemo, memo, useEffect, useCallback } from "react";
 import dynamic from "next/dynamic";
 import type { Pin, PinCategory } from "../types/pin";
-import { mockPins, PIN_META } from "../lib/mockPins";
-import { mockCityData } from "../lib/mockCity";
-import type { MockCityItem, ReconCategory } from "../lib/mockCity";
+import { getPins } from "../lib/getPins";
 
 const LeafletMap = dynamic(() => import("./LeafletMap"), {
   ssr: false,
@@ -18,39 +16,28 @@ const LeafletMap = dynamic(() => import("./LeafletMap"), {
 
 type FilterKey = "all" | PinCategory;
 
-const HOME_CATEGORY_TO_PIN: Record<ReconCategory, PinCategory> = {
-  trending: "locations",
-  cafes: "daily_life",
-  nightlife: "special_events",
-  pop: "special_events",
-};
-
-const HOME_META: Record<string, { street: string; attendees: number }> = {};
-
-for (const item of mockCityData) {
-  HOME_META[`home-${item.id}`] = {
-    street: `${item.placeName} · ${item.neighborhood}`,
-    attendees: item.postCount,
-  };
-}
-
 const FILTER_ICON: Record<string, React.ReactNode> = {
   all: (
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
       <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>
     </svg>
   ),
-  daily_life: (
+  trending: (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>
+    </svg>
+  ),
+  cafes: (
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/>
     </svg>
   ),
-  special_events: (
+  nightlife: (
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="m19 3-7 8-7-8Z"/><path d="M12 11v11"/><path d="M8 22h8"/>
     </svg>
   ),
-  locations: (
+  pop: (
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/>
       <circle cx="12" cy="12" r="2"/>
@@ -60,10 +47,11 @@ const FILTER_ICON: Record<string, React.ReactNode> = {
 };
 
 const FILTERS: { key: FilterKey; label: string }[] = [
-  { key: "all",            label: "Trending" },
-  { key: "daily_life",     label: "Cafés"    },
-  { key: "special_events", label: "Nightlife" },
-  { key: "locations",      label: "Live"     },
+  { key: "all",       label: "All"       },
+  { key: "trending",  label: "Trending"  },
+  { key: "cafes",     label: "Cafés"     },
+  { key: "nightlife", label: "Nightlife" },
+  { key: "pop",       label: "Pop-up"    },
 ];
 
 function relativeTime(iso: string): string {
@@ -86,8 +74,6 @@ interface PinPopupProps {
 }
 
 const PinPopup = memo(function PinPopup({ pin, onClose }: PinPopupProps) {
-  const meta = PIN_META[pin.postId] ?? HOME_META[pin.postId];
-
   const openPost = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!pin.postUrl) return;
@@ -111,18 +97,6 @@ const PinPopup = memo(function PinPopup({ pin, onClose }: PinPopupProps) {
         backdropFilter: "blur(16px)",
       }}
     >
-      {/* thumbnail */}
-      {meta?.imageUrl && (
-        <div style={{ width: 96, flexShrink: 0, overflow: "hidden" }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={meta.imageUrl}
-            alt={pin.placeName}
-            style={{ width: "100%", height: "100%", objectFit: "cover", filter: "brightness(0.72)" }}
-          />
-        </div>
-      )}
-
       {/* content */}
       <div style={{ flex: 1, padding: "12px 40px 12px 14px", display: "flex", flexDirection: "column", justifyContent: "space-between", minWidth: 0 }}>
         {/* badge + time */}
@@ -155,20 +129,13 @@ const PinPopup = memo(function PinPopup({ pin, onClose }: PinPopupProps) {
           </span>
         </div>
 
-        {/* street + count */}
+        {/* place name */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <span
             onClick={openPost}
             style={{ fontSize: 11, color: "#444", cursor: "pointer", textDecoration: "underline", textDecorationColor: "#333" }}
           >
-            {meta?.street ?? ""}
-          </span>
-          <span style={{ display: "flex", alignItems: "center", gap: 3, fontSize: 11, color: "#555" }}>
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-            </svg>
-            {meta?.attendees ?? 0}
+            {pin.placeName}
           </span>
         </div>
       </div>
@@ -229,59 +196,39 @@ export default function ReconMap() {
   const [activeFilter, setActiveFilter] = useState<FilterKey>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedPin, setSelectedPin] = useState<Pin | null>(null);
-  const [loadMap] = useState(true);
+  const [pins, setPins] = useState<Pin[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(false);
 
-  const uniqueHomeCityData = useMemo(() => {
-    const byId = new Map<string, MockCityItem>();
-    for (const item of mockCityData) {
-      if (!byId.has(item.id)) byId.set(item.id, item);
+  const fetchPins = useCallback(async () => {
+    setLoading(true);
+    setFetchError(false);
+    try {
+      const data = await getPins();
+      setPins(data);
+    } catch {
+      setFetchError(true);
+    } finally {
+      setLoading(false);
     }
-    return Array.from(byId.values());
   }, []);
 
-  const homePins = useMemo<Pin[]>(() => {
-    return uniqueHomeCityData.map((item) => ({
-      postId: `home-${item.id}`,
-      source: "X",
-      postUrl: "",
-      creatorHandle: "@ReconHome",
-      text: `${item.title}. ${item.description}`,
-      category: HOME_CATEGORY_TO_PIN[item.category],
-      placeName: item.placeName,
-      lat: item.lat,
-      lng: item.lng,
-      createdAt: new Date(Date.now() - item.postCount * 60_000).toISOString(),
-      fetchedAt: new Date(Date.now() - item.postCount * 60_000).toISOString(),
-      expiresAt: new Date(Date.now() + 6 * 60 * 60_000).toISOString(),
-      locationConfidence: Math.min(0.99, 0.7 + item.activityScore / 300),
-      status: "active",
-    }));
-  }, [uniqueHomeCityData]);
+  useEffect(() => {
+    fetchPins();
+  }, [fetchPins]);
 
   const visiblePins = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
-    const pins = Array.from(
-      new Map([...mockPins, ...homePins].map((pin) => [pin.postId, pin])).values()
-    );
-
     return pins.filter((pin) => {
       const matchesCategory = activeFilter === "all" || pin.category === activeFilter;
       if (!matchesCategory) return false;
-
       if (!query) return true;
-
-      const haystack = [
-        pin.creatorHandle,
-        pin.placeName,
-        pin.text,
-        PIN_META[pin.postId]?.street ?? "",
-      ]
+      return [pin.creatorHandle, pin.placeName, pin.text]
         .join(" ")
-        .toLowerCase();
-
-      return haystack.includes(query);
+        .toLowerCase()
+        .includes(query);
     });
-  }, [activeFilter, searchQuery, homePins]);
+  }, [pins, activeFilter, searchQuery]);
 
   useEffect(() => {
     if (selectedPin && !visiblePins.some((pin) => pin.postId === selectedPin.postId)) {
@@ -381,20 +328,37 @@ export default function ReconMap() {
 
         {/* Map + overlays */}
         <div style={{ flex: 1, minHeight: 0, position: "relative" }}>
-          {(searchQuery.trim() || activeFilter !== "all") && (
+          {(searchQuery.trim() || activeFilter !== "all") && !loading && (
             <div style={{ position: "absolute", top: 12, left: 12, zIndex: 500, background: "rgba(8,8,8,0.88)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 9999, padding: "6px 10px", color: "#aaa", fontSize: 11 }}>
               {visiblePins.length} result{visiblePins.length === 1 ? "" : "s"}
             </div>
           )}
-          {loadMap ? (
-            <LeafletMap
-              pins={visiblePins}
-              selectedPin={selectedPin}
-              onPinSelect={setSelectedPin}
-            />
-          ) : (
-            <div style={{ width: "100%", height: "100%", background: "#0a0a0a", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <span style={{ color: "#333", fontSize: 13 }}>Loading map…</span>
+
+          <LeafletMap
+            pins={visiblePins}
+            selectedPin={selectedPin}
+            onPinSelect={setSelectedPin}
+          />
+
+          {loading && (
+            <div style={{ position: "absolute", inset: 0, zIndex: 600, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(10,10,10,0.7)", backdropFilter: "blur(4px)" }}>
+              <span style={{ color: "#888", fontSize: 13 }}>Loading pins…</span>
+            </div>
+          )}
+
+          {!loading && fetchError && (
+            <div style={{ position: "absolute", inset: 0, zIndex: 600, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, background: "rgba(10,10,10,0.7)", backdropFilter: "blur(4px)" }}>
+              <span style={{ color: "#888", fontSize: 13 }}>Could not load pins.</span>
+              <button onClick={fetchPins} style={{ fontSize: 12, color: "#555", background: "none", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 9999, padding: "5px 14px", cursor: "pointer", fontFamily: "inherit" }}>
+                Retry
+              </button>
+            </div>
+          )}
+
+          {!loading && !fetchError && pins.length === 0 && (
+            <div style={{ position: "absolute", inset: 0, zIndex: 600, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6, pointerEvents: "none" }}>
+              <span style={{ color: "#555", fontSize: 13, fontWeight: 500 }}>No live pins available yet.</span>
+              <span style={{ color: "#3a3a3a", fontSize: 12 }}>Backend connected. Waiting for city activity.</span>
             </div>
           )}
 

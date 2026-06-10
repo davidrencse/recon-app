@@ -9,11 +9,11 @@ interface PinCardProps {
 }
 
 const CATEGORY_LABEL: Record<PinCategory, string> = {
-  weather: "Weather",
+  trending: "Trending",
+  cafes: "Cafés",
+  nightlife: "Nightlife",
+  pop: "Pop-up",
   crime_safety: "Crime & Safety",
-  daily_life: "Daily Life",
-  locations: "Locations",
-  special_events: "Special Events",
 };
 
 function relativeTime(iso: string): string {
