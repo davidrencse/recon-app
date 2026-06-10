@@ -63,7 +63,7 @@ export type CachedPlaceInsert = {
 
 // ─── ingestion_jobs ──────────────────────────────────────────────────────────
 
-export type IngestionJobStatus = "running" | "completed" | "failed" | "partial";
+export type IngestionJobStatus = "started" | "success" | "failed";
 
 export type IngestionJob = {
   id: string;

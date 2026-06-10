@@ -62,11 +62,7 @@ export async function POST(request: NextRequest) {
   }
 
   const finished = new Date().toISOString();
-  const jobStatus = fatalError
-    ? "failed"
-    : errors.length > 0
-    ? "partial"
-    : "completed";
+  const jobStatus: "success" | "failed" = fatalError ? "failed" : "success";
 
   // e8: Log job end
   if (jobId) {

@@ -36,6 +36,15 @@ describe("normalizeCategory — hyphen/space normalization", () => {
   it("crime safety → crime_safety", () => expect(normalizeCategory("crime safety")).toBe("crime_safety"));
 });
 
+describe("normalizeCategory — X-search-api collector categories", () => {
+  it("weather → trending",        () => expect(normalizeCategory("weather")).toBe("trending"));
+  it("daily_life → trending",     () => expect(normalizeCategory("daily_life")).toBe("trending"));
+  it("locations → pop",           () => expect(normalizeCategory("locations")).toBe("pop"));
+  it("special_events → pop",      () => expect(normalizeCategory("special_events")).toBe("pop"));
+  it("WEATHER case-insensitive",  () => expect(normalizeCategory("WEATHER")).toBe("trending"));
+  it("crime_safety passthrough",  () => expect(normalizeCategory("crime_safety")).toBe("crime_safety"));
+});
+
 describe("normalizeCategory — invalid inputs", () => {
   it("empty string", () => expect(normalizeCategory("")).toBeNull());
   it("unknown word", () => expect(normalizeCategory("sports")).toBeNull());

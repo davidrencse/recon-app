@@ -29,6 +29,11 @@ const REQUIRED_COLUMNS: Record<string, string[]> = {
     "id", "pin_id", "post_id", "event_type",
     "previous_status", "new_status", "reason", "source", "created_at",
   ],
+  geocoding_failures: [
+    "normalized_query", "original_query", "reason",
+    "failure_count", "last_failed_at", "cooldown_until",
+    "created_at", "updated_at",
+  ],
 };
 
 export type SchemaAuditResult = {

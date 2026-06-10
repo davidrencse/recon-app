@@ -56,6 +56,14 @@ const CATEGORY_MAP: Record<string, PinCategory> = {
   warning: "crime_safety",
   incident: "crime_safety",
   emergency: "crime_safety",
+
+  // X-search-api collector categories
+  weather: "trending",
+  daily_life: "trending",
+  locations: "pop",
+  location: "pop",
+  special_events: "pop",
+  special_event: "pop",
 };
 
 export function normalizeCategory(raw: string): PinCategory | null {

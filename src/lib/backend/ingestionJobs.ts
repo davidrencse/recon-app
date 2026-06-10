@@ -27,7 +27,7 @@ export async function startIngestionJob(input: IngestionJobStart): Promise<strin
     .from("ingestion_jobs")
     .insert({
       source:     input.source,
-      status:     "running",
+      status:     "started",
       category:   input.category ?? null,
       query_used: input.query_used ?? null,
       metadata:   input.metadata ?? null,
@@ -112,7 +112,7 @@ export async function checkConsecutiveZeroInserts(
   const { data, error } = await supabaseServer
     .from("ingestion_jobs")
     .select("pins_inserted")
-    .in("status", ["completed", "partial"])
+    .in("status", ["success"])
     .order("started_at", { ascending: false })
     .limit(windowSize);
 
