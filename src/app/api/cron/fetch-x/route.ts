@@ -1,0 +1,103 @@
+import { NextRequest, NextResponse } from "next/server";
+import {
+  startIngestionJob,
+  finishIngestionJob,
+  failIngestionJob,
+  checkFailureThreshold,
+} from "@/lib/backend/ingestionJobs";
+import { expireOldPins } from "@/lib/backend/expirePins";
+
+export const dynamic = "force-dynamic";
+
+type CronJobSummary = {
+  jobId: string | null;
+  started: string;
+  finished: string;
+  expiredCount: number;
+  insertedCount: number;
+  rejectedCount: number;
+  warningCount: number;
+  warnings: string[];
+  errors: string[];
+};
+
+export async function POST(request: NextRequest) {
+  // e6/e7: Auth guard
+  const cronSecret = process.env.CRON_SECRET;
+  if (!cronSecret || request.headers.get("x-cron-secret") !== cronSecret) {
+    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+  }
+
+  const started = new Date().toISOString();
+  const warnings: string[] = [];
+  const errors: string[] = [];
+
+  // e8: Log job start
+  const jobId = await startIngestionJob({ source: "x" });
+
+  let expiredCount = 0;
+  let fatalError = false;
+
+  try {
+    // e10: Failure-threshold check before running
+    const failureCheck = await checkFailureThreshold(5, 3);
+    if (failureCheck.suspicious) {
+      const msg = `High failure rate: ${failureCheck.failedCount}/${failureCheck.total} recent jobs failed`;
+      warnings.push(msg);
+      console.warn("[fetch-x]", msg);
+    }
+
+    // e9: Expire stale active pins
+    const expiry = await expireOldPins();
+    expiredCount = expiry.expiredCount;
+    errors.push(...expiry.errors);
+
+    // Ingestion is now handled by POST /api/ingest/source-batch from an external collector.
+    // This route only runs expiry cleanup and monitors job health.
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    errors.push(msg);
+    fatalError = true;
+    console.error("[fetch-x] Unhandled error:", msg);
+  }
+
+  const finished = new Date().toISOString();
+  const jobStatus = fatalError
+    ? "failed"
+    : errors.length > 0
+    ? "partial"
+    : "completed";
+
+  // e8: Log job end
+  if (jobId) {
+    if (fatalError) {
+      await failIngestionJob(jobId, errors[errors.length - 1] ?? "Unknown error");
+    } else {
+      await finishIngestionJob(jobId, {
+        status: jobStatus,
+        posts_fetched: 0,
+        posts_rejected: 0,
+        posts_accepted: 0,
+        pins_inserted: 0,
+        geocode_calls_made: 0,
+        error_message: errors.length > 0 ? errors.join("; ") : null,
+        metadata: warnings.length > 0 ? { warnings } : null,
+      });
+    }
+  }
+
+  // e13: Return clean job summary
+  const summary: CronJobSummary = {
+    jobId,
+    started,
+    finished,
+    expiredCount,
+    insertedCount: 0,
+    rejectedCount: 0,
+    warningCount: warnings.length,
+    warnings,
+    errors,
+  };
+
+  return NextResponse.json(summary, { status: fatalError ? 500 : 200 });
+}

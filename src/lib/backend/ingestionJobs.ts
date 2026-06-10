@@ -76,6 +76,55 @@ export async function failIngestionJob(jobId: string, errorMessage: string): Pro
   return finishIngestionJob(jobId, { status: "failed", error_message: errorMessage });
 }
 
+/**
+ * Check if recent jobs show a suspicious failure rate.
+ * Returns suspicious=true when failedCount >= threshold within windowSize jobs.
+ */
+export async function checkFailureThreshold(
+  windowSize = 5,
+  threshold = 3
+): Promise<{ suspicious: boolean; failedCount: number; total: number }> {
+  const { data, error } = await supabaseServer
+    .from("ingestion_jobs")
+    .select("status")
+    .order("started_at", { ascending: false })
+    .limit(windowSize);
+
+  if (error || !data) return { suspicious: false, failedCount: 0, total: 0 };
+
+  const rows = data as { status: string }[];
+  const failedCount = rows.filter((j) => j.status === "failed").length;
+
+  return {
+    suspicious: failedCount >= threshold,
+    failedCount,
+    total: rows.length,
+  };
+}
+
+/**
+ * Check if the last N completed/partial jobs all inserted 0 pins.
+ * Returns allZero=false when fewer than windowSize completed jobs exist.
+ */
+export async function checkConsecutiveZeroInserts(
+  windowSize = 3
+): Promise<{ allZero: boolean; count: number }> {
+  const { data, error } = await supabaseServer
+    .from("ingestion_jobs")
+    .select("pins_inserted")
+    .in("status", ["completed", "partial"])
+    .order("started_at", { ascending: false })
+    .limit(windowSize);
+
+  if (error || !data || data.length === 0) return { allZero: false, count: 0 };
+  if (data.length < windowSize) return { allZero: false, count: data.length };
+
+  const rows = data as { pins_inserted: number | null }[];
+  const allZero = rows.every((j) => (j.pins_inserted ?? 0) === 0);
+
+  return { allZero, count: rows.length };
+}
+
 /** Fetch the most recent N ingestion jobs. */
 export async function getRecentIngestionJobs(limit = 20): Promise<IngestionJob[]> {
   const { data, error } = await supabaseServer
