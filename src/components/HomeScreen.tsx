@@ -1,14 +1,15 @@
 "use client";
 
-import { useState } from "react";
-import type { PinCategory } from "../types/pin";
+import { useState, useEffect, useCallback } from "react";
+import type { Pin, PinCategory } from "../types/pin";
+import { getPins } from "../lib/getPins";
 
 /* ── Icons ────────────────────────────────────────────────────── */
 function ReconSmall() {
   return (
-    <div style={{ 
-      width: 30, height: 30, borderRadius: 8, 
-      background: "#000", border: "1px solid rgba(255,255,255,0.08)", 
+    <div style={{
+      width: 30, height: 30, borderRadius: 8,
+      background: "#000", border: "1px solid rgba(255,255,255,0.08)",
       display: "flex", alignItems: "center", justifyContent: "center",
       overflow: "hidden"
     }}>
@@ -48,142 +49,226 @@ function IconStar() {
   return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>;
 }
 
-function IconArrow() {
-  return <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>;
+function relativeTime(iso: string): string {
+  const mins = Math.floor((Date.now() - new Date(iso).getTime()) / 60_000);
+  if (mins < 1) return "just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  return hrs < 24 ? `${hrs}h ago` : `${Math.floor(hrs / 24)}d ago`;
 }
 
+const CATEGORY_COLOR: Record<PinCategory, string> = {
+  trending:     "#f97316",
+  cafes:        "#84cc16",
+  nightlife:    "#a855f7",
+  pop:          "#06b6d4",
+  crime_safety: "#ef4444",
+};
+
+/* ── Feed card ───────────────────────────────────────────────── */
+function FeedCard({ pin }: { pin: Pin }) {
+  const color = CATEGORY_COLOR[pin.category] ?? "#888";
+  const title = pin.text.split(".")[0].split(",")[0].trim();
+  return (
+    <div style={{
+      background: "rgba(18,18,18,0.9)",
+      border: "1px solid rgba(255,255,255,0.07)",
+      borderRadius: 12,
+      padding: "12px 14px",
+      display: "flex",
+      flexDirection: "column",
+      gap: 6,
+    }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <span style={{
+          fontSize: 10, fontWeight: 700, letterSpacing: 0.4,
+          color, background: `${color}18`, padding: "2px 7px", borderRadius: 4,
+        }}>
+          {pin.category.toUpperCase()}
+        </span>
+        <span style={{ fontSize: 11, color: "#555" }}>{relativeTime(pin.createdAt)}</span>
+      </div>
+      <div style={{ fontSize: 14, fontWeight: 700, color: "#f0f0f0", lineHeight: 1.3 }}>
+        {pin.placeName}
+      </div>
+      <div style={{ fontSize: 13, color: "#888", lineHeight: 1.5 }}>
+        {title.length > 90 ? title.slice(0, 88) + "…" : title}
+      </div>
+      {pin.creatorHandle && (
+        <div style={{ fontSize: 11, color: "#444" }}>@{pin.creatorHandle}</div>
+      )}
+    </div>
+  );
+}
 
 /* ── Main ─────────────────────────────────────────────────────── */
 export default function HomeScreen() {
   const FILTERS = [
-    { key: "trending" as PinCategory, label: "Trending", icon: <IconTrendUp /> },
-    { key: "cafes" as PinCategory,    label: "Cafés",    icon: <IconCoffee /> },
-    { key: "nightlife" as PinCategory,label: "Nightlife", icon: <IconMartini /> },
-    { key: "pop" as PinCategory,      label: "Pop",      icon: <IconStar /> },
+    { key: "trending"  as PinCategory, label: "Trending",  icon: <IconTrendUp /> },
+    { key: "cafes"     as PinCategory, label: "Cafés",     icon: <IconCoffee /> },
+    { key: "nightlife" as PinCategory, label: "Nightlife", icon: <IconMartini /> },
+    { key: "pop"       as PinCategory, label: "Pop",       icon: <IconStar /> },
   ];
 
-  const [active, setActive] = useState<PinCategory>("trending");
+  const [active, setActive]           = useState<PinCategory>("trending");
   const [searchQuery, setSearchQuery] = useState("");
+  const [pins, setPins]               = useState<Pin[]>([]);
+  const [loading, setLoading]         = useState(true);
+  const [error, setError]             = useState<string | null>(null);
+
+  const loadPins = useCallback(async (category: PinCategory) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await getPins({ category, limit: 50 });
+      setPins(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { loadPins(active); }, [active, loadPins]);
+
+  const visible = searchQuery.trim()
+    ? pins.filter(p =>
+        p.placeName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.text.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : pins;
 
   return (
-    <div style={{ 
-      flex: 1, 
-      display: "flex", 
-      flexDirection: "column", 
-      minHeight: 0, 
+    <div style={{
+      flex: 1,
+      display: "flex",
+      flexDirection: "column",
+      minHeight: 0,
       position: "relative",
       width: "100%",
     }}>
-        {/* Header */}
-        <div style={{ display: "flex", alignItems: "center", padding: "12px 20px 0", gap: 10, flexShrink: 0 }}>
-          <ReconSmall />
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 11, color: "#555", marginBottom: 1 }}>Good evening</div>
-            <div style={{ fontSize: 15, fontWeight: 600, color: "#e8e8e8" }}>Vancouver</div>
-          </div>
-          <button style={{ background: "none", border: "none", cursor: "pointer", color: "#888" }}>
-            <IconBell />
-          </button>
+      {/* Header */}
+      <div style={{ display: "flex", alignItems: "center", padding: "12px 20px 0", gap: 10, flexShrink: 0 }}>
+        <ReconSmall />
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: 11, color: "#555", marginBottom: 1 }}>Good evening</div>
+          <div style={{ fontSize: 15, fontWeight: 600, color: "#e8e8e8" }}>Vancouver</div>
         </div>
+        <button style={{ background: "none", border: "none", cursor: "pointer", color: "#888" }}>
+          <IconBell />
+        </button>
+      </div>
 
-        {/* Headline */}
-        <div style={{ padding: "20px 20px 0", flexShrink: 0 }}>
-          <div style={{ fontSize: 30, fontWeight: 800, color: "#fff", lineHeight: 1.2, letterSpacing: -0.5 }}>
-            What&apos;s{" "}
-            <span style={{ fontStyle: "italic", fontWeight: 400, color: "#888" }}>moving</span>
-          </div>
-          <div style={{ fontSize: 30, fontWeight: 800, color: "#fff", lineHeight: 1.2, letterSpacing: -0.5, marginBottom: 0 }}>
-            tonight.
-          </div>
+      {/* Headline */}
+      <div style={{ padding: "20px 20px 0", flexShrink: 0 }}>
+        <div style={{ fontSize: 30, fontWeight: 800, color: "#fff", lineHeight: 1.2, letterSpacing: -0.5 }}>
+          What&apos;s{" "}
+          <span style={{ fontStyle: "italic", fontWeight: 400, color: "#888" }}>moving</span>
         </div>
-
-        {/* Search */}
-        <div style={{ padding: "16px 20px 0", flexShrink: 0 }}>
-          <div style={{
-            display: "flex", alignItems: "center", gap: 10,
-            height: 44, padding: "0 14px",
-            borderRadius: 9999,
-            background: "rgba(22,22,22,0.9)",
-            border: "1px solid rgba(255,255,255,0.07)",
-            color: "#444",
-          }}>
-            <IconSearch />
-            <input
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search a place, vibe, or street"
-              aria-label="Search home feed"
-              style={{
-                width: "100%",
-                border: "none",
-                outline: "none",
-                background: "transparent",
-                color: "#f0f0f0",
-                fontSize: 13.5,
-                fontFamily: "inherit",
-              }}
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery("")}
-                aria-label="Clear search"
-                style={{
-                  background: "none",
-                  border: "none",
-                  color: "#777",
-                  cursor: "pointer",
-                  fontSize: 18,
-                  lineHeight: 1,
-                  padding: 0,
-                  flexShrink: 0,
-                }}
-              >
-                ×
-              </button>
-            )}
-          </div>
+        <div style={{ fontSize: 30, fontWeight: 800, color: "#fff", lineHeight: 1.2, letterSpacing: -0.5, marginBottom: 0 }}>
+          tonight.
         </div>
+      </div>
 
-        {/* Filters */}
-        <div style={{ display: "flex", gap: 7, padding: "12px 20px 0", flexShrink: 0, overflowX: "auto", scrollbarWidth: "none" }}>
-          {FILTERS.map((f) => (
+      {/* Search */}
+      <div style={{ padding: "16px 20px 0", flexShrink: 0 }}>
+        <div style={{
+          display: "flex", alignItems: "center", gap: 10,
+          height: 44, padding: "0 14px",
+          borderRadius: 9999,
+          background: "rgba(22,22,22,0.9)",
+          border: "1px solid rgba(255,255,255,0.07)",
+          color: "#444",
+        }}>
+          <IconSearch />
+          <input
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search a place, vibe, or street"
+            aria-label="Search home feed"
+            style={{
+              width: "100%",
+              border: "none",
+              outline: "none",
+              background: "transparent",
+              color: "#f0f0f0",
+              fontSize: 13.5,
+              fontFamily: "inherit",
+            }}
+          />
+          {searchQuery && (
             <button
-              key={String(f.key)}
-              onClick={() => setActive(f.key)}
+              onClick={() => setSearchQuery("")}
+              aria-label="Clear search"
               style={{
-                display: "flex", alignItems: "center", gap: 5,
-                padding: "7px 13px", borderRadius: 9999,
-                fontSize: 13, fontWeight: active === f.key ? 600 : 500,
-                background: active === f.key ? "#e8e8e8" : "rgba(18,18,18,0.9)",
-                color: active === f.key ? "#0a0a0a" : "#666",
-                border: active === f.key ? "none" : "1px solid rgba(255,255,255,0.07)",
-                cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0,
-                fontFamily: "inherit",
+                background: "none", border: "none", color: "#777",
+                cursor: "pointer", fontSize: 18, lineHeight: 1, padding: 0, flexShrink: 0,
               }}
             >
-              {f.icon}{f.label}
+              ×
             </button>
-          ))}
+          )}
+        </div>
+      </div>
+
+      {/* Filters */}
+      <div style={{ display: "flex", gap: 7, padding: "12px 20px 0", flexShrink: 0, overflowX: "auto", scrollbarWidth: "none" }}>
+        {FILTERS.map((f) => (
+          <button
+            key={String(f.key)}
+            onClick={() => setActive(f.key)}
+            style={{
+              display: "flex", alignItems: "center", gap: 5,
+              padding: "7px 13px", borderRadius: 9999,
+              fontSize: 13, fontWeight: active === f.key ? 600 : 500,
+              background: active === f.key ? "#e8e8e8" : "rgba(18,18,18,0.9)",
+              color: active === f.key ? "#0a0a0a" : "#666",
+              border: active === f.key ? "none" : "1px solid rgba(255,255,255,0.07)",
+              cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0,
+              fontFamily: "inherit",
+            }}
+          >
+            {f.icon}{f.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Feed */}
+      <div style={{ flex: 1, minHeight: 0, overflowY: "auto", scrollbarWidth: "none", padding: "16px 20px 0" }}>
+        <div style={{ marginBottom: 10 }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <span style={{ fontSize: 17, fontWeight: 700, color: "#fff" }}>Happening now</span>
+            <span style={{ fontSize: 12, color: "#555" }}>
+              {loading ? "…" : `${visible.length} shown`}
+            </span>
+          </div>
         </div>
 
-          {/* Feed */}
-        <div style={{ flex: 1, minHeight: 0, overflowY: "auto", scrollbarWidth: "none", padding: "16px 20px 0" }}>
-          {/* Section header */}
-          <div style={{ marginBottom: 10 }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <span style={{ fontSize: 17, fontWeight: 700, color: "#fff" }}>Happening now</span>
-              <span style={{ fontSize: 12, color: "#555" }}>0 shown</span>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8, paddingBottom: 16 }}>
+          {loading ? (
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 0" }}>
+              <span style={{ color: "#444", fontSize: 13 }}>Loading…</span>
             </div>
-          </div>
-
-          {/* Cards */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 8, paddingBottom: 16 }}>
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, padding: "40px 0", pointerEvents: "none" }}>
+          ) : error ? (
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, padding: "40px 0" }}>
+              <span style={{ color: "#666", fontSize: 13 }}>Could not load pins</span>
+              <button
+                onClick={() => loadPins(active)}
+                style={{ fontSize: 12, color: "#555", background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}
+              >
+                Retry
+              </button>
+            </div>
+          ) : visible.length === 0 ? (
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, padding: "40px 0" }}>
               <span style={{ color: "#444", fontSize: 13, fontWeight: 500 }}>No live activity yet.</span>
               <span style={{ color: "#2e2e2e", fontSize: 12 }}>Backend connected. Waiting for city activity.</span>
             </div>
-          </div>
+          ) : (
+            visible.map((pin) => <FeedCard key={pin.postId} pin={pin} />)
+          )}
         </div>
+      </div>
     </div>
   );
 }

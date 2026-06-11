@@ -6,6 +6,7 @@ import {
   checkFailureThreshold,
 } from "@/lib/backend/ingestionJobs";
 import { expireOldPins } from "@/lib/backend/expirePins";
+import { pruneOldRows } from "@/lib/backend/pruneOldRows";
 
 export const dynamic = "force-dynamic";
 
@@ -19,6 +20,11 @@ type CronJobSummary = {
   warningCount: number;
   warnings: string[];
   errors: string[];
+  pruned: {
+    processedPosts: number;
+    ingestionJobs: number;
+    geocodingFailures: number;
+  };
 };
 
 export async function POST(request: NextRequest) {
@@ -36,7 +42,8 @@ export async function POST(request: NextRequest) {
   const jobId = await startIngestionJob({ source: "x" });
 
   let expiredCount = 0;
-  let fatalError = false;
+  let fatalError   = false;
+  let pruned       = { processedPosts: 0, ingestionJobs: 0, geocodingFailures: 0 };
 
   try {
     // e10: Failure-threshold check before running
@@ -52,8 +59,17 @@ export async function POST(request: NextRequest) {
     expiredCount = expiry.expiredCount;
     errors.push(...expiry.errors);
 
+    // Prune stale rows to keep tables lean
+    const pruneResult = await pruneOldRows();
+    pruned = {
+      processedPosts:    pruneResult.processedPostsPruned,
+      ingestionJobs:     pruneResult.ingestionJobsPruned,
+      geocodingFailures: pruneResult.geocodingFailuresPruned,
+    };
+    errors.push(...pruneResult.errors);
+
     // Ingestion is now handled by POST /api/ingest/source-batch from an external collector.
-    // This route only runs expiry cleanup and monitors job health.
+    // This route only runs expiry cleanup, pruning, and job health monitoring.
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     errors.push(msg);
@@ -93,6 +109,7 @@ export async function POST(request: NextRequest) {
     warningCount: warnings.length,
     warnings,
     errors,
+    pruned,
   };
 
   return NextResponse.json(summary, { status: fatalError ? 500 : 200 });

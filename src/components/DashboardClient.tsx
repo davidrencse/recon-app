@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { DashboardFilter } from "../types/dashboard";
+import type { Pin, PinCategory } from "../types/pin";
+import { getPins } from "../lib/getPins";
 
 /* ══════════════════════════════════════════════════════════════
    DESIGN TOKENS
@@ -12,6 +14,22 @@ const BORDER   = "rgba(255,255,255,0.08)";
 const T1       = "#f2f2f2";
 const T2       = "#9a9a9a";
 const T3       = "#4e4e4e";
+
+const CATEGORY_COLOR: Record<PinCategory, string> = {
+  trending:     "#f97316",
+  cafes:        "#84cc16",
+  nightlife:    "#a855f7",
+  pop:          "#06b6d4",
+  crime_safety: "#ef4444",
+};
+
+const CATEGORY_LABEL: Record<PinCategory, string> = {
+  trending:     "Trending",
+  cafes:        "Cafés",
+  nightlife:    "Nightlife",
+  pop:          "Pop-up",
+  crime_safety: "Safety",
+};
 
 /* ══════════════════════════════════════════════════════════════
    ICONS
@@ -100,6 +118,71 @@ function SegmentedFilter({
   );
 }
 
+function StatCard({ label, value, sub }: { label: string; value: string | number; sub?: string }) {
+  return (
+    <div style={{
+      background: SURFACE,
+      border: `1px solid ${BORDER}`,
+      borderRadius: 12,
+      padding: "14px 16px",
+      display: "flex",
+      flexDirection: "column",
+      gap: 4,
+      flex: 1,
+      minWidth: 0,
+    }}>
+      <span style={{ fontSize: 11, color: T3, fontWeight: 500, letterSpacing: 0.3 }}>{label.toUpperCase()}</span>
+      <span style={{ fontSize: 26, fontWeight: 800, color: T1, letterSpacing: -0.5 }}>{value}</span>
+      {sub && <span style={{ fontSize: 11, color: T3 }}>{sub}</span>}
+    </div>
+  );
+}
+
+function CategoryBar({ category, count, total }: { category: PinCategory; count: number; total: number }) {
+  const pct   = total > 0 ? Math.round((count / total) * 100) : 0;
+  const color = CATEGORY_COLOR[category];
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <span style={{ fontSize: 13, fontWeight: 500, color: T2 }}>{CATEGORY_LABEL[category]}</span>
+        <span style={{ fontSize: 12, color: T3 }}>{count} · {pct}%</span>
+      </div>
+      <div style={{ height: 4, borderRadius: 2, background: "rgba(255,255,255,0.05)" }}>
+        <div style={{ height: "100%", borderRadius: 2, background: color, width: `${pct}%`, transition: "width 400ms ease" }} />
+      </div>
+    </div>
+  );
+}
+
+function filterPins(pins: Pin[], filter: DashboardFilter): Pin[] {
+  const now  = new Date();
+  const startOfDay = new Date(now); startOfDay.setHours(0, 0, 0, 0);
+  const endOfDay   = new Date(now); endOfDay.setHours(23, 59, 59, 999);
+
+  if (filter === "today") {
+    return pins.filter(p => new Date(p.createdAt) >= startOfDay);
+  }
+  if (filter === "tonight") {
+    const evening = new Date(now); evening.setHours(18, 0, 0, 0);
+    return pins.filter(p => {
+      const t = new Date(p.createdAt);
+      return t >= evening && t <= endOfDay;
+    });
+  }
+  // weekend: sat + sun of current week
+  if (filter === "weekend") {
+    const day    = now.getDay();
+    const toSat  = (6 - day + 7) % 7;
+    const satStart = new Date(now); satStart.setDate(now.getDate() + toSat); satStart.setHours(0,0,0,0);
+    const sunEnd   = new Date(satStart); sunEnd.setDate(satStart.getDate() + 1); sunEnd.setHours(23,59,59,999);
+    return pins.filter(p => {
+      const t = new Date(p.createdAt);
+      return t >= satStart && t <= sunEnd;
+    });
+  }
+  return pins;
+}
+
 /* ══════════════════════════════════════════════════════════════
    MAIN DASHBOARD
 ══════════════════════════════════════════════════════════════ */
@@ -109,8 +192,33 @@ const FILTER_OPTIONS: { value: DashboardFilter; label: string }[] = [
   { value: "weekend", label: "Weekend" },
 ];
 
+const ALL_CATEGORIES: PinCategory[] = ["trending", "cafes", "nightlife", "pop", "crime_safety"];
+
 export default function DashboardClient() {
-  const [filter, setFilter] = useState<DashboardFilter>("today");
+  const [filter, setFilter]   = useState<DashboardFilter>("today");
+  const [pins, setPins]       = useState<Pin[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getPins({ limit: 200 })
+      .then(setPins)
+      .catch(() => setPins([]))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const filtered = filterPins(pins, filter);
+  const total    = filtered.length;
+
+  const categoryCounts = ALL_CATEGORIES.reduce<Record<PinCategory, number>>(
+    (acc, cat) => {
+      acc[cat] = filtered.filter(p => p.category === cat).length;
+      return acc;
+    },
+    {} as Record<PinCategory, number>
+  );
+
+  const uniquePlaces = new Set(filtered.map(p => p.placeName)).size;
+  const newestPin    = filtered[0];
 
   return (
     <div style={{
@@ -141,10 +249,44 @@ export default function DashboardClient() {
         <SegmentedFilter options={FILTER_OPTIONS} active={filter} onChange={setFilter} />
       </div>
 
-      {/* ── EMPTY STATE ── */}
-      <main style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8 }}>
-        <span style={{ color: "#444", fontSize: 13, fontWeight: 500 }}>No dashboard data yet.</span>
-        <span style={{ color: "#2e2e2e", fontSize: 12 }}>Backend connected. Waiting for city activity.</span>
+      {/* ── CONTENT ── */}
+      <main style={{ flex: 1, minHeight: 0, overflowY: "auto", scrollbarWidth: "none", padding: "16px 18px 24px", display: "flex", flexDirection: "column", gap: 16 }}>
+        {loading ? (
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "60px 0" }}>
+            <span style={{ color: T3, fontSize: 13 }}>Loading…</span>
+          </div>
+        ) : (
+          <>
+            {/* Stats row */}
+            <div style={{ display: "flex", gap: 10 }}>
+              <StatCard label="Active pins" value={total} sub={`${uniquePlaces} location${uniquePlaces !== 1 ? "s" : ""}`} />
+              <StatCard
+                label="Latest"
+                value={newestPin ? `${Math.floor((Date.now() - new Date(newestPin.createdAt).getTime()) / 60_000)}m` : "—"}
+                sub="since last pin"
+              />
+            </div>
+
+            {/* Category breakdown */}
+            <div style={{ background: SURFACE, border: `1px solid ${BORDER}`, borderRadius: 12, padding: "14px 16px", display: "flex", flexDirection: "column", gap: 12 }}>
+              <span style={{ fontSize: 13, fontWeight: 600, color: T2 }}>By category</span>
+              {total === 0 ? (
+                <span style={{ fontSize: 13, color: T3 }}>No pins for this period.</span>
+              ) : (
+                ALL_CATEGORIES.map(cat => (
+                  <CategoryBar key={cat} category={cat} count={categoryCounts[cat]} total={total} />
+                ))
+              )}
+            </div>
+
+            {total === 0 && (
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, padding: "20px 0" }}>
+                <span style={{ color: "#444", fontSize: 13, fontWeight: 500 }}>No data for this period.</span>
+                <span style={{ color: "#2e2e2e", fontSize: 12 }}>Backend connected. Waiting for city activity.</span>
+              </div>
+            )}
+          </>
+        )}
       </main>
     </div>
   );
