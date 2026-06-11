@@ -7,18 +7,18 @@ import { supabaseServer } from "@/lib/supabase/server";
  */
 const REQUIRED_COLUMNS: Record<string, string[]> = {
   pins: [
-    "id", "post_id", "source", "text", "category",
+    "id", "post_id", "source", "post_url", "creator_handle", "text", "category",
     "place_name", "neighborhood", "lat", "lng",
-    "status", "expires_at", "created_at",
+    "status", "expires_at", "created_at", "fetched_at",
     "activity_score", "crowd_level", "tags",
   ],
   processed_posts: [
-    "id", "source", "post_id", "processing_status",
-    "first_seen_at", "last_seen_at", "rejection_reason", "raw_source",
+    "id", "source", "post_id", "post_url", "creator_handle", "category", "text",
+    "processing_status", "first_seen_at", "last_seen_at", "rejection_reason", "raw_source",
   ],
   cached_places: [
-    "id", "place_query", "lat", "lng",
-    "provider", "confidence", "manual_override", "last_used_at",
+    "id", "place_query", "normalized_place_name", "display_name", "lat", "lng",
+    "provider", "confidence", "manual_override", "created_at", "updated_at", "last_used_at",
   ],
   ingestion_jobs: [
     "id", "source", "status", "started_at", "finished_at",

@@ -99,6 +99,14 @@ function validatePost(raw: unknown): PostCheck {
   } else {
     const urlErr = validateUrl(p.source_url);
     if (urlErr) errs.push(`source_url: ${urlErr}`);
+    // Reject URLs that don't reference the post's own ID — catches misattributed retweet URLs
+    else if (
+      p.source_post_id &&
+      typeof p.source_post_id === "string" &&
+      !p.source_url.includes(p.source_post_id as string)
+    ) {
+      errs.push(`source_url does not contain source_post_id "${p.source_post_id}"`);
+    }
   }
   const textErr = validateText(typeof p.text === "string" ? p.text : "");
   if (textErr) errs.push(`text: ${textErr}`);
@@ -303,6 +311,7 @@ export async function processIngestBatch(batch: IngestBatch): Promise<BatchSumma
             neighborhood:   null,
             lat:            resolved.lat,
             lng:            resolved.lng,
+            fetched_at:     batch.fetched_at,
             expires_at:     expiresAt,
             status:         "active",
             activity_score: null,
