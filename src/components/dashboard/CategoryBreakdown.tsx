@@ -52,18 +52,15 @@ function DonutChart({
     ].join(" ");
   };
 
-  let startAngle = -90;
-  const slices = stats.map((cat) => {
-    const sweep = total > 0 ? (cat.count / total) * 360 : 0;
-    const slice = {
-      ...cat,
-      pct: total > 0 ? Math.round((cat.count / total) * 100) : 0,
-      start: startAngle,
-      end: startAngle + sweep,
-    };
-    startAngle += sweep;
-    return slice;
-  });
+  const slices = stats.reduce<Array<CategoryStat & { pct: number; start: number; end: number }>>(
+    (acc, cat) => {
+      const prevEnd = acc.length > 0 ? acc[acc.length - 1].end : -90;
+      const sweep = total > 0 ? (cat.count / total) * 360 : 0;
+      acc.push({ ...cat, pct: total > 0 ? Math.round((cat.count / total) * 100) : 0, start: prevEnd, end: prevEnd + sweep });
+      return acc;
+    },
+    [],
+  );
 
   const selectedStat = selectedKey ? stats.find((s) => s.key === selectedKey) : null;
   const pct = selectedStat && total > 0 ? Math.round((selectedStat.count / total) * 100) : null;

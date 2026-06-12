@@ -160,7 +160,6 @@ export function SafetyCautionPreview({
 }) {
   const activeItems = items.filter((i) => i.severity !== "low" || true); // show all
   const highCount = items.filter((i) => i.severity === "high").length;
-  const topArea = items[0]?.area ?? "—";
 
   return (
     <button
