@@ -27,10 +27,19 @@ type CronJobSummary = {
   };
 };
 
-export async function POST(request: NextRequest) {
-  // e6/e7: Auth guard
-  const cronSecret = process.env.CRON_SECRET;
-  if (!cronSecret || request.headers.get("x-cron-secret") !== cronSecret) {
+function isAuthorized(request: NextRequest): boolean {
+  const secret = process.env.CRON_SECRET;
+  if (!secret) return false;
+  // Vercel cron: GET with Authorization: Bearer <secret>
+  const bearer = request.headers.get("authorization");
+  if (bearer === `Bearer ${secret}`) return true;
+  // Manual trigger: POST/GET with x-cron-secret header
+  if (request.headers.get("x-cron-secret") === secret) return true;
+  return false;
+}
+
+async function runCronJob(request: NextRequest): Promise<NextResponse> {
+  if (!isAuthorized(request)) {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
 
@@ -113,4 +122,14 @@ export async function POST(request: NextRequest) {
   };
 
   return NextResponse.json(summary, { status: fatalError ? 500 : 200 });
+}
+
+// Vercel cron fires GET with Authorization: Bearer header
+export async function GET(request: NextRequest): Promise<NextResponse> {
+  return runCronJob(request);
+}
+
+// Manual trigger via POST with x-cron-secret header
+export async function POST(request: NextRequest): Promise<NextResponse> {
+  return runCronJob(request);
 }
