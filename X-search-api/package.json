@@ -1,0 +1,29 @@
+{
+  "name": "x-search",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js weather",
+    "test:weather": "node test.js weather",
+    "test:crime": "node test.js crime_safety",
+    "test:daily": "node test.js daily_life",
+    "test:locations": "node test.js locations",
+    "test:events": "node test.js special_events",
+    "cookies": "node scripts/exportCookies.js",
+    "cookies:refresh": "node scripts/refreshCookies.js",
+    "cookies:sync-env": "node scripts/syncCookieEnv.js",
+    "run:once": "node server.js --once",
+    "run:dry": "node server.js --once --dry-run",
+    "secrets:check": "node scripts/secretScan.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "description": "",
+  "dependencies": {
+    "@the-convocation/twitter-scraper": "^0.22.3",
+    "dotenv": "^17.4.2",
+    "node-tls-client": "^2.1.0"
+  }
+}

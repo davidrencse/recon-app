@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "backend-dev-guidelines": {
+      "source": "langfuse/langfuse",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/backend-dev-guidelines/SKILL.md",
+      "computedHash": "d459ff4daf2254a9f6751fabeeac70f50c688f783643dd03a679101b0962b8f9"
+    }
+  }
+}
