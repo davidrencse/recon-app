@@ -57,7 +57,7 @@ const CATEGORY_MAP: Record<string, PinCategory> = {
   incident: "crime_safety",
   emergency: "crime_safety",
 
-  // X-search-api collector categories
+  // Legacy X-search-api collector categories (kept for backwards compat)
   weather: "trending",
   daily_life: "trending",
   locations: "pop",
