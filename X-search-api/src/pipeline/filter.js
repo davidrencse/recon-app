@@ -41,13 +41,6 @@ function isVancouverRelevant(rawPost) {
 }
 
 /**
- * Returns true if the post has at least one media attachment.
- */
-function hasMedia(rawPost) {
-  return rawPost.hasMedia;
-}
-
-/**
  * Returns true if the post has enough text to be useful (strips URLs first).
  */
 function hasUsefulText(rawPost) {

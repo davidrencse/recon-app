@@ -1,5 +1,24 @@
 'use strict';
 
+// Terms that regex extraction commonly pulls but are too vague to geocode usefully.
+// Single-word pronouns, directions, and common English nouns that aren't place names.
+const VAGUE_TERMS = new Set([
+  // articles / pronouns
+  'a', 'an', 'the', 'it', 'this', 'that', 'here', 'there', 'me', 'us', 'you',
+  // directions / relative location
+  'home', 'work', 'school', 'downtown', 'uptown', 'out', 'outside',
+  'north', 'south', 'east', 'west', 'left', 'right', 'centre', 'center',
+  // time words regex sometimes captures
+  'every', 'today', 'tonight', 'morning', 'evening', 'night', 'weekend',
+  'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday',
+  // too-large geography
+  'north america', 'south america', 'canada', 'united states', 'the world',
+  'the city', 'the area', 'the block', 'the corner', 'the end', 'the park',
+  'the beach', 'the mall', 'the store', 'the office', 'the station',
+  // common false positives from tweet text
+  'last night', 'right now', 'all day', 'all night', 'my place', 'your place',
+]);
+
 // Known Vancouver places with canonical names
 const KNOWN_PLACES = [
   'Science World',
@@ -89,7 +108,7 @@ function extractPlace(rawPost) {
     if (match) {
       const candidate = match[1].trim();
       // Minimum sanity: at least 3 chars, not just a pronoun
-      if (candidate.length >= 3 && !/^(the|a|an|it|here|there)$/i.test(candidate)) {
+      if (candidate.length >= 3 && !VAGUE_TERMS.has(candidate.toLowerCase())) {
         return {
           placeName: candidate,
           extractionMethod: 'regex',

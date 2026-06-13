@@ -4,16 +4,22 @@
  * The scraper uses the same X advanced search operators as the web UI.
  * point_radius / bounding_box are API-only — not available via scraper.
  * We rely on text-based Vancouver terms + place:"Vancouver" as the geo signal.
+ *
+ * Categories match the DB exactly: trending, cafes, nightlife, pop, crime_safety.
  */
 
-const GEO_TERMS = '(Vancouver OR "Vancouver BC" OR YVR OR Kitsilano OR Gastown OR "Mount Pleasant" OR "Stanley Park" OR UBC OR Granville OR "Commercial Drive" OR Robson OR Yaletown OR "False Creek" OR "Coal Harbour")';
+const GEO_TERMS = '(Vancouver OR "Vancouver BC" OR YVR OR Kitsilano OR Gastown OR "Mount Pleasant" OR "Stanley Park" OR UBC OR Granville OR "Commercial Drive" OR Robson OR Yaletown OR "False Creek" OR "Coal Harbour" OR Burnaby OR "North Van")';
 
 const CATEGORY_KEYWORDS = {
-  weather: `(rain OR snow OR flood OR storm OR fog OR wind OR hail OR flooding OR "black ice" OR weather) ${GEO_TERMS}`,
-  crime_safety: `(police OR crime OR arrest OR shooting OR stabbing OR robbery OR assault OR "road closure" OR emergency OR evacuation OR "police activity" OR incident) ${GEO_TERMS}`,
-  daily_life: `(lineup OR "line up" OR busy OR packed OR crowded OR vibes OR "open late" OR brunch OR "pop up" OR "pop-up" OR market OR festival OR "food truck") ${GEO_TERMS}`,
-  locations: `(📍 OR patio OR rooftop OR "sunset view" OR "great view" OR "photo spot" OR "new spot" OR "love this place" OR "beautiful view" OR "worth the visit") ${GEO_TERMS}`,
-  special_events: `(concert OR show OR event OR festival OR game OR "sold out" OR tonight OR opening OR launch OR parade) ${GEO_TERMS}`,
+  trending: `(viral OR trending OR packed OR lineup OR crowded OR vibes OR "just opened" OR "now open" OR "so good" OR amazing OR gorgeous OR beautiful OR sunset OR "golden hour" OR "can't believe" OR "check this out" OR "look at this") ${GEO_TERMS}`,
+
+  cafes: `(coffee OR cafe OR espresso OR latte OR brunch OR breakfast OR lunch OR "food truck" OR restaurant OR "great food" OR "best coffee" OR boba OR matcha OR bakery OR foodie OR "must try" OR "hidden gem" OR "new spot" OR "just tried") ${GEO_TERMS}`,
+
+  nightlife: `(bar OR pub OR club OR drinks OR cocktails OR "happy hour" OR party OR nightclub OR lounge OR "live music" OR DJ OR nightlife OR "open late" OR "after hours" OR "ladies night" OR "dance floor") ${GEO_TERMS}`,
+
+  pop: `(popup OR "pop-up" OR "pop up" OR market OR festival OR concert OR show OR event OR opening OR launch OR exhibition OR "one night only" OR parade OR performance OR fair OR "limited time" OR "last chance") ${GEO_TERMS}`,
+
+  crime_safety: `(police OR crime OR arrest OR shooting OR stabbing OR robbery OR assault OR "road closure" OR emergency OR evacuation OR "police activity" OR incident OR fire OR crash OR collision OR "stay away" OR "avoid area") ${GEO_TERMS}`,
 };
 
 /**

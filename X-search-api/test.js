@@ -2,7 +2,7 @@
 
 require('dotenv').config();
 require('./src/lib/proxyBootstrap');
-const { fetchCategory, DEFAULT_MAX_PER_CATEGORY } = require('./src/searchRunner');
+const { fetchCategory } = require('./src/searchRunner');
 
 (async () => {
   const category = process.argv[2] || 'weather';

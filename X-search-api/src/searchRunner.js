@@ -8,11 +8,11 @@ const { applyFilters }  = require('./pipeline/filter');
 const { extractPlace }  = require('./pipeline/placeExtractor');
 
 const ACTIVE_CATEGORIES = [
-  'weather',
+  'trending',
+  'cafes',
+  'nightlife',
+  'pop',
   'crime_safety',
-  'daily_life',
-  'locations',
-  'special_events',
 ];
 
 const DEFAULT_MAX_PER_CATEGORY = 20;
