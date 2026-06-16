@@ -6,6 +6,7 @@ import {
   clearFailure,
   type GeoFailureReason,
 } from "./geocodingFailures";
+import { safeError } from "./safeLog";
 
 // ─── Config ───────────────────────────────────────────────────────────────────
 
@@ -60,12 +61,14 @@ async function removeCooldown(normalized: string): Promise<void> {
 
 // ─── Ambiguous / vague terms (g28/g29) ───────────────────────────────────────
 
+// These terms are too vague to geocode even with Metro Vancouver context appended.
+// "downtown" is intentionally NOT here — it resolves correctly to Downtown Vancouver.
 const AMBIGUOUS_TERMS = new Set([
-  "downtown", "downtown core", "uptown", "midtown",
-  "main street", "the beach", "beach", "the park", "park",
-  "station", "the station", "mall", "the mall", "street",
-  "the waterfront", "waterfront", "road", "lane", "ave", "blvd",
-  "drive", "court", "place", "way", "walk", "path",
+  "uptown", "midtown",
+  "the beach", "beach", "the park", "park",
+  "station", "the station", "mall", "the mall",
+  "street", "road", "lane", "ave", "blvd", "drive", "court",
+  "place", "way", "walk", "path",
 ]);
 
 function isAmbiguous(normalized: string): boolean {
@@ -102,12 +105,19 @@ let lastCallAt     = 0;
 let dailyCallCount = 0;
 let dailyResetDate = "";
 
-async function throttle(): Promise<void> {
-  const elapsed = Date.now() - lastCallAt;
-  if (elapsed < THROTTLE_MS) {
-    await new Promise<void>((r) => setTimeout(r, THROTTLE_MS - elapsed));
-  }
-  lastCallAt = Date.now();
+// Chain throttle calls so concurrent callers queue rather than both seeing the
+// same lastCallAt and both firing within the same window.
+let throttleChain: Promise<void> = Promise.resolve();
+
+function throttle(): Promise<void> {
+  const next = throttleChain.then(() => {
+    const wait = THROTTLE_MS - (Date.now() - lastCallAt);
+    if (wait > 0) return new Promise<void>((r) => setTimeout(r, wait));
+  }).then(() => {
+    lastCallAt = Date.now();
+  });
+  throttleChain = next.catch(() => {});
+  return next;
 }
 
 type NominatimHit = {
@@ -165,7 +175,7 @@ export async function geocodePlace(
       };
     }
   } catch (err) {
-    console.error("[geocoder] cache lookup failed:", err);
+    safeError("geocoder", `cache lookup: ${err instanceof Error ? err.message : String(err)}`);
   }
 
   // g21/g33: Daily cap.
@@ -191,10 +201,12 @@ export async function geocodePlace(
 
   try {
     // g27: Metro Vancouver context suffix; g24: custom User-Agent + Referer.
+    // limit=3 so we can fall through to the first in-bounds result if the top hit
+    // lands outside Metro Vancouver (e.g. same name exists elsewhere in Canada).
     const params = new URLSearchParams({
       q:            `${placeName}, Metro Vancouver, BC, Canada`,
       format:       "json",
-      limit:        "1",
+      limit:        "3",
       countrycodes: "ca",
     });
 
@@ -207,7 +219,7 @@ export async function geocodePlace(
     });
 
     if (!res.ok) {
-      console.error(`[geocoder] Nominatim HTTP ${res.status} for "${normalized}"`);
+      console.warn(`[geocoder] Nominatim HTTP ${res.status} for "${normalized}"`);
       await setCooldown(normalized, placeName, "nominatim_error");
       return null;
     }
@@ -220,18 +232,24 @@ export async function geocodePlace(
       return null;
     }
 
-    const hit         = data[0];
+    // g30/g37: Pick the first result that falls inside Metro Vancouver.
+    // Nominatim returns results ordered by relevance; we skip out-of-bounds ones.
+    const hit = data.find((h) =>
+      isInsideMetroVancouver(parseFloat(h.lat), parseFloat(h.lon))
+    );
+
+    if (!hit) {
+      const first = data[0];
+      const lat0 = parseFloat(first.lat), lng0 = parseFloat(first.lon);
+      console.warn(`[geocoder] g37 all results outside Metro Vancouver for "${normalized}"`);
+      await setCooldown(normalized, placeName, "outside_bounds");
+      return { badBounds: true, lat: lat0, lng: lng0 };
+    }
+
     const lat         = parseFloat(hit.lat);
     const lng         = parseFloat(hit.lon);
     const confidence  = Math.max(hit.importance ?? 0, 0.1);
     const displayName = hit.display_name ?? null;
-
-    // g30/g37: Validate bounds.
-    if (!isInsideMetroVancouver(lat, lng)) {
-      console.warn(`[geocoder] g37 outside Metro Vancouver (${lat}, ${lng}) for "${normalized}"`);
-      await setCooldown(normalized, placeName, "outside_bounds");
-      return { badBounds: true, lat, lng };
-    }
 
     // g31: Cache successful result (g32: setCachedPlace guards manual_override internally).
     await setCachedPlace({
@@ -249,7 +267,7 @@ export async function geocodePlace(
 
     return { lat, lng, displayName, confidence, fromCache: false };
   } catch (err) {
-    console.error("[geocoder] geocodePlace error:", err);
+    safeError("geocoder", err);
     await setCooldown(normalized, placeName, "nominatim_error");
     return null;
   }
@@ -266,7 +284,7 @@ export const _testInternals = {
     failedPlaces.set(place.trim().toLowerCase(), Date.now() - 1000),
   clearFailedPlace:   (place: string)  => failedPlaces.delete(place.trim().toLowerCase()),
   clearAllFailed:     ()               => failedPlaces.clear(),
-  resetThrottle:      ()               => { lastCallAt = 0; },
+  resetThrottle:      ()               => { lastCallAt = 0; throttleChain = Promise.resolve(); },
   resetDailyCount:    ()               => { dailyCallCount = 0; dailyResetDate = ""; },
   setDailyCount:      (n: number)      => { dailyCallCount = n; dailyResetDate = todayString(); },
   DAILY_CAP,

@@ -50,6 +50,9 @@ export const METRO_VANCOUVER_PLACES: readonly string[] = [
   "Trout Lake",
 
   // Vancouver neighborhoods
+  "Hastings-Sunrise",
+  "False Creek Flats",
+  "Olympic Village",
   "Mount Pleasant",
   "Commercial Drive",
   "South Granville",
@@ -71,15 +74,22 @@ export const METRO_VANCOUVER_PLACES: readonly string[] = [
   "Marpole",
   "Dunbar",
   "Riley Park",
+  "Railtown",
   "West End",
   "East Van",
+  "Downtown Vancouver",
   "Downtown",
   "UBC",
+  // Colloquial shorthands
+  "Kits",
+  "The Drive",
 
   // Metro Vancouver cities/municipalities
   "New Westminster",
   "North Vancouver",
   "West Vancouver",
+  "North Van",
+  "West Van",
   "Port Coquitlam",
   "Port Moody",
   "Coquitlam",
@@ -94,8 +104,6 @@ export const METRO_VANCOUVER_PLACES: readonly string[] = [
   "Mission",
   "Surrey",
   "Delta",
-  "North Van",
-  "West Van",
 
   // Major streets
   "Robson Street",
@@ -114,7 +122,7 @@ export const METRO_VANCOUVER_PLACES: readonly string[] = [
 
 // Matches prepositions followed by a potential place name.
 const PREP_RE =
-  /\b(?:near|at|outside|on|by|in)\s+([A-Za-z][A-Za-z0-9 ]{1,49}?)(?=[,!?.\n"']|$|\s+(?:and|but|or|is|was|has|have|the|a|an|with|for|to|of)\b)/gi;
+  /\b(?:near|at|outside|on|by|in|around|heading\s+to|going\s+to)\s+([A-Za-z][A-Za-z0-9 ]{1,49}?)(?=[,!?.\n"']|$|\s+(?:and|but|or|is|was|has|have|the|a|an|with|for|to|of)\b)/gi;
 
 function escapeRegex(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");

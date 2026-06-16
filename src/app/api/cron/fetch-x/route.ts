@@ -7,6 +7,8 @@ import {
 } from "@/lib/backend/ingestionJobs";
 import { expireOldPins } from "@/lib/backend/expirePins";
 import { pruneOldRows } from "@/lib/backend/pruneOldRows";
+import { safeError, safeWarn } from "@/lib/backend/safeLog";
+import { checkRateLimit, getClientIp } from "@/lib/backend/rateLimit";
 
 export const dynamic = "force-dynamic";
 
@@ -43,6 +45,19 @@ async function runCronJob(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
 
+  // i16: Rate limit — 5 invocations per minute per IP (Vercel cron comes from one IP)
+  const ip = getClientIp(request);
+  const rl = checkRateLimit(`cron:${ip}`, 5, 60 * 1000);
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { error: "Too many requests." },
+      {
+        status: 429,
+        headers: { "Retry-After": String(Math.ceil(rl.retryAfterMs / 1000)) },
+      }
+    );
+  }
+
   const started = new Date().toISOString();
   const warnings: string[] = [];
   const errors: string[] = [];
@@ -60,7 +75,7 @@ async function runCronJob(request: NextRequest): Promise<NextResponse> {
     if (failureCheck.suspicious) {
       const msg = `High failure rate: ${failureCheck.failedCount}/${failureCheck.total} recent jobs failed`;
       warnings.push(msg);
-      console.warn("[fetch-x]", msg);
+      safeWarn("fetch-x", msg);
     }
 
     // e9: Expire stale active pins
@@ -83,7 +98,7 @@ async function runCronJob(request: NextRequest): Promise<NextResponse> {
     const msg = err instanceof Error ? err.message : String(err);
     errors.push(msg);
     fatalError = true;
-    console.error("[fetch-x] Unhandled error:", msg);
+    safeError("fetch-x", err);
   }
 
   const finished = new Date().toISOString();

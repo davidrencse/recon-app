@@ -18,15 +18,17 @@ const ACTIVE_CATEGORIES = [
 const DEFAULT_MAX_PER_CATEGORY = 20;
 const DEFAULT_DEADLINE_MS      = 50_000; // 50s — leaves buffer before 60s timeout
 
+const MAX_POSTS_PER_AUTHOR = 2; // per-run cap — prevents hashtag-spam floods from single accounts
+
 /**
  * Fetches + filters posts for one category.
  * Returns IngestPost objects — no geocoding (Recon handles it, h34).
  *
  * @param {string} category
- * @param {{ runId: string, seenIds: Set, deadlineAt: number, maxPerCategory: number }} context
+ * @param {{ runId: string, seenIds: Set, seenAuthors: Map, deadlineAt: number, maxPerCategory: number }} context
  */
 async function fetchCategory(category, context) {
-  const { runId, seenIds, deadlineAt, maxPerCategory } = context;
+  const { runId, seenIds, seenAuthors, deadlineAt, maxPerCategory } = context;
   const scraper = await getClient();
   const query   = buildGeoQuery(category);
 
@@ -62,6 +64,15 @@ async function fetchCategory(category, context) {
       continue;
     }
 
+    // Per-author cap: skip if this author already contributed MAX_POSTS_PER_AUTHOR this run.
+    const handle = rawPost.creatorHandle ?? '__unknown__';
+    const authorCount = seenAuthors.get(handle) ?? 0;
+    if (authorCount >= MAX_POSTS_PER_AUTHOR) {
+      rejected++;
+      console.debug(`[${runId}] [${category}] skip ${tweet.id}: author_cap(@${handle})`);
+      continue;
+    }
+
     const extracted = extractPlace(rawPost);
     if (!extracted) {
       rejected++;
@@ -73,6 +84,8 @@ async function fetchCategory(category, context) {
     const rawGeo = rawPost.geoPlace
       ? { lat: null, lng: null, place_name: rawPost.geoPlace.fullName || null }
       : null;
+
+    seenAuthors.set(handle, authorCount + 1);
 
     // h43: raw_source contains only engagement/media metadata — no auth state or proxy creds
     posts.push({
@@ -123,7 +136,8 @@ async function runIngestion(options = {}) {
 
   const context = {
     runId,
-    seenIds:        options.seenIds ?? new Set(),
+    seenIds:     options.seenIds     ?? new Set(),
+    seenAuthors: options.seenAuthors ?? new Map(),
     deadlineAt,
     maxPerCategory,
   };

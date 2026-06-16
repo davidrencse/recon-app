@@ -112,7 +112,7 @@ export async function checkConsecutiveZeroInserts(
   const { data, error } = await supabaseServer
     .from("ingestion_jobs")
     .select("pins_inserted")
-    .in("status", ["success"])
+    .in("status", ["success", "partial"])
     .order("started_at", { ascending: false })
     .limit(windowSize);
 

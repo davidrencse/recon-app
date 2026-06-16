@@ -9,6 +9,7 @@ import { isPostProcessed, recordProcessedPost } from "./processedPosts";
 import { logPinEvent } from "./pinAuditLog";
 import { startIngestionJob, finishIngestionJob, failIngestionJob } from "./ingestionJobs";
 import { geocodePlace } from "./geocoder";
+import { safeError } from "./safeLog";
 import type { IngestBatch, IngestPost, PostRejection, BatchSummary } from "@/types/ingest";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -186,6 +187,7 @@ export async function processIngestBatch(batch: IngestBatch): Promise<BatchSumma
   const started = new Date().toISOString();
   const rejections: PostRejection[] = [];
   const errors: string[] = [];
+  let hasFatalError = false;
 
   let accepted    = 0;
   let rejected    = 0;
@@ -371,23 +373,21 @@ export async function processIngestBatch(batch: IngestBatch): Promise<BatchSumma
         accepted++;
         inserted++;
       } catch (postErr) {
-        const msg = postErr instanceof Error ? postErr.message : String(postErr);
-        console.error("[ingestBatch] Unhandled post error:", msg, "post:", postId);
-        errors.push(`Post ${postId}: ${msg}`);
+        safeError("ingestBatch", `post ${postId}: ${postErr instanceof Error ? postErr.message : String(postErr)}`);
+        errors.push(`Post ${postId} failed`);
         rejected++;
       }
     }
   } catch (fatalErr) {
-    const msg = fatalErr instanceof Error ? fatalErr.message : String(fatalErr);
-    errors.push(`Fatal: ${msg}`);
-    console.error("[ingestBatch] Fatal error:", msg);
+    safeError("ingestBatch", fatalErr);
+    errors.push("Fatal batch error");
+    hasFatalError = true;
   }
 
   // f35: Update ingestion job
   const finished = new Date().toISOString();
   if (jobId) {
-    const jobStatus: "success" | "failed" =
-      errors.some((e) => e.startsWith("Fatal")) ? "failed" : "success";
+    const jobStatus: "success" | "failed" = hasFatalError ? "failed" : "success";
 
     await finishIngestionJob(jobId, {
       status:             jobStatus,
