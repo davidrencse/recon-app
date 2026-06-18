@@ -4,6 +4,7 @@ import { useState, useMemo, memo, useEffect, useCallback } from "react";
 import dynamic from "next/dynamic";
 import type { Pin, PinCategory } from "../types/pin";
 import { getPins } from "../lib/getPins";
+import { isSaved, toggleSavedPin } from "../lib/savedPins";
 
 const LeafletMap = dynamic(() => import("./LeafletMap"), {
   ssr: false,
@@ -74,10 +75,21 @@ interface PinPopupProps {
 }
 
 const PinPopup = memo(function PinPopup({ pin, onClose }: PinPopupProps) {
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    setSaved(isSaved(pin.postId));
+  }, [pin.postId]);
+
   const openPost = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!pin.postUrl) return;
     window.open(pin.postUrl, "_blank", "noopener,noreferrer");
+  };
+
+  const onToggleSave = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSaved(toggleSavedPin(pin));
   };
 
   return (
@@ -129,14 +141,32 @@ const PinPopup = memo(function PinPopup({ pin, onClose }: PinPopupProps) {
           </span>
         </div>
 
-        {/* place name */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        {/* place name + save */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
           <span
             onClick={openPost}
             style={{ fontSize: 11, color: "#444", cursor: "pointer", textDecoration: "underline", textDecorationColor: "#333" }}
           >
-            {pin.placeName}
+            View post
           </span>
+          <button
+            onClick={onToggleSave}
+            aria-pressed={saved}
+            aria-label={saved ? "Remove from saved" : "Save pin"}
+            style={{
+              display: "flex", alignItems: "center", gap: 5,
+              fontSize: 11, fontWeight: 600, fontFamily: "inherit",
+              color: saved ? "#0a0a0a" : "#cfcfcf",
+              background: saved ? "#e8e8e8" : "rgba(255,255,255,0.08)",
+              border: `1px solid ${saved ? "transparent" : "rgba(255,255,255,0.12)"}`,
+              borderRadius: 9999, padding: "5px 11px", cursor: "pointer",
+            }}
+          >
+            <svg width="11" height="11" viewBox="0 0 24 24" fill={saved ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+            </svg>
+            {saved ? "Saved" : "Save"}
+          </button>
         </div>
       </div>
 

@@ -14,6 +14,10 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // X-search-api is a CJS Node.js project — not subject to Next.js ESLint rules
     "X-search-api/**",
+    // next-pwa generated service worker artifacts (minified, regenerated each build)
+    "public/sw.js",
+    "public/sw.js.map",
+    "public/workbox-*.js",
   ]),
   {
     rules: {
