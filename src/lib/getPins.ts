@@ -19,7 +19,7 @@ function dbPinToPin(row: DbPin): Pin {
     status: row.status,
     activityScore: row.activity_score,
     crowdLevel: row.crowd_level,
-    tags: row.tags,
+    tags: row.tags ?? [],
   };
 }
 

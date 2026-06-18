@@ -257,9 +257,11 @@ describe("g42 — 1 req/sec throttle", () => {
 // ─── g43: Ambiguous place rejection ──────────────────────────────────────────
 
 describe("g43 — ambiguous place rejection", () => {
+  // NOTE: "downtown" and "waterfront" are intentionally NOT ambiguous — they
+  // resolve to real Vancouver places (Downtown Vancouver / Waterfront Station).
   const ambiguous = [
-    "downtown", "park", "beach", "the beach", "mall",
-    "station", "street", "waterfront", "the waterfront",
+    "park", "beach", "the beach", "mall",
+    "station", "street",
     "the park", "the mall", "the station",
   ];
 
@@ -282,9 +284,9 @@ describe("g43 — ambiguous place rejection", () => {
 
   it("rejects case-insensitive variants", async () => {
     mockNominatim([VANCOUVER_HIT]);
-    expect(await geocodePlace("Downtown")).toBeNull();
     expect(await geocodePlace("PARK")).toBeNull();
     expect(await geocodePlace("Mall")).toBeNull();
+    expect(await geocodePlace("The Beach")).toBeNull();
     expect(fetch).not.toHaveBeenCalled();
   });
 });
@@ -407,7 +409,7 @@ describe("g44 — failed-geocode cooldown (DB persistent path)", () => {
   it("does not call recordFailure for ambiguous terms", async () => {
     mockNominatim([]);
 
-    await geocodePlace("downtown");
+    await geocodePlace("park");
 
     expect(recordFailure).not.toHaveBeenCalled();
     expect(getActiveCooldown).not.toHaveBeenCalled();
