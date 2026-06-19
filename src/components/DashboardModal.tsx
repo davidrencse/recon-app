@@ -2,12 +2,12 @@
 
 import { useEffect, useRef } from "react";
 
-const BG      = "#131313";
-const SURFACE = "#1c1c1c";
-const LINE    = "rgba(255,255,255,0.05)";
-const BORDER  = "rgba(255,255,255,0.09)";
-const T1      = "#f2f2f2";
-const T2      = "#9a9a9a";
+const BG      = "var(--bg)";
+const SURFACE = "var(--surface)";
+const LINE    = "var(--line)";
+const BORDER  = "var(--border)";
+const T1      = "var(--t1)";
+const T2      = "var(--t2)";
 
 interface DashboardModalProps {
   title: string;

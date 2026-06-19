@@ -3,16 +3,16 @@
 import type { TransitRoute, DelayLevel } from "../../types/dashboard";
 
 /* ── Design tokens ────────────────────────────────────────────── */
-const T_PRIMARY = "#f2f2f2";
-const T_MUTED   = "#9a9a9a";
-const T_DIM     = "#4e4e4e";
+const T_PRIMARY = "var(--t1)";
+const T_MUTED   = "var(--t2)";
+const T_DIM     = "var(--t3)";
 
 /* ── Delay level styles ───────────────────────────────────────── */
 const DELAY_CONFIG: Record<DelayLevel, { label: string; dotColor: string; textColor: string }> = {
-  none:     { label: "On time",     dotColor: "#333",  textColor: "#444" },
-  minor:    { label: "Minor",       dotColor: "#555",  textColor: "#777" },
-  moderate: { label: "Moderate",    dotColor: "#888",  textColor: "#aaa" },
-  severe:   { label: "Disrupted",   dotColor: "#c0c0c0", textColor: "#d0d0d0" },
+  none:     { label: "On time",     dotColor: "var(--t4)",  textColor: "var(--t3)" },
+  minor:    { label: "Minor",       dotColor: "var(--t3)",  textColor: "var(--t3)" },
+  moderate: { label: "Moderate",    dotColor: "var(--t2)",  textColor: "var(--t2)" },
+  severe:   { label: "Disrupted",   dotColor: "var(--t1)", textColor: "var(--t1)" },
 };
 
 /* ── Route line SVG ───────────────────────────────────────────── */
@@ -53,7 +53,7 @@ function RouteLine({
         y1={LINE_Y}
         x2={width}
         y2={LINE_Y}
-        stroke={route.delayLevel === "severe" ? "#4a4a4a" : "#2a2a2a"}
+        stroke={route.delayLevel === "severe" ? "var(--t3)" : "var(--surface-3)"}
         strokeWidth={compact ? 1.5 : 2}
         strokeDasharray={route.delayLevel === "severe" ? "6 3" : "none"}
       />
@@ -78,7 +78,7 @@ function RouteLine({
                 cx={s.x}
                 cy={LINE_Y}
                 r={AFF_R}
-                fill="#111"
+                fill="var(--surface-2)"
                 stroke={cfg.dotColor}
                 strokeWidth={1.5}
               />
@@ -95,8 +95,8 @@ function RouteLine({
               cx={s.x}
               cy={LINE_Y}
               r={DOT_R}
-              fill="#111"
-              stroke="#3a3a3a"
+              fill="var(--surface-2)"
+              stroke="var(--t4)"
               strokeWidth={1}
             />
           )}
@@ -123,8 +123,8 @@ export function TransitDisruptionPreview({
       aria-label={`Transit disruption — ${active.length} affected routes. Tap to expand.`}
       style={{
         width: "100%",
-        background: "#1c1c1c",
-        border: "1px solid rgba(255,255,255,0.08)",
+        background: "var(--surface)",
+        border: "1px solid var(--border)",
         borderRadius: 18,
         padding: "14px 14px 12px",
         cursor: "pointer",
@@ -145,7 +145,7 @@ export function TransitDisruptionPreview({
           style={{
             fontSize: 10,
             fontWeight: 700,
-            color: "#555",
+            color: "var(--t3)",
             letterSpacing: 1.8,
             textTransform: "uppercase" as const,
           }}
@@ -156,9 +156,9 @@ export function TransitDisruptionPreview({
           style={{
             fontSize: 11,
             fontWeight: 600,
-            color: severe.length > 0 ? "#aaa" : T_DIM,
-            background: "#1a1a1a",
-            border: "1px solid rgba(255,255,255,0.08)",
+            color: severe.length > 0 ? "var(--t2)" : T_DIM,
+            background: "var(--surface-2)",
+            border: "1px solid var(--border)",
             borderRadius: 9999,
             padding: "2px 9px",
           }}
@@ -224,7 +224,7 @@ export function TransitDisruptionModal({ routes }: { routes: TransitRoute[] }) {
               key={route.id}
               style={{
                 padding: "16px 0",
-                borderBottom: isLast ? "none" : "1px solid rgba(255,255,255,0.05)",
+                borderBottom: isLast ? "none" : "1px solid var(--line)",
               }}
             >
               {/* Route name + delay badge */}
@@ -244,8 +244,8 @@ export function TransitDisruptionModal({ routes }: { routes: TransitRoute[] }) {
                     fontSize: 11,
                     fontWeight: 600,
                     color: cfg.textColor,
-                    background: "#1a1a1a",
-                    border: "1px solid rgba(255,255,255,0.08)",
+                    background: "var(--surface-2)",
+                    border: "1px solid var(--border)",
                     borderRadius: 9999,
                     padding: "3px 10px",
                     flexShrink: 0,
@@ -290,10 +290,10 @@ export function TransitDisruptionModal({ routes }: { routes: TransitRoute[] }) {
               {/* Disruption details */}
               <p style={{ fontSize: 12, color: T_DIM, lineHeight: 1.5, margin: "0 0 6px" }}>
                 {route.disruptionType}
-                <span style={{ margin: "0 5px", color: "#2a2a2a" }}>·</span>
+                <span style={{ margin: "0 5px", color: "var(--surface-3)" }}>·</span>
                 {route.affectedArea}
               </p>
-              <span style={{ fontSize: 11, color: "#444" }}>Until {route.until}</span>
+              <span style={{ fontSize: 11, color: "var(--t3)" }}>Until {route.until}</span>
             </div>
           );
         })}

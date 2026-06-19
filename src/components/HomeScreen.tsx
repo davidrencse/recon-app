@@ -9,7 +9,7 @@ function ReconSmall() {
   return (
     <div style={{
       width: 30, height: 30, borderRadius: 8,
-      background: "#000", border: "1px solid rgba(255,255,255,0.08)",
+      background: "var(--bg-deep)", border: "1px solid var(--border)",
       display: "flex", alignItems: "center", justifyContent: "center",
       overflow: "hidden"
     }}>
@@ -24,7 +24,7 @@ function IconBell() {
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
       </svg>
-      <span style={{ position: "absolute", top: 0, right: 0, width: 7, height: 7, borderRadius: "50%", background: "#ef4444", border: "1.5px solid #080808" }} />
+      <span style={{ position: "absolute", top: 0, right: 0, width: 7, height: 7, borderRadius: "50%", background: "#ef4444", border: "1.5px solid var(--bg-deep)" }} />
     </div>
   );
 }
@@ -67,12 +67,12 @@ const CATEGORY_COLOR: Record<PinCategory, string> = {
 
 /* ── Feed card ───────────────────────────────────────────────── */
 function FeedCard({ pin }: { pin: Pin }) {
-  const color = CATEGORY_COLOR[pin.category] ?? "#888";
+  const color = CATEGORY_COLOR[pin.category] ?? "var(--t2)";
   const title = pin.text.split(".")[0].split(",")[0].trim();
   return (
     <div style={{
-      background: "rgba(18,18,18,0.9)",
-      border: "1px solid rgba(255,255,255,0.07)",
+      background: "var(--surface-2)",
+      border: "1px solid var(--border)",
       borderRadius: 12,
       padding: "12px 14px",
       display: "flex",
@@ -86,16 +86,16 @@ function FeedCard({ pin }: { pin: Pin }) {
         }}>
           {pin.category.toUpperCase()}
         </span>
-        <span style={{ fontSize: 11, color: "#555" }}>{relativeTime(pin.createdAt)}</span>
+        <span style={{ fontSize: 11, color: "var(--t3)" }}>{relativeTime(pin.createdAt)}</span>
       </div>
-      <div style={{ fontSize: 14, fontWeight: 700, color: "#f0f0f0", lineHeight: 1.3 }}>
+      <div style={{ fontSize: 14, fontWeight: 700, color: "var(--t1)", lineHeight: 1.3 }}>
         {pin.placeName}
       </div>
-      <div style={{ fontSize: 13, color: "#888", lineHeight: 1.5 }}>
+      <div style={{ fontSize: 13, color: "var(--t2)", lineHeight: 1.5 }}>
         {title.length > 90 ? title.slice(0, 88) + "…" : title}
       </div>
       {pin.creatorHandle && (
-        <div style={{ fontSize: 11, color: "#444" }}>@{pin.creatorHandle}</div>
+        <div style={{ fontSize: 11, color: "var(--t3)" }}>@{pin.creatorHandle}</div>
       )}
     </div>
   );
@@ -151,21 +151,21 @@ export default function HomeScreen() {
       <div style={{ display: "flex", alignItems: "center", padding: "12px 20px 0", gap: 10, flexShrink: 0 }}>
         <ReconSmall />
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 11, color: "#555", marginBottom: 1 }}>Good evening</div>
-          <div style={{ fontSize: 15, fontWeight: 600, color: "#e8e8e8" }}>Vancouver</div>
+          <div style={{ fontSize: 11, color: "var(--t3)", marginBottom: 1 }}>Good evening</div>
+          <div style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)" }}>Vancouver</div>
         </div>
-        <button style={{ background: "none", border: "none", cursor: "pointer", color: "#888" }}>
+        <button style={{ background: "none", border: "none", cursor: "pointer", color: "var(--t2)" }}>
           <IconBell />
         </button>
       </div>
 
       {/* Headline */}
       <div style={{ padding: "20px 20px 0", flexShrink: 0 }}>
-        <div style={{ fontSize: 30, fontWeight: 800, color: "#fff", lineHeight: 1.2, letterSpacing: -0.5 }}>
+        <div style={{ fontSize: 30, fontWeight: 800, color: "var(--t1)", lineHeight: 1.2, letterSpacing: -0.5 }}>
           What&apos;s{" "}
-          <span style={{ fontStyle: "italic", fontWeight: 400, color: "#888" }}>moving</span>
+          <span style={{ fontStyle: "italic", fontWeight: 400, color: "var(--t2)" }}>moving</span>
         </div>
-        <div style={{ fontSize: 30, fontWeight: 800, color: "#fff", lineHeight: 1.2, letterSpacing: -0.5, marginBottom: 0 }}>
+        <div style={{ fontSize: 30, fontWeight: 800, color: "var(--t1)", lineHeight: 1.2, letterSpacing: -0.5, marginBottom: 0 }}>
           tonight.
         </div>
       </div>
@@ -176,9 +176,9 @@ export default function HomeScreen() {
           display: "flex", alignItems: "center", gap: 10,
           height: 44, padding: "0 14px",
           borderRadius: 9999,
-          background: "rgba(22,22,22,0.9)",
-          border: "1px solid rgba(255,255,255,0.07)",
-          color: "#444",
+          background: "var(--surface)",
+          border: "1px solid var(--border)",
+          color: "var(--t3)",
         }}>
           <IconSearch />
           <input
@@ -191,7 +191,7 @@ export default function HomeScreen() {
               border: "none",
               outline: "none",
               background: "transparent",
-              color: "#f0f0f0",
+              color: "var(--t1)",
               fontSize: 13.5,
               fontFamily: "inherit",
             }}
@@ -201,7 +201,7 @@ export default function HomeScreen() {
               onClick={() => setSearchQuery("")}
               aria-label="Clear search"
               style={{
-                background: "none", border: "none", color: "#777",
+                background: "none", border: "none", color: "var(--t3)",
                 cursor: "pointer", fontSize: 18, lineHeight: 1, padding: 0, flexShrink: 0,
               }}
             >
@@ -221,9 +221,9 @@ export default function HomeScreen() {
               display: "flex", alignItems: "center", gap: 5,
               padding: "7px 13px", borderRadius: 9999,
               fontSize: 13, fontWeight: active === f.key ? 600 : 500,
-              background: active === f.key ? "#e8e8e8" : "rgba(18,18,18,0.9)",
-              color: active === f.key ? "#0a0a0a" : "#666",
-              border: active === f.key ? "none" : "1px solid rgba(255,255,255,0.07)",
+              background: active === f.key ? "var(--chip-bg)" : "var(--surface-2)",
+              color: active === f.key ? "var(--bg-deep)" : "var(--t3)",
+              border: active === f.key ? "none" : "1px solid var(--border)",
               cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0,
               fontFamily: "inherit",
             }}
@@ -237,8 +237,8 @@ export default function HomeScreen() {
       <div style={{ flex: 1, minHeight: 0, overflowY: "auto", scrollbarWidth: "none", padding: "16px 20px 0" }}>
         <div style={{ marginBottom: 10 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <span style={{ fontSize: 17, fontWeight: 700, color: "#fff" }}>Happening now</span>
-            <span style={{ fontSize: 12, color: "#555" }}>
+            <span style={{ fontSize: 17, fontWeight: 700, color: "var(--t1)" }}>Happening now</span>
+            <span style={{ fontSize: 12, color: "var(--t3)" }}>
               {loading ? "…" : `${visible.length} shown`}
             </span>
           </div>
@@ -247,22 +247,22 @@ export default function HomeScreen() {
         <div style={{ display: "flex", flexDirection: "column", gap: 8, paddingBottom: 16 }}>
           {loading ? (
             <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 0" }}>
-              <span style={{ color: "#444", fontSize: 13 }}>Loading…</span>
+              <span style={{ color: "var(--t3)", fontSize: 13 }}>Loading…</span>
             </div>
           ) : error ? (
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, padding: "40px 0" }}>
-              <span style={{ color: "#666", fontSize: 13 }}>Could not load pins</span>
+              <span style={{ color: "var(--t3)", fontSize: 13 }}>Could not load pins</span>
               <button
                 onClick={() => loadPins(active)}
-                style={{ fontSize: 12, color: "#555", background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}
+                style={{ fontSize: 12, color: "var(--t3)", background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}
               >
                 Retry
               </button>
             </div>
           ) : visible.length === 0 ? (
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, padding: "40px 0" }}>
-              <span style={{ color: "#444", fontSize: 13, fontWeight: 500 }}>No live activity yet.</span>
-              <span style={{ color: "#2e2e2e", fontSize: 12 }}>Backend connected. Waiting for city activity.</span>
+              <span style={{ color: "var(--t3)", fontSize: 13, fontWeight: 500 }}>No live activity yet.</span>
+              <span style={{ color: "var(--faint)", fontSize: 12 }}>Backend connected. Waiting for city activity.</span>
             </div>
           ) : (
             visible.map((pin) => <FeedCard key={pin.postId} pin={pin} />)

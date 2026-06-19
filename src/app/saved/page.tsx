@@ -42,12 +42,12 @@ function cleanText(text: string): string {
 function EmptyState() {
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", padding: "56px 24px 24px" }}>
-      <div style={{ width: 40, height: 40, borderRadius: "50%", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>
+      <div style={{ width: 40, height: 40, borderRadius: "50%", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>
       </div>
-      <p style={{ fontSize: 15, fontWeight: 600, color: "#f0f0f0", marginBottom: 8 }}>Nothing saved yet</p>
-      <p style={{ fontSize: 13, color: "#555", lineHeight: 1.6, marginBottom: 24 }}>Tap a pin on the map and save places you want to check later.</p>
-      <Link href="/discover" style={{ fontSize: 13.5, fontWeight: 600, color: "#000", background: "#fff", borderRadius: 9999, padding: "10px 24px", textDecoration: "none" }}>Open map</Link>
+      <p style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)", marginBottom: 8 }}>Nothing saved yet</p>
+      <p style={{ fontSize: 13, color: "var(--t3)", lineHeight: 1.6, marginBottom: 24 }}>Tap a pin on the map and save places you want to check later.</p>
+      <Link href="/discover" style={{ fontSize: 13.5, fontWeight: 600, color: "var(--bg-deep)", background: "var(--t1)", borderRadius: 9999, padding: "10px 24px", textDecoration: "none" }}>Open map</Link>
     </div>
   );
 }
@@ -55,23 +55,23 @@ function EmptyState() {
 /* ── Saved row ────────────────────────────────────────────────── */
 function SavedRow({ pin, onRemove }: { pin: Pin; onRemove: (id: string) => void }) {
   return (
-    <div style={{ display: "flex", gap: 12, padding: "14px 0", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+    <div style={{ display: "flex", gap: 12, padding: "14px 0", borderBottom: "1px solid var(--line)" }}>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 5 }}>
-          <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.3, color: "#cfcfcf", background: "rgba(255,255,255,0.08)", padding: "2px 8px", borderRadius: 9999 }}>
+          <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.3, color: "var(--t1)", background: "var(--border)", padding: "2px 8px", borderRadius: 9999 }}>
             {CATEGORY_LABEL[pin.category]}
           </span>
-          <span style={{ fontSize: 11, color: "#555" }}>{relativeTime(pin.createdAt)}</span>
+          <span style={{ fontSize: 11, color: "var(--t3)" }}>{relativeTime(pin.createdAt)}</span>
         </div>
-        <div style={{ fontSize: 14, fontWeight: 600, color: "#f0f0f0", lineHeight: 1.3, marginBottom: 4 }}>
+        <div style={{ fontSize: 14, fontWeight: 600, color: "var(--t1)", lineHeight: 1.3, marginBottom: 4 }}>
           {cleanText(pin.text).slice(0, 110) || pin.placeName}
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 4, marginBottom: 4 }}>
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-          <span style={{ fontSize: 12, color: "#666" }}>{pin.placeName}{pin.neighborhood ? ` · ${pin.neighborhood}` : ""}</span>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span style={{ fontSize: 12, color: "var(--t3)" }}>{pin.placeName}{pin.neighborhood ? ` · ${pin.neighborhood}` : ""}</span>
         </div>
         {pin.postUrl && (
-          <a href={pin.postUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, color: "#5a5a5a", textDecoration: "underline", textDecorationColor: "#333" }}>
+          <a href={pin.postUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, color: "var(--t3)", textDecoration: "underline", textDecorationColor: "var(--t4)" }}>
             View post
           </a>
         )}
@@ -79,7 +79,7 @@ function SavedRow({ pin, onRemove }: { pin: Pin; onRemove: (id: string) => void 
       <button
         onClick={() => onRemove(pin.postId)}
         aria-label="Remove from saved"
-        style={{ alignSelf: "flex-start", width: 30, height: 30, borderRadius: "50%", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "#888", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontFamily: "inherit" }}
+        style={{ alignSelf: "flex-start", width: 30, height: 30, borderRadius: "50%", background: "var(--line)", border: "1px solid var(--border)", color: "var(--t2)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontFamily: "inherit" }}
       >
         <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
       </button>
@@ -114,9 +114,9 @@ export default function SavedPage() {
   return (
     <div style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0, position: "relative", width: "100%" }}>
       {/* Header */}
-      <div style={{ padding: "14px 20px 12px", flexShrink: 0, borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-        <div style={{ fontSize: 24, fontWeight: 800, color: "#f0f0f0", letterSpacing: -0.3, marginBottom: 2 }}>Saved</div>
-        <div style={{ fontSize: 12, color: "#555" }}>
+      <div style={{ padding: "14px 20px 12px", flexShrink: 0, borderBottom: "1px solid var(--line)" }}>
+        <div style={{ fontSize: 24, fontWeight: 800, color: "var(--t1)", letterSpacing: -0.3, marginBottom: 2 }}>Saved</div>
+        <div style={{ fontSize: 12, color: "var(--t3)" }}>
           {saved.length === 0 ? "Places, posts, and plans you marked" : `${saved.length} saved pin${saved.length !== 1 ? "s" : ""}`}
         </div>
       </div>
@@ -131,8 +131,8 @@ export default function SavedPage() {
               onClick={() => setActiveFilter(f.key)}
               style={{
                 flexShrink: 0, padding: "7px 13px", borderRadius: 9999, fontSize: 13, fontWeight: active ? 600 : 500,
-                background: active ? "#e8e8e8" : "rgba(18,18,18,0.9)", color: active ? "#0a0a0a" : "#666",
-                border: active ? "none" : "1px solid rgba(255,255,255,0.07)", cursor: "pointer", whiteSpace: "nowrap", fontFamily: "inherit",
+                background: active ? "var(--chip-bg)" : "var(--surface-2)", color: active ? "var(--bg-deep)" : "var(--t3)",
+                border: active ? "none" : "1px solid var(--border)", cursor: "pointer", whiteSpace: "nowrap", fontFamily: "inherit",
               }}
               aria-pressed={active}
             >
@@ -147,7 +147,7 @@ export default function SavedPage() {
         {saved.length === 0 ? (
           <EmptyState />
         ) : visible.length === 0 ? (
-          <p style={{ fontSize: 13, color: "#555", padding: "40px 0", textAlign: "center" }}>No saved pins in this category.</p>
+          <p style={{ fontSize: 13, color: "var(--t3)", padding: "40px 0", textAlign: "center" }}>No saved pins in this category.</p>
         ) : (
           <div style={{ display: "flex", flexDirection: "column" }}>
             {visible.map((pin) => <SavedRow key={pin.postId} pin={pin} onRemove={handleRemove} />)}

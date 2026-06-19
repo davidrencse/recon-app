@@ -3,18 +3,19 @@
 import { useState, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTheme } from "../lib/theme";
 
 /* ══ Tokens ═══════════════════════════════════════════════════════ */
-const BG      = "#131313";
-const SURFACE = "#1c1c1c";
-const SURFACE2= "#222222";
-const LINE    = "rgba(255,255,255,0.05)";
-const BORDER  = "rgba(255,255,255,0.08)";
-const BORDER_M= "rgba(255,255,255,0.11)";
-const T1      = "#f2f2f2";
-const T2      = "#9a9a9a";
-const T3      = "#4e4e4e";
-const T4      = "#2e2e2e";
+const BG      = "var(--bg)";
+const SURFACE = "var(--surface)";
+const SURFACE2= "var(--surface-3)";
+const LINE    = "var(--line)";
+const BORDER  = "var(--border)";
+const BORDER_M= "var(--border)";
+const T1      = "var(--t1)";
+const T2      = "var(--t2)";
+const T3      = "var(--t3)";
+const T4      = "var(--faint)";
 
 /* ══ Nav icons ════════════════════════════════════════════════════ */
 function IconHome({ active }: { active: boolean }) {
@@ -81,7 +82,7 @@ function MockQR() {
   return (
     <svg width={cols*SZ} height={rows*SZ} viewBox={`0 0 ${cols*SZ} ${rows*SZ}`} style={{ display:"block" }}>
       {pattern.map((row, ri) => [...row].map((cell, ci) =>
-        cell === "1" ? <rect key={`${ri}-${ci}`} x={ci*SZ} y={ri*SZ} width={SZ} height={SZ} fill="rgba(255,255,255,0.6)"/> : null
+        cell === "1" ? <rect key={`${ri}-${ci}`} x={ci*SZ} y={ri*SZ} width={SZ} height={SZ} fill="var(--t2)"/> : null
       ))}
     </svg>
   );
@@ -182,7 +183,7 @@ function Switch({ on, onClick }: { on: boolean; onClick: () => void }) {
         justifyContent: on ? "flex-end" : "flex-start", transition:"background 0.15s, border-color 0.15s",
       }}
     >
-      <span style={{ width:20, height:20, borderRadius:"50%", background: on ? "#0d0d0d" : "#6a6a6a", transition:"background 0.15s" }}/>
+      <span style={{ width:20, height:20, borderRadius:"50%", background: on ? "var(--chip-text)" : "var(--t3)", transition:"background 0.15s" }}/>
     </button>
   );
 }
@@ -202,7 +203,7 @@ function ChipGroup({ options, value, onChange, multi=false }: { options: string[
             onClick={() => toggle(opt)}
             style={{
               padding:"7px 13px", borderRadius:999, fontSize:12.5, fontWeight:500, cursor:"pointer", fontFamily:"inherit",
-              background: active ? T1 : SURFACE2, color: active ? "#0d0d0d" : T2,
+              background: active ? T1 : SURFACE2, color: active ? "var(--chip-text)" : T2,
               border:`1px solid ${active ? T1 : BORDER}`, transition:"all 0.12s",
             }}
           >
@@ -481,7 +482,7 @@ function SecurityPanel({ onClose }: { onClose: () => void }) {
             </div>
             {twoFA
               ? <Switch on={twoFA} onClick={() => setTwoFA(false)}/>
-              : <button onClick={() => setTwoFA(true)} style={{ flexShrink:0, padding:"8px 14px", borderRadius:10, fontSize:12.5, fontWeight:600, cursor:"pointer", fontFamily:"inherit", background:T1, color:"#0d0d0d", border:"none" }}>Set up 2FA</button>}
+              : <button onClick={() => setTwoFA(true)} style={{ flexShrink:0, padding:"8px 14px", borderRadius:10, fontSize:12.5, fontWeight:600, cursor:"pointer", fontFamily:"inherit", background:T1, color:"var(--chip-text)", border:"none" }}>Set up 2FA</button>}
           </div>
         </div>
 
@@ -548,6 +549,35 @@ function IconDevice() {
   );
 }
 
+/* ══ Light-mode toggle row ════════════════════════════════════════ */
+function LightModeRow() {
+  const { theme, toggle } = useTheme();
+  const on = theme === "light";
+  return (
+    <button
+      onClick={toggle}
+      aria-pressed={on}
+      aria-label="Toggle light mode"
+      style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", gap:12, padding:"15px 0", background:"none", border:"none", cursor:"pointer", fontFamily:"inherit" }}
+    >
+      <div style={{ display:"flex", alignItems:"center", gap:11 }}>
+        <span style={{ color:T2, display:"flex" }}>
+          {on
+            ? <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+            : <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>}
+        </span>
+        <div style={{ textAlign:"left" }}>
+          <div style={{ fontSize:15, color:T1, fontWeight:500 }}>Light mode</div>
+          <div style={{ fontSize:12, color:T3, marginTop:1 }}>{on ? "On" : "Off"}</div>
+        </div>
+      </div>
+      <span style={{ width:44, height:26, borderRadius:9999, background: on ? T1 : SURFACE2, border:`1px solid ${BORDER}`, position:"relative", flexShrink:0, transition:"background 0.15s" }}>
+        <span style={{ position:"absolute", top:2, left: on ? 20 : 2, width:20, height:20, borderRadius:"50%", background: on ? "var(--chip-text)" : T2, transition:"left 0.15s" }}/>
+      </span>
+    </button>
+  );
+}
+
 /* ══ Settings panel ═══════════════════════════════════════════════ */
 function SettingsPanel({ onClose, onEditProfile, onPrivacy, onAbout, onHelp, onTerms, onNotifications, onSecurity, onDataActivity }: { onClose: () => void; onEditProfile: () => void; onPrivacy: () => void; onAbout: () => void; onHelp: () => void; onTerms: () => void; onNotifications: () => void; onSecurity: () => void; onDataActivity: () => void }) {
   return (
@@ -559,6 +589,15 @@ function SettingsPanel({ onClose, onEditProfile, onPrivacy, onAbout, onHelp, onT
       </div>
       <div style={{ padding:"0 20px 0" }}>
         <div style={{ fontSize:24, fontWeight:800, color:T1, marginBottom:22, letterSpacing:-0.5 }}>Settings</div>
+
+        {/* Appearance */}
+        <div style={{ marginBottom:20 }}>
+          <div style={{ fontSize:10, color:T3, letterSpacing:1.8, textTransform:"uppercase" as const, fontWeight:600, marginBottom:6 }}>Appearance</div>
+          <div style={{ background:SURFACE, borderRadius:16, padding:"0 16px", border:`1px solid ${BORDER}` }}>
+            <LightModeRow />
+          </div>
+        </div>
+
         {([
           { group:"Preferences", rows:[{ label:"Notifications", onClick: onNotifications },{ label:"Security", onClick: onSecurity },{ label:"Data & activity", last:true, onClick: onDataActivity }] },
           { group:"Account",     rows:[{ label:"Edit profile", onClick: onEditProfile },{ label:"Change city", sublabel:"Vancouver, BC", last:true }] },
@@ -628,7 +667,7 @@ function HelpPanel({ onClose }: { onClose: () => void }) {
         <p style={{ ...p, marginBottom:16 }}>
           Have an idea for a new feature or ways we can improve the app? We read every message.
         </p>
-        <button style={{ width:"100%", height:50, borderRadius:14, background:T1, border:"none", color:"#0d0d0d", fontSize:14, fontWeight:700, cursor:"pointer", marginBottom:24, fontFamily:"inherit" }}>
+        <button style={{ width:"100%", height:50, borderRadius:14, background:T1, border:"none", color:"var(--chip-text)", fontSize:14, fontWeight:700, cursor:"pointer", marginBottom:24, fontFamily:"inherit" }}>
           Send feedback
         </button>
 
@@ -1148,38 +1187,38 @@ function AccountPanel({ onClose }: { onClose: () => void }) {
           <IconClose/>
         </button>
       </div>
-      <div style={{ margin:"16px 20px 0", background:"#111", borderRadius:22, padding:"24px 22px", border:`1px solid ${BORDER_M}` }}>
+      <div style={{ margin:"16px 20px 0", background:"var(--surface-2)", borderRadius:22, padding:"24px 22px", border:`1px solid ${BORDER_M}` }}>
         <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", marginBottom:20 }}>
           <div style={{ width:40, height:40, borderRadius:12, background:SURFACE2, border:`1px solid ${BORDER}`, display:"flex", alignItems:"center", justifyContent:"center", overflow: "hidden" }}>
             {LOGO_IMG}
           </div>
-          <span style={{ fontSize:8, color:"rgba(255,255,255,0.25)", letterSpacing:3, textTransform:"uppercase" as const, fontWeight:700, paddingTop:4 }}>RECON™</span>
+          <span style={{ fontSize:8, color:"var(--border-strong)", letterSpacing:3, textTransform:"uppercase" as const, fontWeight:700, paddingTop:4 }}>RECON™</span>
         </div>
         <div style={{ fontSize:22, fontWeight:800, color:T1, letterSpacing:-0.3, textTransform:"uppercase" as const, marginBottom:18, lineHeight:1.2 }}>Member —<br/>All Access</div>
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16, marginBottom:18 }}>
           {[{ label:"CITY", value:"Vancouver, BC" },{ label:"SINCE", value:"Jun 2026" }].map((f) => (
             <div key={f.label}>
-              <div style={{ fontSize:8, color:"rgba(255,255,255,0.22)", letterSpacing:2.5, textTransform:"uppercase" as const, marginBottom:4, fontWeight:600 }}>{f.label}</div>
-              <div style={{ fontSize:12, color:"rgba(255,255,255,0.65)" }}>{f.value}</div>
+              <div style={{ fontSize:8, color:"var(--border-strong)", letterSpacing:2.5, textTransform:"uppercase" as const, marginBottom:4, fontWeight:600 }}>{f.label}</div>
+              <div style={{ fontSize:12, color:"var(--t2)" }}>{f.value}</div>
             </div>
           ))}
         </div>
-        <div style={{ height:1, background:"rgba(255,255,255,0.1)", marginBottom:18 }}/>
+        <div style={{ height:1, background:"var(--border)", marginBottom:18 }}/>
         <div style={{ marginBottom:20 }}>
-          <div style={{ fontSize:10.5, color:"rgba(255,255,255,0.3)", marginBottom:5 }}>@davidren</div>
+          <div style={{ fontSize:10.5, color:"var(--border-strong)", marginBottom:5 }}>@davidren</div>
           <div style={{ fontSize:26, fontWeight:800, color:T1, textTransform:"uppercase" as const, letterSpacing:-0.5, lineHeight:1 }}>David Ren</div>
         </div>
         <div style={{ display:"flex", gap:18, alignItems:"flex-end" }}>
           <div style={{ flexShrink:0 }}><MockQR/></div>
           <div style={{ flex:1 }}>
-            <div style={{ fontSize:8, color:"rgba(255,255,255,0.22)", letterSpacing:2.5, textTransform:"uppercase" as const, marginBottom:4, fontWeight:600 }}>REFERENCE ID</div>
-            <div style={{ fontSize:12, color:"rgba(255,255,255,0.55)", fontVariantNumeric:"tabular-nums", marginBottom:12 }}>RC-20381930</div>
-            <div style={{ fontSize:9, color:"rgba(255,255,255,0.25)", textTransform:"uppercase" as const, letterSpacing:1.5, lineHeight:1.7 }}>Recon Beta<br/>Vancouver · v0.1</div>
+            <div style={{ fontSize:8, color:"var(--border-strong)", letterSpacing:2.5, textTransform:"uppercase" as const, marginBottom:4, fontWeight:600 }}>REFERENCE ID</div>
+            <div style={{ fontSize:12, color:"var(--t2)", fontVariantNumeric:"tabular-nums", marginBottom:12 }}>RC-20381930</div>
+            <div style={{ fontSize:9, color:"var(--border-strong)", textTransform:"uppercase" as const, letterSpacing:1.5, lineHeight:1.7 }}>Recon Beta<br/>Vancouver · v0.1</div>
           </div>
         </div>
       </div>
       <div style={{ padding:"22px 20px 32px" }}>
-        <button style={{ width:"100%", height:50, borderRadius:14, background:T1, border:"none", color:"#0d0d0d", fontSize:14, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>Edit profile</button>
+        <button style={{ width:"100%", height:50, borderRadius:14, background:T1, border:"none", color:"var(--chip-text)", fontSize:14, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>Edit profile</button>
       </div>
     </DraggablePanel>
   );
@@ -1214,7 +1253,7 @@ function YouPopup({ onSettings, onClose }: {
         borderRadius:18,
         zIndex:1001,
         overflow:"hidden",
-        boxShadow:"0 16px 48px rgba(0,0,0,0.65)",
+        boxShadow:"0 16px 48px var(--shadow)",
       }}>
         <Link href="/dashboard" onClick={onClose} style={{ textDecoration:"none" }}>
           <div style={{ ...rowStyle, display:"flex" as const }}>
@@ -1285,7 +1324,7 @@ export default function BottomNav() {
             <Link key={item.label} href={item.href} style={{ textDecoration:"none" }}>
               <div style={{
                 display:"flex", flexDirection:"column", alignItems:"center", gap:3,
-                color: active ? T1 : "#3a3a3a",
+                color: active ? T1 : "var(--t4)",
                 padding:"4px 16px",
               }}>
                 <Icon active={active}/>
@@ -1298,7 +1337,7 @@ export default function BottomNav() {
         <button
           onClick={() => setYouPopupOpen(v => !v)}
           aria-expanded={youPopupOpen}
-          style={{ background:"none", border:"none", cursor:"pointer", color: youPopupOpen ? T1 : "#3a3a3a", padding:"4px 16px", fontFamily:"inherit" }}
+          style={{ background:"none", border:"none", cursor:"pointer", color: youPopupOpen ? T1 : "var(--t4)", padding:"4px 16px", fontFamily:"inherit" }}
         >
           <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:3 }}>
             <IconUser active={youPopupOpen}/>

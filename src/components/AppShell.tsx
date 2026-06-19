@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import BottomNav from "./BottomNav";
+import { ThemeProvider } from "../lib/theme";
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -9,6 +10,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const showNav = !isLanding;
 
   return (
+    <ThemeProvider>{(
     /* 
        THE REDDIT-PROVEN SHELL:
        - Since html/body is 100vh, this 100% height container 
@@ -17,7 +19,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     <div style={{
       width: "100%",
       height: "100%",
-      background: "#131313",
+      background: "var(--bg)",
       display: "flex",
       flexDirection: "column",
       overflow: "hidden",
@@ -41,5 +43,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       
       {showNav && <BottomNav />}
     </div>
+    )}</ThemeProvider>
   );
 }

@@ -7,9 +7,9 @@ function ReconLogo() {
     <div style={{
       width: 100, height: 100, borderRadius: 22,
       overflow: "hidden",
-      border: "1px solid rgba(255,255,255,0.08)",
+      border: "1px solid var(--border)",
       display: "flex", alignItems: "center", justifyContent: "center",
-      background: "#000",
+      background: "var(--bg-deep)",
     }}>
       <img 
         src="/logo.png" 
@@ -51,13 +51,13 @@ export default function LandingScreen() {
 
           {/* Headline */}
           <div style={{ textAlign: "center", marginBottom: 20 }}>
-            <div style={{ fontSize: 34, fontWeight: 800, color: "#fff", lineHeight: 1.15, letterSpacing: -0.5 }}>
+            <div style={{ fontSize: 34, fontWeight: 800, color: "var(--t1)", lineHeight: 1.15, letterSpacing: -0.5 }}>
               See your city,
             </div>
-            <div style={{ fontSize: 34, fontWeight: 400, fontStyle: "italic", color: "#bbb", lineHeight: 1.15, letterSpacing: -0.3 }}>
+            <div style={{ fontSize: 34, fontWeight: 400, fontStyle: "italic", color: "var(--t2)", lineHeight: 1.15, letterSpacing: -0.3 }}>
               as it is,
             </div>
-            <div style={{ fontSize: 34, fontWeight: 800, color: "#fff", lineHeight: 1.15, letterSpacing: -0.5 }}>
+            <div style={{ fontSize: 34, fontWeight: 800, color: "var(--t1)", lineHeight: 1.15, letterSpacing: -0.5 }}>
               right now.
             </div>
           </div>
@@ -66,7 +66,7 @@ export default function LandingScreen() {
           <p style={{
             textAlign: "center",
             fontSize: 13.5,
-            color: "#666",
+            color: "var(--t3)",
             lineHeight: 1.65,
             margin: "0 0 36px",
           }}>
@@ -84,17 +84,17 @@ export default function LandingScreen() {
               <div
                 key={card.label}
                 style={{
-                  background: "#0f0f0f",
-                  border: "1px solid rgba(255,255,255,0.07)",
+                  background: "var(--bg)",
+                  border: "1px solid var(--border)",
                   borderRadius: 14,
                   padding: "16px 14px",
                 }}
               >
-                <div style={{ color: "#666", marginBottom: 10 }}>{card.icon}</div>
-                <div style={{ fontSize: 13.5, fontWeight: 600, color: "#e0e0e0", marginBottom: 4 }}>
+                <div style={{ color: "var(--t3)", marginBottom: 10 }}>{card.icon}</div>
+                <div style={{ fontSize: 13.5, fontWeight: 600, color: "var(--t1)", marginBottom: 4 }}>
                   {card.label}
                 </div>
-                <div style={{ fontSize: 11.5, color: "#444" }}>{card.sub}</div>
+                <div style={{ fontSize: 11.5, color: "var(--t3)" }}>{card.sub}</div>
               </div>
             ))}
           </div>
@@ -106,8 +106,8 @@ export default function LandingScreen() {
                 width: "100%",
                 height: 54,
                 borderRadius: 12,
-                background: "#fff",
-                color: "#000",
+                background: "var(--t1)",
+                color: "var(--bg-deep)",
                 fontSize: 15,
                 fontWeight: 600,
                 display: "flex",
@@ -125,7 +125,7 @@ export default function LandingScreen() {
                 height: 54,
                 borderRadius: 12,
                 background: "transparent",
-                color: "#ccc",
+                color: "var(--t2)",
                 fontSize: 15,
                 fontWeight: 500,
                 display: "flex",
@@ -141,7 +141,7 @@ export default function LandingScreen() {
 
         {/* Footer */}
         <div style={{ padding: "16px 0 28px", textAlign: "center", flexShrink: 0 }}>
-          <span style={{ fontSize: 12, color: "#333" }}>Vancouver · v0.1 MVP</span>
+          <span style={{ fontSize: 12, color: "var(--t4)" }}>Vancouver · v0.1 MVP</span>
         </div>
     </>
   );

@@ -43,8 +43,8 @@ function PinCard({ pin, onClose }: PinCardProps) {
         left: 0,
         right: 0,
         zIndex: 1000,
-        background: "#111",
-        borderTop: "1px solid rgba(255,255,255,0.1)",
+        background: "var(--surface-2)",
+        borderTop: "1px solid var(--border)",
         borderRadius: "14px 14px 0 0",
         padding: "12px 16px 20px",
       }}
@@ -54,7 +54,7 @@ function PinCard({ pin, onClose }: PinCardProps) {
         style={{
           width: 36,
           height: 4,
-          background: "#333",
+          background: "var(--t4)",
           borderRadius: 2,
           margin: "0 auto 12px",
         }}
@@ -71,9 +71,9 @@ function PinCard({ pin, onClose }: PinCardProps) {
           width: 28,
           height: 28,
           borderRadius: "50%",
-          background: "#222",
-          border: "1px solid #333",
-          color: "#aaa",
+          background: "var(--surface-3)",
+          border: "1px solid var(--t4)",
+          color: "var(--t2)",
           fontSize: 13,
           cursor: "pointer",
           display: "flex",
@@ -91,19 +91,19 @@ function PinCard({ pin, onClose }: PinCardProps) {
             fontSize: 10,
             fontWeight: 700,
             letterSpacing: 0.5,
-            color: "#000",
-            background: "#fff",
+            color: "var(--bg-deep)",
+            background: "var(--t1)",
             padding: "2px 7px",
             borderRadius: 4,
           }}
         >
           {CATEGORY_LABEL[pin.category].toUpperCase()}
         </span>
-        <span style={{ fontSize: 12, color: "#666" }}>{relativeTime(pin.createdAt)}</span>
+        <span style={{ fontSize: 12, color: "var(--t3)" }}>{relativeTime(pin.createdAt)}</span>
       </div>
 
       {/* place name */}
-      <div style={{ fontSize: 18, fontWeight: 700, color: "#fff", marginBottom: 4 }}>
+      <div style={{ fontSize: 18, fontWeight: 700, color: "var(--t1)", marginBottom: 4 }}>
         {pin.placeName}
       </div>
 
@@ -111,7 +111,7 @@ function PinCard({ pin, onClose }: PinCardProps) {
       <div
         style={{
           fontSize: 14,
-          color: "#bbb",
+          color: "var(--t2)",
           lineHeight: 1.55,
           marginBottom: 10,
         }}
@@ -128,8 +128,8 @@ function PinCard({ pin, onClose }: PinCardProps) {
           marginBottom: 14,
         }}
       >
-        <span style={{ fontSize: 12, color: "#777" }}>{pin.creatorHandle}</span>
-        <span style={{ fontSize: 12, color: "#555" }}>
+        <span style={{ fontSize: 12, color: "var(--t3)" }}>{pin.creatorHandle}</span>
+        <span style={{ fontSize: 12, color: "var(--t3)" }}>
           {Math.round(pin.locationConfidence * 100)}% location confidence
         </span>
       </div>
@@ -142,8 +142,8 @@ function PinCard({ pin, onClose }: PinCardProps) {
             flex: 1,
             height: 44,
             borderRadius: 8,
-            background: "#fff",
-            color: "#000",
+            background: "var(--t1)",
+            color: "var(--bg-deep)",
             fontSize: 14,
             fontWeight: 600,
             border: "none",
@@ -158,11 +158,11 @@ function PinCard({ pin, onClose }: PinCardProps) {
             flex: 1,
             height: 44,
             borderRadius: 8,
-            background: "#1c1c1c",
-            color: "#fff",
+            background: "var(--surface)",
+            color: "var(--t1)",
             fontSize: 14,
             fontWeight: 600,
-            border: "1px solid #333",
+            border: "1px solid var(--t4)",
             cursor: "pointer",
           }}
         >

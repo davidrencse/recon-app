@@ -3,9 +3,9 @@
 import type { WeatherData, WeatherConditionCode, ImpactLevel } from "../../types/dashboard";
 
 /* ── Design tokens ────────────────────────────────────────────── */
-const T_PRIMARY = "#f2f2f2";
-const T_MUTED   = "#9a9a9a";
-const T_DIM     = "#4e4e4e";
+const T_PRIMARY = "var(--t1)";
+const T_MUTED   = "var(--t2)";
+const T_DIM     = "var(--t3)";
 
 /* ── Weather icons (SVG) ──────────────────────────────────────── */
 function CloudRainIcon({ size = 40 }: { size?: number }) {
@@ -132,7 +132,7 @@ function HourlyRow({ forecast }: { forecast: WeatherData["hourlyForecast"] }) {
         alignItems: "flex-start",
         justifyContent: "space-between",
         paddingTop: 12,
-        borderTop: "1px solid rgba(255,255,255,0.08)",
+        borderTop: "1px solid var(--border)",
       }}
     >
       {forecast.map((f) => (
@@ -162,7 +162,7 @@ function HourlyRow({ forecast }: { forecast: WeatherData["hourlyForecast"] }) {
 function ImpactArrow({ impact }: { impact: ImpactLevel }) {
   if (impact === "positive") {
     return (
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#c8c8c8" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-label="Increases">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--t1)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-label="Increases">
         <line x1="12" y1="19" x2="12" y2="5" />
         <polyline points="5 12 12 5 19 12" />
       </svg>
@@ -170,14 +170,14 @@ function ImpactArrow({ impact }: { impact: ImpactLevel }) {
   }
   if (impact === "negative") {
     return (
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#666" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-label="Reduces">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-label="Reduces">
         <line x1="12" y1="5" x2="12" y2="19" />
         <polyline points="19 12 12 19 5 12" />
       </svg>
     );
   }
   return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-label="No change">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-label="No change">
       <line x1="5" y1="12" x2="19" y2="12" />
     </svg>
   );
@@ -197,7 +197,7 @@ function OutdoorMeter({ level }: { level: "low" | "moderate" | "high" }) {
               flex: 1,
               height: 4,
               borderRadius: 2,
-              background: i < filled ? (level === "high" ? "#aaa" : level === "moderate" ? "#777" : "#555") : "#1a1a1a",
+              background: i < filled ? (level === "high" ? "var(--t2)" : level === "moderate" ? "var(--t3)" : "var(--t3)") : "var(--surface-2)",
             }}
           />
         ))}
@@ -206,7 +206,7 @@ function OutdoorMeter({ level }: { level: "low" | "moderate" | "high" }) {
         style={{
           fontSize: 10,
           fontWeight: 600,
-          color: level === "high" ? "#c0c0c0" : level === "moderate" ? "#888" : "#666",
+          color: level === "high" ? "var(--t1)" : level === "moderate" ? "var(--t2)" : "var(--t3)",
           textTransform: "uppercase" as const,
           letterSpacing: 0.5,
           flexShrink: 0,
@@ -234,8 +234,8 @@ export function WeatherImpactPreview({
       aria-label={`Weather impact — ${weather.condition}, ${weather.temperature}°C. Tap to expand.`}
       style={{
         width: "100%",
-        background: "#1c1c1c",
-        border: "1px solid rgba(255,255,255,0.08)",
+        background: "var(--surface)",
+        border: "1px solid var(--border)",
         borderRadius: 18,
         padding: "14px 14px 14px",
         cursor: "pointer",
@@ -250,7 +250,7 @@ export function WeatherImpactPreview({
           style={{
             fontSize: 10,
             fontWeight: 700,
-            color: "#555",
+            color: "var(--t3)",
             letterSpacing: 1.8,
             textTransform: "uppercase" as const,
           }}
@@ -309,8 +309,8 @@ export function WeatherImpactModal({ weather }: { weather: WeatherData }) {
       {/* Reference-image style header */}
       <div
         style={{
-          background: "#1a1a1a",
-          border: "1px solid rgba(255,255,255,0.08)",
+          background: "var(--surface-2)",
+          border: "1px solid var(--border)",
           borderRadius: 14,
           padding: "16px 16px 14px",
           marginBottom: 16,
@@ -358,8 +358,8 @@ export function WeatherImpactModal({ weather }: { weather: WeatherData }) {
           display: "flex",
           gap: 0,
           marginBottom: 16,
-          background: "#1a1a1a",
-          border: "1px solid rgba(255,255,255,0.08)",
+          background: "var(--surface-2)",
+          border: "1px solid var(--border)",
           borderRadius: 14,
           overflow: "hidden",
         }}
@@ -374,7 +374,7 @@ export function WeatherImpactModal({ weather }: { weather: WeatherData }) {
             style={{
               flex: 1,
               padding: "12px 12px 11px",
-              borderLeft: i > 0 ? "1px solid rgba(255,255,255,0.06)" : "none",
+              borderLeft: i > 0 ? "1px solid var(--line)" : "none",
             }}
           >
             <div style={{ fontSize: 8.5, color: T_DIM, fontWeight: 600, letterSpacing: 1.5, textTransform: "uppercase" as const, marginBottom: 4 }}>
@@ -410,7 +410,7 @@ export function WeatherImpactModal({ weather }: { weather: WeatherData }) {
               padding: "12px 0",
               borderBottom:
                 idx < weather.categoryImpacts.length - 1
-                  ? "1px solid rgba(255,255,255,0.05)"
+                  ? "1px solid var(--line)"
                   : "none",
             }}
           >
@@ -420,8 +420,8 @@ export function WeatherImpactModal({ weather }: { weather: WeatherData }) {
                 width: 28,
                 height: 28,
                 borderRadius: 8,
-                background: "#1a1a1a",
-                border: "1px solid rgba(255,255,255,0.08)",
+                background: "var(--surface-2)",
+                border: "1px solid var(--border)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -456,8 +456,8 @@ export function WeatherImpactModal({ weather }: { weather: WeatherData }) {
                 style={{
                   fontSize: 11,
                   color: T_MUTED,
-                  background: "#1a1a1a",
-                  border: "1px solid rgba(255,255,255,0.08)",
+                  background: "var(--surface-2)",
+                  border: "1px solid var(--border)",
                   borderRadius: 9999,
                   padding: "4px 10px",
                 }}

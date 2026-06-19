@@ -4,12 +4,12 @@ import { useState } from "react";
 import type { EventTimeBlock, EventItem, TimeBlock, DashboardFilter } from "../../types/dashboard";
 
 /* ── Design tokens ────────────────────────────────────────────── */
-const T_PRIMARY = "#f2f2f2";
-const T_MUTED   = "#9a9a9a";
-const T_DIM     = "#4e4e4e";
-const BAR_PEAK  = "#e8e8e8";
-const BAR_MID   = "#2e2e2e";
-const BAR_REST  = "#1e1e1e";
+const T_PRIMARY = "var(--t1)";
+const T_MUTED   = "var(--t2)";
+const T_DIM     = "var(--t3)";
+const BAR_PEAK  = "var(--chip-bg)";
+const BAR_MID   = "var(--faint)";
+const BAR_REST  = "var(--surface-2)";
 
 /* ── Bar inner content (shared between interactive and static bars) ── */
 function BarContent({
@@ -189,7 +189,7 @@ function EventList({
             padding: "11px 0",
             borderBottom:
               idx < filtered.length - 1
-                ? "1px solid rgba(255,255,255,0.05)"
+                ? "1px solid var(--line)"
                 : "none",
           }}
         >
@@ -218,9 +218,9 @@ function EventList({
             >
               {ev.title}
             </div>
-            <div style={{ fontSize: 11, color: "#555" }}>
+            <div style={{ fontSize: 11, color: "var(--t3)" }}>
               {ev.venue}
-              <span style={{ margin: "0 4px", color: "#333" }}>·</span>
+              <span style={{ margin: "0 4px", color: "var(--t4)" }}>·</span>
               {ev.area}
             </div>
           </div>
@@ -258,8 +258,8 @@ export function EventsByTimePreview({
       aria-label={`Events by time — ${total} events ${filterLabel[filter]}. Tap to expand.`}
       style={{
         width: "100%",
-        background: "#1c1c1c",
-        border: "1px solid rgba(255,255,255,0.08)",
+        background: "var(--surface)",
+        border: "1px solid var(--border)",
         borderRadius: 18,
         padding: "15px 15px 13px",
         cursor: "pointer",
@@ -279,7 +279,7 @@ export function EventsByTimePreview({
           style={{
             fontSize: 10,
             fontWeight: 600,
-            color: "#4e4e4e",
+            color: "var(--t3)",
             letterSpacing: 1.8,
             textTransform: "uppercase" as const,
           }}
@@ -350,7 +350,7 @@ export function EventsByTimeModal({
             alignItems: "center",
             justifyContent: "space-between",
             padding: "14px 0 10px",
-            borderTop: "1px solid rgba(255,255,255,0.05)",
+            borderTop: "1px solid var(--line)",
             marginTop: 8,
           }}
         >
@@ -367,8 +367,8 @@ export function EventsByTimeModal({
               fontSize: 11,
               fontWeight: 600,
               color: T_MUTED,
-              background: "#1a1a1a",
-              border: "1px solid rgba(255,255,255,0.07)",
+              background: "var(--surface-2)",
+              border: "1px solid var(--border)",
               borderRadius: 9999,
               padding: "3px 10px",
             }}

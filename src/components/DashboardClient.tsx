@@ -24,18 +24,18 @@ import { TransitDisruptionPreview, TransitDisruptionModal } from "./dashboard/Tr
 /* ══════════════════════════════════════════════════════════════
    DESIGN TOKENS
 ══════════════════════════════════════════════════════════════ */
-const BG        = "#131313";
-const SURFACE   = "#1c1c1c";
-const SURFACE2  = "#222222";
-const SURFACE3  = "#2a2a2a";
+const BG        = "var(--bg)";
+const SURFACE   = "var(--surface)";
+const SURFACE2  = "var(--surface-3)";
+const SURFACE3  = "var(--surface-3)";
 
-const LINE      = "rgba(255,255,255,0.05)";
-const BORDER    = "rgba(255,255,255,0.08)";
-const BORDER_M  = "rgba(255,255,255,0.12)";
+const LINE      = "var(--line)";
+const BORDER    = "var(--border)";
+const BORDER_M  = "var(--border-strong)";
 
-const T1        = "#f2f2f2";
-const T2        = "#9a9a9a";
-const T3        = "#4e4e4e";
+const T1        = "var(--t1)";
+const T2        = "var(--t2)";
+const T3        = "var(--t3)";
 
 /* ══════════════════════════════════════════════════════════════
    ICONS
@@ -147,8 +147,8 @@ function SegmentedFilter({
             style={{
               padding: "6px 16px", borderRadius: 9999, fontSize: 13,
               fontWeight: isActive ? 700 : 500,
-              background: isActive ? "#e8e8e8" : "transparent",
-              color: isActive ? "#0d0d0d" : T3,
+              background: isActive ? "var(--chip-bg)" : "transparent",
+              color: isActive ? "var(--chip-text)" : T3,
               border: "none", cursor: "pointer",
               letterSpacing: isActive ? -0.1 : 0,
               transition: "background 120ms, color 120ms",
@@ -208,7 +208,7 @@ function MiniCalendar({ events, onOpen }: { events: CalEvent[]; onOpen: () => vo
             const dots = d ? (dotsByDate[d] ?? []).slice(0, 3) : [];
             return (
               <div key={di} style={{ display: "flex", flexDirection: "column", alignItems: "center", paddingBottom: 1 }}>
-                <div style={{ width: 20, height: 20, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", background: d === todayDate ? T1 : "transparent", fontSize: 9.5, fontWeight: d === todayDate ? 700 : 400, color: d === todayDate ? "#0d0d0d" : d ? "#7a7a7a" : "transparent" }}>
+                <div style={{ width: 20, height: 20, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", background: d === todayDate ? T1 : "transparent", fontSize: 9.5, fontWeight: d === todayDate ? 700 : 400, color: d === todayDate ? "var(--chip-text)" : d ? "var(--t3)" : "transparent" }}>
                   {d ?? ""}
                 </div>
                 <div style={{ height: 5, display: "flex", alignItems: "center", gap: 1.5, justifyContent: "center" }}>
@@ -227,7 +227,7 @@ function LiveCard({ total, recent }: { total: number; recent: number }) {
   return (
     <div style={{ background: SURFACE, borderRadius: 18, border: `1px solid ${BORDER}`, padding: "15px 15px 12px", flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
-        <span style={{ width: 6, height: 6, borderRadius: "50%", background: "rgba(255,255,255,0.3)", flexShrink: 0 }} />
+        <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--border-strong)", flexShrink: 0 }} />
         <span style={{ fontSize: 10, fontWeight: 600, color: T3, letterSpacing: 1.5, textTransform: "uppercase" }}>Live right now</span>
       </div>
       <div style={{ fontSize: 46, fontWeight: 800, color: T1, lineHeight: 1, marginBottom: 6, letterSpacing: -2.5 }}>{total}</div>
@@ -398,8 +398,8 @@ function CalendarModal({ events, onClose }: { events: CalEvent[]; onClose: () =>
               const dots = (d && dotsByDate[d]) ? dotsByDate[d].slice(0, 3) : [];
               return (
                 <div key={di} onClick={() => d && setSelected(d)} style={{ display: "flex", flexDirection: "column", alignItems: "center", cursor: d ? "pointer" : "default" }}>
-                  <div style={{ width: 36, height: 36, borderRadius: 9999, display: "flex", alignItems: "center", justifyContent: "center", background: sel ? SURFACE2 : "transparent", border: sel ? `1px solid ${BORDER_M}` : todayCell ? `1px solid rgba(255,255,255,0.2)` : "none" }}>
-                    <span style={{ fontSize: 15, fontWeight: sel || todayCell ? 700 : 400, color: d ? (sel || todayCell ? T1 : "#666") : "transparent" }}>{d ?? ""}</span>
+                  <div style={{ width: 36, height: 36, borderRadius: 9999, display: "flex", alignItems: "center", justifyContent: "center", background: sel ? SURFACE2 : "transparent", border: sel ? `1px solid ${BORDER_M}` : todayCell ? `1px solid var(--border-strong)` : "none" }}>
+                    <span style={{ fontSize: 15, fontWeight: sel || todayCell ? 700 : 400, color: d ? (sel || todayCell ? T1 : "var(--t3)") : "transparent" }}>{d ?? ""}</span>
                   </div>
                   <div style={{ height: 8, display: "flex", alignItems: "center", gap: 2, justifyContent: "center", marginTop: 1 }}>
                     {dots.map((col, ci) => <div key={ci} style={{ width: 5, height: 5, borderRadius: "50%", background: col }} />)}

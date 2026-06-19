@@ -5,6 +5,7 @@ import { MapContainer, TileLayer, Marker, useMap, CircleMarker, useMapEvents } f
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import type { Pin, PinCategory } from "../types/pin";
+import { useTheme } from "../lib/theme";
 
 interface LeafletMapProps {
   pins: Pin[];
@@ -73,6 +74,11 @@ function ZoomHandler({ onZooming }: { onZooming: (v: boolean) => void }) {
 
 function LeafletMap({ pins, selectedPin, onPinSelect }: LeafletMapProps) {
   const [isZooming, setIsZooming] = useState(false);
+  const { theme } = useTheme();
+  const tileUrl =
+    theme === "light"
+      ? "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+      : "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
 
   const markers = useMemo(() => {
     return pins.map((pin) => (
@@ -115,7 +121,8 @@ function LeafletMap({ pins, selectedPin, onPinSelect }: LeafletMapProps) {
       <SizeInvalidator />
       <ZoomHandler onZooming={setIsZooming} />
       <TileLayer
-        url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+        key={theme}
+        url={tileUrl}
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
         maxZoom={19}
         subdomains="abcd"

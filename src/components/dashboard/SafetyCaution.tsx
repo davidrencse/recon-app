@@ -3,9 +3,9 @@
 import type { SafetyItem, CautionType } from "../../types/dashboard";
 
 /* ── Design tokens ────────────────────────────────────────────── */
-const T_PRIMARY = "#f2f2f2";
-const T_MUTED   = "#9a9a9a";
-const T_DIM     = "#4e4e4e";
+const T_PRIMARY = "var(--t1)";
+const T_MUTED   = "var(--t2)";
+const T_DIM     = "var(--t3)";
 
 /* ── Caution type icons ───────────────────────────────────────── */
 function CautionIcon({ type }: { type: CautionType }) {
@@ -49,9 +49,9 @@ function CautionIcon({ type }: { type: CautionType }) {
 
 /* ── Severity dot ─────────────────────────────────────────────── */
 const SEVERITY_DOT: Record<string, string> = {
-  high:   "#c0c0c0",
-  medium: "#666",
-  low:    "#333",
+  high:   "var(--t1)",
+  medium: "var(--t3)",
+  low:    "var(--t4)",
 };
 
 /* ── Single caution row (full modal version) ──────────────────── */
@@ -63,7 +63,7 @@ function CautionRow({ item, last }: { item: SafetyItem; last?: boolean }) {
         alignItems: "flex-start",
         gap: 12,
         padding: "13px 0",
-        borderBottom: last ? "none" : "1px solid rgba(255,255,255,0.05)",
+        borderBottom: last ? "none" : "1px solid var(--line)",
       }}
     >
       {/* Icon container */}
@@ -72,8 +72,8 @@ function CautionRow({ item, last }: { item: SafetyItem; last?: boolean }) {
           width: 32,
           height: 32,
           borderRadius: 9,
-          background: "#1a1a1a",
-          border: "1px solid rgba(255,255,255,0.08)",
+          background: "var(--surface-2)",
+          border: "1px solid var(--border)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -137,7 +137,7 @@ function CautionRow({ item, last }: { item: SafetyItem; last?: boolean }) {
             fontWeight: 600,
             color: T_DIM,
             background: "none",
-            border: "1px solid rgba(255,255,255,0.08)",
+            border: "1px solid var(--border)",
             borderRadius: 6,
             padding: "5px 10px",
             cursor: "pointer",
@@ -167,8 +167,8 @@ export function SafetyCautionPreview({
       aria-label={`Safety caution — ${items.length} active items. Tap to expand.`}
       style={{
         width: "100%",
-        background: "#1c1c1c",
-        border: "1px solid rgba(255,255,255,0.08)",
+        background: "var(--surface)",
+        border: "1px solid var(--border)",
         borderRadius: 18,
         padding: "14px 14px 12px",
         cursor: "pointer",
@@ -190,7 +190,7 @@ export function SafetyCautionPreview({
             style={{
               fontSize: 10,
               fontWeight: 700,
-              color: "#555",
+              color: "var(--t3)",
               letterSpacing: 1.8,
               textTransform: "uppercase" as const,
             }}
@@ -202,9 +202,9 @@ export function SafetyCautionPreview({
           style={{
             fontSize: 11,
             fontWeight: 600,
-            color: highCount > 0 ? "#aaa" : T_DIM,
-            background: "#1a1a1a",
-            border: "1px solid rgba(255,255,255,0.08)",
+            color: highCount > 0 ? "var(--t2)" : T_DIM,
+            background: "var(--surface-2)",
+            border: "1px solid var(--border)",
             borderRadius: 9999,
             padding: "2px 9px",
           }}
@@ -284,7 +284,7 @@ export function SafetyCautionModal({ items }: { items: SafetyItem[] }) {
           style={{
             width: 1,
             height: 36,
-            background: "rgba(255,255,255,0.08)",
+            background: "var(--border)",
           }}
         />
         <div>
@@ -293,9 +293,9 @@ export function SafetyCautionModal({ items }: { items: SafetyItem[] }) {
         </div>
         {highCount > 0 && (
           <>
-            <div style={{ width: 1, height: 36, background: "rgba(255,255,255,0.08)" }} />
+            <div style={{ width: 1, height: 36, background: "var(--border)" }} />
             <div>
-              <div style={{ fontSize: 13, fontWeight: 600, color: "#aaa" }}>{highCount} high</div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: "var(--t2)" }}>{highCount} high</div>
               <div style={{ fontSize: 12, color: T_DIM }}>priority</div>
             </div>
           </>

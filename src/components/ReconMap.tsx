@@ -9,8 +9,8 @@ import { isSaved, toggleSavedPin } from "../lib/savedPins";
 const LeafletMap = dynamic(() => import("./LeafletMap"), {
   ssr: false,
   loading: () => (
-    <div style={{ width: "100%", height: "100%", background: "#0a0a0a", display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <span style={{ color: "#333", fontSize: 13 }}>Loading map…</span>
+    <div style={{ width: "100%", height: "100%", background: "var(--bg-deep)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <span style={{ color: "var(--t4)", fontSize: 13 }}>Loading map…</span>
     </div>
   ),
 });
@@ -103,9 +103,9 @@ const PinPopup = memo(function PinPopup({ pin, onClose }: PinPopupProps) {
         display: "flex",
         overflow: "hidden",
         borderRadius: 14,
-        background: "rgba(14,14,14,0.96)",
-        border: "1px solid rgba(255,255,255,0.08)",
-        boxShadow: "0 12px 48px rgba(0,0,0,0.85)",
+        background: "var(--surface)",
+        border: "1px solid var(--border)",
+        boxShadow: "0 12px 48px var(--shadow)",
         backdropFilter: "blur(16px)",
       }}
     >
@@ -116,27 +116,27 @@ const PinPopup = memo(function PinPopup({ pin, onClose }: PinPopupProps) {
           <span style={{
             display: "flex", alignItems: "center", gap: 4,
             fontSize: 10, fontWeight: 700, letterSpacing: 0.4,
-            color: "#fff",
-            background: "rgba(255,255,255,0.1)",
+            color: "var(--t1)",
+            background: "var(--border)",
             padding: "2px 8px", borderRadius: 9999,
           }}>
             <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#ef4444", flexShrink: 0, display: "inline-block" }} />
             LIVE
           </span>
-          <span style={{ fontSize: 11, color: "#555" }}>{relativeTime(pin.createdAt)}</span>
+          <span style={{ fontSize: 11, color: "var(--t3)" }}>{relativeTime(pin.createdAt)}</span>
         </div>
 
         {/* title */}
-        <div style={{ fontSize: 15, fontWeight: 700, color: "#f0f0f0", lineHeight: 1.25, marginBottom: 7 }}>
+        <div style={{ fontSize: 15, fontWeight: 700, color: "var(--t1)", lineHeight: 1.25, marginBottom: 7 }}>
           {cardTitle(pin.text)}
         </div>
 
         {/* venue */}
         <div style={{ display: "flex", alignItems: "center", gap: 4, marginBottom: 4 }}>
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>
           </svg>
-          <span style={{ fontSize: 12, color: "#666", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+          <span style={{ fontSize: 12, color: "var(--t3)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
             {pin.placeName}
           </span>
         </div>
@@ -145,7 +145,7 @@ const PinPopup = memo(function PinPopup({ pin, onClose }: PinPopupProps) {
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
           <span
             onClick={openPost}
-            style={{ fontSize: 11, color: "#444", cursor: "pointer", textDecoration: "underline", textDecorationColor: "#333" }}
+            style={{ fontSize: 11, color: "var(--t3)", cursor: "pointer", textDecoration: "underline", textDecorationColor: "var(--t4)" }}
           >
             View post
           </span>
@@ -156,9 +156,9 @@ const PinPopup = memo(function PinPopup({ pin, onClose }: PinPopupProps) {
             style={{
               display: "flex", alignItems: "center", gap: 5,
               fontSize: 11, fontWeight: 600, fontFamily: "inherit",
-              color: saved ? "#0a0a0a" : "#cfcfcf",
-              background: saved ? "#e8e8e8" : "rgba(255,255,255,0.08)",
-              border: `1px solid ${saved ? "transparent" : "rgba(255,255,255,0.12)"}`,
+              color: saved ? "var(--bg-deep)" : "var(--t1)",
+              background: saved ? "var(--chip-bg)" : "var(--border)",
+              border: `1px solid ${saved ? "transparent" : "var(--border-strong)"}`,
               borderRadius: 9999, padding: "5px 11px", cursor: "pointer",
             }}
           >
@@ -181,9 +181,9 @@ const PinPopup = memo(function PinPopup({ pin, onClose }: PinPopupProps) {
           width: 26,
           height: 26,
           borderRadius: "50%",
-          background: "rgba(255,255,255,0.08)",
-          border: "1px solid rgba(255,255,255,0.12)",
-          color: "#777",
+          background: "var(--border)",
+          border: "1px solid var(--border-strong)",
+          color: "var(--t3)",
           fontSize: 12,
           cursor: "pointer",
           display: "flex",
@@ -277,22 +277,22 @@ export default function ReconMap() {
     }}>
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "4px 16px 10px", flexShrink: 0 }}>
-          <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(22,22,22,0.95)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+          <div style={{ width: 40, height: 40, borderRadius: 12, background: "var(--surface)", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
             <ReconLogo />
           </div>
           <div style={{ flex: 1, display: "flex", justifyContent: "center" }}>
-            <button style={{ display: "flex", alignItems: "center", gap: 5, color: "#fff", fontSize: 16, fontWeight: 600, background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}>
+            <button style={{ display: "flex", alignItems: "center", gap: 5, color: "var(--t1)", fontSize: 16, fontWeight: 600, background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}>
               <IconMapPin />Vancouver<IconChevron />
             </button>
           </div>
-          <button aria-label="Notifications" style={{ width: 40, height: 40, borderRadius: 9999, background: "rgba(22,22,22,0.95)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.7)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
+          <button aria-label="Notifications" style={{ width: 40, height: 40, borderRadius: 9999, background: "var(--surface)", border: "1px solid var(--border)", color: "var(--t2)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
             <IconBell />
           </button>
         </div>
 
         {/* Search */}
         <div style={{ padding: "0 16px 10px", flexShrink: 0 }}>
-          <label style={{ display: "flex", alignItems: "center", gap: 10, height: 46, padding: "0 16px", borderRadius: 9999, background: "rgba(18,18,18,0.95)", border: "1px solid rgba(255,255,255,0.07)", color: "#555" }}>
+          <label style={{ display: "flex", alignItems: "center", gap: 10, height: 46, padding: "0 16px", borderRadius: 9999, background: "var(--surface-2)", border: "1px solid var(--border)", color: "var(--t3)" }}>
             <IconSearch />
             <input
               value={searchQuery}
@@ -304,7 +304,7 @@ export default function ReconMap() {
                 background: "transparent",
                 border: "none",
                 outline: "none",
-                color: "#f0f0f0",
+                color: "var(--t1)",
                 fontSize: 14,
                 fontFamily: "inherit",
               }}
@@ -316,7 +316,7 @@ export default function ReconMap() {
                 style={{
                   background: "none",
                   border: "none",
-                  color: "#777",
+                  color: "var(--t3)",
                   cursor: "pointer",
                   flexShrink: 0,
                   fontSize: 18,
@@ -342,9 +342,9 @@ export default function ReconMap() {
                   display: "flex", alignItems: "center", gap: 5,
                   padding: "7px 12px", borderRadius: 9999,
                   fontSize: 13, fontWeight: active ? 600 : 500,
-                  background: active ? "#e8e8e8" : "rgba(18,18,18,0.9)",
-                  color: active ? "#0a0a0a" : "#888",
-                  border: active ? "none" : "1px solid rgba(255,255,255,0.08)",
+                  background: active ? "var(--chip-bg)" : "var(--surface-2)",
+                  color: active ? "var(--bg-deep)" : "var(--t2)",
+                  border: active ? "none" : "1px solid var(--border)",
                   cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0,
                   fontFamily: "inherit",
                 }}
@@ -359,7 +359,7 @@ export default function ReconMap() {
         {/* Map + overlays */}
         <div style={{ flex: 1, minHeight: 0, position: "relative" }}>
           {(searchQuery.trim() || activeFilter !== "all") && !loading && (
-            <div style={{ position: "absolute", top: 12, left: 12, zIndex: 500, background: "rgba(8,8,8,0.88)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 9999, padding: "6px 10px", color: "#aaa", fontSize: 11 }}>
+            <div style={{ position: "absolute", top: 12, left: 12, zIndex: 500, background: "var(--overlay)", border: "1px solid var(--border)", borderRadius: 9999, padding: "6px 10px", color: "var(--t2)", fontSize: 11 }}>
               {visiblePins.length} result{visiblePins.length === 1 ? "" : "s"}
             </div>
           )}
@@ -371,15 +371,15 @@ export default function ReconMap() {
           />
 
           {loading && (
-            <div style={{ position: "absolute", inset: 0, zIndex: 600, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(10,10,10,0.7)", backdropFilter: "blur(4px)" }}>
-              <span style={{ color: "#888", fontSize: 13 }}>Loading pins…</span>
+            <div style={{ position: "absolute", inset: 0, zIndex: 600, display: "flex", alignItems: "center", justifyContent: "center", background: "var(--overlay)", backdropFilter: "blur(4px)" }}>
+              <span style={{ color: "var(--t2)", fontSize: 13 }}>Loading pins…</span>
             </div>
           )}
 
           {!loading && fetchError && (
-            <div style={{ position: "absolute", inset: 0, zIndex: 600, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, background: "rgba(10,10,10,0.7)", backdropFilter: "blur(4px)" }}>
-              <span style={{ color: "#888", fontSize: 13 }}>Could not load pins.</span>
-              <button onClick={fetchPins} style={{ fontSize: 12, color: "#555", background: "none", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 9999, padding: "5px 14px", cursor: "pointer", fontFamily: "inherit" }}>
+            <div style={{ position: "absolute", inset: 0, zIndex: 600, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, background: "var(--overlay)", backdropFilter: "blur(4px)" }}>
+              <span style={{ color: "var(--t2)", fontSize: 13 }}>Could not load pins.</span>
+              <button onClick={fetchPins} style={{ fontSize: 12, color: "var(--t3)", background: "none", border: "1px solid var(--border)", borderRadius: 9999, padding: "5px 14px", cursor: "pointer", fontFamily: "inherit" }}>
                 Retry
               </button>
             </div>
@@ -387,8 +387,8 @@ export default function ReconMap() {
 
           {!loading && !fetchError && pins.length === 0 && (
             <div style={{ position: "absolute", inset: 0, zIndex: 600, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6, pointerEvents: "none" }}>
-              <span style={{ color: "#555", fontSize: 13, fontWeight: 500 }}>No live pins available yet.</span>
-              <span style={{ color: "#3a3a3a", fontSize: 12 }}>Backend connected. Waiting for city activity.</span>
+              <span style={{ color: "var(--t3)", fontSize: 13, fontWeight: 500 }}>No live pins available yet.</span>
+              <span style={{ color: "var(--t4)", fontSize: 12 }}>Backend connected. Waiting for city activity.</span>
             </div>
           )}
 

@@ -4,16 +4,16 @@ import { useState } from "react";
 import type { CategoryStat, CategoryKey } from "../../types/dashboard";
 
 /* ── Design tokens ────────────────────────────────────────────── */
-const T_PRIMARY = "#f2f2f2";
-const T_MUTED   = "#9a9a9a";
-const T_DIM     = "#4e4e4e";
+const T_PRIMARY = "var(--t1)";
+const T_MUTED   = "var(--t2)";
+const T_DIM     = "var(--t3)";
 
 /* ── Category colors (monochrome shades) ──────────────────────── */
 const CAT_COLORS: Record<CategoryKey, string> = {
-  trending:  "#e0e0e0",
-  nightlife: "#a0a0a0",
-  cafes:     "#606060",
-  popups:    "#303030",
+  trending:  "var(--t1)",
+  nightlife: "var(--t2)",
+  cafes:     "var(--t3)",
+  popups:    "var(--t4)",
 };
 
 /* ── Donut chart ─────────────────────────────────────────────── */
@@ -79,7 +79,7 @@ function DonutChart({
         cy={center}
         r={radius}
         fill="none"
-        stroke="#1a1a1a"
+        stroke="var(--surface-2)"
         strokeWidth={strokeWidth}
       />
 
@@ -105,7 +105,7 @@ function DonutChart({
         cx={center}
         cy={center}
         r={radius - strokeWidth / 2 - 4}
-        fill="#080808"
+        fill="var(--bg-deep)"
       />
 
       {/* Center text */}
@@ -238,7 +238,7 @@ function CategoryDetail({ stat }: { stat: CategoryStat }) {
     <div
       style={{
         padding: "14px 0",
-        borderTop: "1px solid rgba(255,255,255,0.05)",
+        borderTop: "1px solid var(--line)",
       }}
     >
       <div
@@ -265,8 +265,8 @@ function CategoryDetail({ stat }: { stat: CategoryStat }) {
           style={{
             fontSize: 11,
             color: T_DIM,
-            background: "#1a1a1a",
-            border: "1px solid rgba(255,255,255,0.08)",
+            background: "var(--surface-2)",
+            border: "1px solid var(--border)",
             borderRadius: 9999,
             padding: "2px 8px",
             marginLeft: "auto",
@@ -310,8 +310,8 @@ export function CategoryBreakdownPreview({
       aria-label={`Category breakdown — ${total} total pins. Tap to expand.`}
       style={{
         width: "100%",
-        background: "#1c1c1c",
-        border: "1px solid rgba(255,255,255,0.08)",
+        background: "var(--surface)",
+        border: "1px solid var(--border)",
         borderRadius: 18,
         padding: "14px 14px 12px",
         cursor: "pointer",
@@ -331,7 +331,7 @@ export function CategoryBreakdownPreview({
           style={{
             fontSize: 10,
             fontWeight: 700,
-            color: "#555",
+            color: "var(--t3)",
             letterSpacing: 1.8,
             textTransform: "uppercase" as const,
           }}
