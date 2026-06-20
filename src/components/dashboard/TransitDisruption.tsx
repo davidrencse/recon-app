@@ -78,7 +78,7 @@ function RouteLine({
                 cx={s.x}
                 cy={LINE_Y}
                 r={AFF_R}
-                fill="var(--surface-2)"
+                style={{ fill: "var(--surface-2)" }}
                 stroke={cfg.dotColor}
                 strokeWidth={1.5}
               />
@@ -95,8 +95,7 @@ function RouteLine({
               cx={s.x}
               cy={LINE_Y}
               r={DOT_R}
-              fill="var(--surface-2)"
-              stroke="var(--t4)"
+              style={{ fill: "var(--surface-2)", stroke: "var(--t4)" }}
               strokeWidth={1}
             />
           )}

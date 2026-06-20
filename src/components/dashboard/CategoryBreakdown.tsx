@@ -79,7 +79,7 @@ function DonutChart({
         cy={center}
         r={radius}
         fill="none"
-        stroke="var(--surface-2)"
+        style={{ stroke: "var(--surface-2)" }}
         strokeWidth={strokeWidth}
       />
 
@@ -105,7 +105,7 @@ function DonutChart({
         cx={center}
         cy={center}
         r={radius - strokeWidth / 2 - 4}
-        fill="var(--bg-deep)"
+        style={{ fill: "var(--bg-deep)" }}
       />
 
       {/* Center text */}

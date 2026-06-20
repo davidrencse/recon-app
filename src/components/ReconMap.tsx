@@ -133,7 +133,7 @@ const PinPopup = memo(function PinPopup({ pin, onClose }: PinPopupProps) {
 
         {/* venue */}
         <div style={{ display: "flex", alignItems: "center", gap: 4, marginBottom: 4 }}>
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" style={{ stroke: "var(--t3)" }} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>
           </svg>
           <span style={{ fontSize: 12, color: "var(--t3)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>

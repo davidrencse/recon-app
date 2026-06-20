@@ -162,7 +162,7 @@ function HourlyRow({ forecast }: { forecast: WeatherData["hourlyForecast"] }) {
 function ImpactArrow({ impact }: { impact: ImpactLevel }) {
   if (impact === "positive") {
     return (
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--t1)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-label="Increases">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style={{ stroke: "var(--t1)" }} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-label="Increases">
         <line x1="12" y1="19" x2="12" y2="5" />
         <polyline points="5 12 12 5 19 12" />
       </svg>
@@ -170,14 +170,14 @@ function ImpactArrow({ impact }: { impact: ImpactLevel }) {
   }
   if (impact === "negative") {
     return (
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-label="Reduces">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style={{ stroke: "var(--t3)" }} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-label="Reduces">
         <line x1="12" y1="5" x2="12" y2="19" />
         <polyline points="19 12 12 19 5 12" />
       </svg>
     );
   }
   return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-label="No change">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style={{ stroke: "var(--t3)" }} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-label="No change">
       <line x1="5" y1="12" x2="19" y2="12" />
     </svg>
   );

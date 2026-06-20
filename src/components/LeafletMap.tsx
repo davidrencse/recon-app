@@ -92,21 +92,22 @@ function LeafletMap({ pins, selectedPin, onPinSelect }: LeafletMapProps) {
   }, [pins, selectedPin?.postId, onPinSelect]);
 
   const canvasMarkers = useMemo(() => {
+    const selColor = theme === "light" ? "#18181b" : "#fff";
     return pins.map((pin) => (
       <CircleMarker
         key={pin.postId}
         center={[pin.lat, pin.lng]}
         radius={selectedPin?.postId === pin.postId ? 6 : 4}
         pathOptions={{
-          color: selectedPin?.postId === pin.postId ? "#fff" : "#999",
-          fillColor: selectedPin?.postId === pin.postId ? "#fff" : "#999",
+          color: selectedPin?.postId === pin.postId ? selColor : "#999",
+          fillColor: selectedPin?.postId === pin.postId ? selColor : "#999",
           weight: 1,
           fillOpacity: 1,
         }}
         eventHandlers={{ click: () => onPinSelect(pin) }}
       />
     ));
-  }, [pins, selectedPin?.postId, onPinSelect]);
+  }, [pins, selectedPin?.postId, onPinSelect, theme]);
 
   return (
     <MapContainer

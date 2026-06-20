@@ -82,7 +82,7 @@ function MockQR() {
   return (
     <svg width={cols*SZ} height={rows*SZ} viewBox={`0 0 ${cols*SZ} ${rows*SZ}`} style={{ display:"block" }}>
       {pattern.map((row, ri) => [...row].map((cell, ci) =>
-        cell === "1" ? <rect key={`${ri}-${ci}`} x={ci*SZ} y={ri*SZ} width={SZ} height={SZ} fill="var(--t2)"/> : null
+        cell === "1" ? <rect key={`${ri}-${ci}`} x={ci*SZ} y={ri*SZ} width={SZ} height={SZ} style={{ fill: "var(--t2)" }}/> : null
       ))}
     </svg>
   );

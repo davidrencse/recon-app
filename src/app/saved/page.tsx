@@ -43,7 +43,7 @@ function EmptyState() {
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", padding: "56px 24px 24px" }}>
       <div style={{ width: 40, height: 40, borderRadius: "50%", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{ stroke: "var(--t3)" }} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>
       </div>
       <p style={{ fontSize: 15, fontWeight: 600, color: "var(--t1)", marginBottom: 8 }}>Nothing saved yet</p>
       <p style={{ fontSize: 13, color: "var(--t3)", lineHeight: 1.6, marginBottom: 24 }}>Tap a pin on the map and save places you want to check later.</p>
@@ -67,7 +67,7 @@ function SavedRow({ pin, onRemove }: { pin: Pin; onRemove: (id: string) => void 
           {cleanText(pin.text).slice(0, 110) || pin.placeName}
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 4, marginBottom: 4 }}>
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" style={{ stroke: "var(--t3)" }} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
           <span style={{ fontSize: 12, color: "var(--t3)" }}>{pin.placeName}{pin.neighborhood ? ` · ${pin.neighborhood}` : ""}</span>
         </div>
         {pin.postUrl && (
