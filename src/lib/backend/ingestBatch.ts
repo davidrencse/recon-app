@@ -14,7 +14,7 @@ import type { IngestBatch, IngestPost, PostRejection, BatchSummary } from "@/typ
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const VALID_SOURCES  = ["x"] as const;
+const VALID_SOURCES  = ["x", "reddit"] as const;
 const VALID_REGIONS  = ["metro_vancouver"] as const;
 const MAX_PER_CATEGORY = 50;
 
