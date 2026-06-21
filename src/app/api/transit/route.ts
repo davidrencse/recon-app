@@ -4,6 +4,9 @@ import type { TransitRoute, DelayLevel } from "@/types/dashboard";
 export const dynamic = "force-dynamic";
 export const revalidate = 300;
 
+// Edge-cache the response so repeat dashboard loads hit the CDN, not the function.
+const CACHE_HDR = "public, s-maxage=300, stale-while-revalidate=600";
+
 /**
  * TransLink service alerts.
  *
@@ -27,7 +30,7 @@ export async function GET() {
   const key = process.env.TRANSLINK_API_KEY;
   if (!key) {
     // No key configured — no disruptions to report.
-    return NextResponse.json({ routes: [] as TransitRoute[] });
+    return NextResponse.json({ routes: [] as TransitRoute[] }, { headers: { "Cache-Control": CACHE_HDR } });
   }
 
   try {
@@ -63,8 +66,8 @@ export async function GET() {
       };
     });
 
-    return NextResponse.json({ routes });
+    return NextResponse.json({ routes }, { headers: { "Cache-Control": CACHE_HDR } });
   } catch {
-    return NextResponse.json({ routes: [] as TransitRoute[] });
+    return NextResponse.json({ routes: [] as TransitRoute[] }, { headers: { "Cache-Control": CACHE_HDR } });
   }
 }

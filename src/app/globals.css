@@ -95,10 +95,11 @@ body {
   font-family: inherit;
 }
 
-/* Leaflet */
-.leaflet-container { background-color: var(--bg) !important; }
-.leaflet-tile { background-color: transparent !important; transition: none !important; }
-.leaflet-tile-pane img.leaflet-tile { background-color: transparent !important; }
+/* MapLibre GL */
+.maplibregl-map { background-color: var(--bg); }
+.maplibregl-canvas { outline: none; }
+.maplibregl-ctrl-attrib,
+.maplibregl-ctrl-logo { display: none !important; }
 
 /* Mobile specific overrides */
 @media (max-width: 768px) {

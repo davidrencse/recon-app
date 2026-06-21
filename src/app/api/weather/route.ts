@@ -12,6 +12,12 @@ export const revalidate = 600;
 
 const VANCOUVER = { lat: 49.2827, lng: -123.1207 };
 
+// Edge-cache the JSON response so repeat dashboard loads (and other users) are
+// served from the CDN instead of re-invoking the function. Stale data served
+// while a single background refresh updates the cache.
+const CACHE_OK = "public, s-maxage=600, stale-while-revalidate=1200";
+const CACHE_FALLBACK = "public, s-maxage=60, stale-while-revalidate=120";
+
 /** WMO weather interpretation code → our condition code + label. */
 function mapWmo(code: number): { code: WeatherConditionCode; condition: string } {
   if (code === 0) return { code: "clear", condition: "Clear" };
@@ -79,7 +85,7 @@ export async function GET() {
       `&timezone=America%2FVancouver&forecast_days=2`;
 
     const res = await fetch(url, { next: { revalidate: 600 } });
-    if (!res.ok) return NextResponse.json(FALLBACK);
+    if (!res.ok) return NextResponse.json(FALLBACK, { headers: { "Cache-Control": CACHE_FALLBACK } });
 
     const j = await res.json();
     const cur = j.current ?? {};
@@ -118,8 +124,8 @@ export async function GET() {
       categoryImpacts: buildCategoryImpacts(isWet),
     };
 
-    return NextResponse.json(data);
+    return NextResponse.json(data, { headers: { "Cache-Control": CACHE_OK } });
   } catch {
-    return NextResponse.json(FALLBACK);
+    return NextResponse.json(FALLBACK, { headers: { "Cache-Control": CACHE_FALLBACK } });
   }
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import type { Pin, PinCategory } from "../types/pin";
 import { getPins } from "../lib/getPins";
 
@@ -116,11 +116,13 @@ export default function HomeScreen() {
   const [loading, setLoading]         = useState(true);
   const [error, setError]             = useState<string | null>(null);
 
-  const loadPins = useCallback(async (category: PinCategory) => {
+  // Fetch all categories once and filter client-side — switching category tabs
+  // is a pure in-memory filter, not a network round-trip.
+  const loadPins = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await getPins({ category, limit: 50 });
+      const data = await getPins({ limit: 200 });
       setPins(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load");
@@ -129,14 +131,16 @@ export default function HomeScreen() {
     }
   }, []);
 
-  useEffect(() => { loadPins(active); }, [active, loadPins]);
+  useEffect(() => { loadPins(); }, [loadPins]);
 
-  const visible = searchQuery.trim()
-    ? pins.filter(p =>
-        p.placeName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.text.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : pins;
+  const visible = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    return pins.filter(p => {
+      if (p.category !== active) return false;
+      if (!q) return true;
+      return p.placeName.toLowerCase().includes(q) || p.text.toLowerCase().includes(q);
+    });
+  }, [pins, active, searchQuery]);
 
   return (
     <div style={{
@@ -253,7 +257,7 @@ export default function HomeScreen() {
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, padding: "40px 0" }}>
               <span style={{ color: "var(--t3)", fontSize: 13 }}>Could not load pins</span>
               <button
-                onClick={() => loadPins(active)}
+                onClick={() => loadPins()}
                 style={{ fontSize: 12, color: "var(--t3)", background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}
               >
                 Retry

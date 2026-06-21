@@ -6,7 +6,7 @@ import type { Pin, PinCategory } from "../types/pin";
 import { getPins } from "../lib/getPins";
 import { isSaved, toggleSavedPin } from "../lib/savedPins";
 
-const LeafletMap = dynamic(() => import("./LeafletMap"), {
+const MapGL = dynamic(() => import("./MapGL"), {
   ssr: false,
   loading: () => (
     <div style={{ width: "100%", height: "100%", background: "var(--bg-deep)", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -364,7 +364,7 @@ export default function ReconMap() {
             </div>
           )}
 
-          <LeafletMap
+          <MapGL
             pins={visiblePins}
             selectedPin={selectedPin}
             onPinSelect={setSelectedPin}

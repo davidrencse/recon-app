@@ -29,20 +29,43 @@ export type GetPinsOptions = {
   limit?: number;
 };
 
+// Short-lived client cache so navigating between /home, /dashboard, and the map
+// (or re-mounting components) reuses a recent response instead of re-hitting the
+// DB on every mount. In-flight requests for the same query are also deduped so
+// concurrent callers share one network round-trip.
+const TTL_MS = 15_000;
+type CacheEntry = { at: number; pins: Pin[] };
+const cache = new Map<string, CacheEntry>();
+const inflight = new Map<string, Promise<Pin[]>>();
+
 export async function getPins(opts: GetPinsOptions = {}): Promise<Pin[]> {
   const params = new URLSearchParams();
   if (opts.category) params.set("category", opts.category);
   if (opts.neighborhood) params.set("neighborhood", opts.neighborhood);
   params.set("limit", String(opts.limit ?? 200));
+  const key = params.toString();
 
-  const res = await fetch(`/api/pins?${params.toString()}`, {
-    cache: "no-store",
-  });
+  const cached = cache.get(key);
+  if (cached && Date.now() - cached.at < TTL_MS) return cached.pins;
 
-  if (!res.ok) {
-    throw new Error(`GET /api/pins failed: ${res.status}`);
+  const existing = inflight.get(key);
+  if (existing) return existing;
+
+  const promise = (async () => {
+    const res = await fetch(`/api/pins?${key}`, { cache: "no-store" });
+    if (!res.ok) {
+      throw new Error(`GET /api/pins failed: ${res.status}`);
+    }
+    const json: PinsApiResponse = await res.json();
+    const pins = json.pins.map(dbPinToPin);
+    cache.set(key, { at: Date.now(), pins });
+    return pins;
+  })();
+
+  inflight.set(key, promise);
+  try {
+    return await promise;
+  } finally {
+    inflight.delete(key);
   }
-
-  const json: PinsApiResponse = await res.json();
-  return json.pins.map(dbPinToPin);
 }
